@@ -14,6 +14,8 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// External canonical (e.g. Substack original) for cross-posted essays.
+			canonicalURL: z.string().url().optional(),
 		}),
 });
 
