@@ -1,0 +1,36 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Projects · ${SITE_TITLE}`} description="Projects by Griffin Hilly." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Projects</h1>
+			<p>Things I've built.</p>
+
+			<ul>
+				<li>
+					<a href="https://griffinhilly.github.io/open-knowledge-graph/">Open Knowledge Graph</a> —
+					an open-source prerequisite knowledge graph: 2,628 topics across 19 domains of
+					human knowledge.
+					<span>(<a href="https://github.com/griffinhilly/open-knowledge-graph">source</a>)</span>
+				</li>
+				<li>
+					<a href="https://x.com/GriffinHilly/status/2024462131135934862">NBA Draft Anti-Tanking Proposal</a> —
+					My proposed solution to the NBA's tanking issues, centered around forcing
+					lottery teams to trade picks amongst themselves and thus align incentive to win.
+					<span>(<a href="https://github.com/griffinhilly/nba-tanking-fix-simulator">source</a>)</span>
+				</li>
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
