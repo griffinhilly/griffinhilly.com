@@ -1,8 +1,17 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import EssayListItem from '../components/EssayListItem.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 4);
 ---
 
 <!doctype html>
@@ -13,17 +22,116 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<h1>Griffin Hilly</h1>
-			<p>
-				Personal site. A running list of things I'm working on and thinking about.
-			</p>
-			<ul>
-				<li><a href="/blog">Writing</a></li>
-				<li><a href="/projects">Projects</a></li>
-				<li><a href="/about">About</a></li>
-				<li><a href="https://github.com/griffinhilly">GitHub</a></li>
-			</ul>
+			<Hero
+				name="Griffin Hilly"
+				positioning="Finding my comparative advantage on an uncertain frontier."
+			/>
+
+			<!-- Projects (curated subset; full set at /projects) -->
+			<section class="block">
+				<SectionHeader title="Projects" href="/projects" linkLabel="See all →" />
+				<div class="card-grid">
+					<ProjectCard
+						title="Open Knowledge Graph"
+						href="https://griffinhilly.github.io/open-knowledge-graph/"
+					>
+						An open-source prerequisite knowledge graph: 2,628 topics across 19 domains of
+						human knowledge.
+					</ProjectCard>
+
+					<ProjectCard title="Agencyism" href="https://agencyism.org" draft={true}>
+						A philosophical framework built around agency — the capacity for, and tendency
+						toward, rational autonomy.
+					</ProjectCard>
+
+					<ProjectCard
+						title="Claude Code Synthesis"
+						href="https://github.com/griffinhilly/claude-code-synthesis"
+						draft={true}
+					>
+						Patterns and workflow for agentic software development — a synthesis of how to
+						build with Claude Code.
+					</ProjectCard>
+
+					<ProjectCard title="Canons" draft={true}>
+						Three curated reading lists — the Cosmos (229), Silicon Valley (50), and Western
+						(126) canons.
+					</ProjectCard>
+				</div>
+			</section>
+
+			<!-- Currently building -->
+			<section class="block">
+				<SectionHeader title="Currently building" />
+				<div class="card-grid">
+					<ProjectCard title="Bottom Billion and Beyond" badge="Currently building" draft={true}>
+						An atlas of development traps — interactive data visualization on the economics
+						of extreme poverty. [layered title TBD]
+					</ProjectCard>
+				</div>
+			</section>
+
+			<!-- Writing -->
+			<section class="block">
+				<SectionHeader title="Writing" href="/blog" linkLabel="All writing →" />
+				<div class="essay-list">
+					{
+						posts.map((post) => (
+							<EssayListItem
+								href={`/blog/${post.id}/`}
+								title={post.data.title}
+								description={post.data.description}
+								pubDate={post.data.pubDate}
+							/>
+						))
+					}
+				</div>
+			</section>
+
+			<!-- About blurb -->
+			<section class="block about">
+				<SectionHeader title="About" href="/about" linkLabel="More →" />
+				<p class="about-blurb">
+					Fixed income trader. Amateur philosopher. Eternal student.<br />
+					Husband to Madi Hilly. Father of two and counting. Proud Chicagoan.
+				</p>
+			</section>
 		</main>
 		<Footer />
+
+		<style>
+			main {
+				width: 960px;
+			}
+			.block {
+				margin: 0 0 3.25rem 0;
+			}
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1.25rem;
+			}
+			.essay-list {
+				display: flex;
+				flex-direction: column;
+			}
+			.about-blurb {
+				font-size: 1.1rem;
+				line-height: 1.6;
+				color: var(--text);
+				max-width: 60ch;
+			}
+			.about-blurb.placeholder {
+				color: var(--accent);
+				font-style: italic;
+				border-left: 3px dashed rgba(35, 55, 255, 0.4);
+				padding-left: 0.7em;
+			}
+			@media (max-width: 720px) {
+				.card-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</body>
 </html>

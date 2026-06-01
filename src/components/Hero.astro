@@ -1,0 +1,55 @@
+---
+interface Props {
+	name: string;
+	positioning: string; // the one-line positioning statement
+	subtitle?: string;
+	placeholder?: boolean; // true while copy is awaiting Griffin's words
+}
+const { name, positioning, subtitle, placeholder = false } = Astro.props;
+---
+
+<section class="hero">
+	<h1>{name}</h1>
+	<p class:list={['positioning', { placeholder }]}>{positioning}</p>
+	{subtitle && <p class:list={['subtitle', { placeholder }]}>{subtitle}</p>}
+</section>
+
+<style>
+	.hero {
+		padding: 2.5rem 0 2.75rem;
+	}
+	.hero h1 {
+		font-size: 3.2rem;
+		line-height: 1.05;
+		margin: 0 0 0.4rem 0;
+		letter-spacing: -0.03em;
+	}
+	.positioning {
+		font-size: 1.35rem;
+		line-height: 1.35;
+		color: var(--text);
+		max-width: 38ch;
+		margin: 0 0 0.5rem 0;
+		font-weight: 500;
+	}
+	.subtitle {
+		font-size: 1.05rem;
+		color: var(--text-muted);
+		max-width: 52ch;
+		margin: 0;
+	}
+	/* Visible flag for un-written copy (dev only; remove markers when filled). */
+	.placeholder {
+		color: var(--accent);
+		border-left: 3px dashed rgba(35, 55, 255, 0.4);
+		padding-left: 0.6em;
+	}
+	@media (max-width: 720px) {
+		.hero h1 {
+			font-size: 2.4rem;
+		}
+		.positioning {
+			font-size: 1.2rem;
+		}
+	}
+</style>

@@ -1,12 +1,11 @@
 ---
 title: 'Whose Constitution'
 description: 'Finding your humanity'
+subtitle: 'Finding your humanity'
 pubDate: 'Feb 13 2026'
 heroImage: '../../assets/whose-constitution.png'
 canonicalURL: 'https://abundanceagendad.substack.com/p/whose-constitution'
 ---
-
-*Finding your humanity*
 
 Most product guides never find their way to their intended audience, resigned to the same dustbin as their legal disclaimer brethren. Anthropic recently updated the product guide for its flagship service, Claude. It's called [Claude's constitution](https://www.anthropic.com/constitution), and unlike every other product guide, the intended audience isn't you; it's Claude. Also unlike other product guides, the content of Claude's constitution may be of vital importance to humanity's survival.
 

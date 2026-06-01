@@ -10,6 +10,8 @@ const blog = defineCollection({
 		z.object({
 			title: z.string(),
 			description: z.string(),
+			// Optional deck/subtitle, rendered as italic line below the title.
+			subtitle: z.string().optional(),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),

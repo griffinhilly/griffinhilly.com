@@ -1,0 +1,108 @@
+---
+interface Props {
+	title: string;
+	href?: string; // primary link; if absent the card is not clickable
+	sourceHref?: string; // optional "(source)" link
+	badge?: string; // e.g. "Currently building"
+	draft?: boolean; // flags placeholder copy awaiting Griffin's words
+}
+const { title, href, sourceHref, badge, draft = false } = Astro.props;
+const external = href?.startsWith('http');
+---
+
+<article class:list={['project-card', { 'is-draft': draft }]}>
+	<div class="card-head">
+		<h3>
+			{
+				href ? (
+					<a href={href} {...external ? { target: '_blank', rel: 'noopener' } : {}}>
+						{title}
+					</a>
+				) : (
+					title
+				)
+			}
+		</h3>
+		{badge && <span class="badge">{badge}</span>}
+	</div>
+	<p class="desc"><slot /></p>
+	{
+		sourceHref && (
+			<a class="source" href={sourceHref} target="_blank" rel="noopener">
+				source ↗
+			</a>
+		)
+	}
+</article>
+
+<style>
+	.project-card {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 1.25rem 1.4rem 1.4rem;
+		transition:
+			box-shadow 0.18s ease,
+			transform 0.18s ease,
+			border-color 0.18s ease;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+	.project-card:hover {
+		box-shadow: var(--box-shadow);
+		transform: translateY(-2px);
+		border-color: #d4d4d4;
+	}
+	.card-head {
+		display: flex;
+		align-items: center;
+		gap: 0.6em;
+		margin-bottom: 0.5rem;
+	}
+	.project-card h3 {
+		margin: 0;
+		font-size: 1.2rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+	.project-card h3 a {
+		text-decoration: none;
+		color: var(--text);
+	}
+	.project-card h3 a:hover {
+		color: var(--accent);
+	}
+	.badge {
+		flex: none;
+		font-family: var(--font-body);
+		font-size: 0.68rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--accent);
+		background: rgba(35, 55, 255, 0.08);
+		border-radius: 999px;
+		padding: 0.18em 0.6em;
+	}
+	.desc {
+		margin: 0 0 0.75rem 0;
+		color: var(--text-muted);
+		font-size: 0.97rem;
+		line-height: 1.5;
+		flex: 1;
+	}
+	.source {
+		font-size: 0.85rem;
+		font-weight: 500;
+		text-decoration: none;
+	}
+	.source:hover {
+		text-decoration: underline;
+	}
+	/* Placeholder copy awaiting real words — visually flagged in dev. */
+	.is-draft .desc {
+		font-style: italic;
+		opacity: 0.7;
+	}
+</style>

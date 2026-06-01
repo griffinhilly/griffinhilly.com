@@ -34,7 +34,8 @@ const resolvedCanonicalURL = canonicalURL ?? new URL(Astro.url.pathname, Astro.s
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<Font cssVariable="--font-inter" preload />
+<Font cssVariable="--font-geist" />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={resolvedCanonicalURL} />

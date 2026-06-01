@@ -1,0 +1,66 @@
+---
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	href: string;
+	title: string;
+	description?: string;
+	pubDate: Date;
+}
+const { href, title, description, pubDate } = Astro.props;
+---
+
+<a class="essay-item" href={href}>
+	<span class="date"><FormattedDate date={pubDate} /></span>
+	<span class="body">
+		<span class="title">{title}</span>
+		{description && <span class="desc">{description}</span>}
+	</span>
+</a>
+
+<style>
+	.essay-item {
+		display: flex;
+		gap: 1.25rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px solid var(--border);
+		text-decoration: none;
+		color: var(--text);
+	}
+	.essay-item:hover .title {
+		color: var(--accent);
+	}
+	.date {
+		flex: none;
+		width: 7.5em;
+		color: var(--text-muted);
+		font-size: 0.9rem;
+		padding-top: 0.15em;
+	}
+	.body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+	.title {
+		font-weight: 600;
+		font-size: 1.05rem;
+		letter-spacing: -0.01em;
+		transition: color 0.15s ease;
+	}
+	.desc {
+		color: var(--text-muted);
+		font-size: 0.95rem;
+		line-height: 1.45;
+	}
+	@media (max-width: 560px) {
+		.essay-item {
+			flex-direction: column;
+			gap: 0.2rem;
+		}
+		.date {
+			width: auto;
+			font-size: 0.82rem;
+		}
+	}
+</style>

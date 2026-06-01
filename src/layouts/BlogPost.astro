@@ -5,16 +5,21 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import { Font } from 'astro:assets';
+import '../styles/essay.css';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage, canonicalURL } = Astro.props;
+const { title, description, subtitle, pubDate, updatedDate, heroImage, canonicalURL } =
+	Astro.props;
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} canonicalURL={canonicalURL} />
+		<Font cssVariable="--font-newsreader" preload />
 		<style>
+			/* Structural only — typography/palette live in essay.css */
 			main {
 				width: calc(100% - 2em);
 				max-width: 100%;
@@ -26,41 +31,28 @@ const { title, description, pubDate, updatedDate, heroImage, canonicalURL } = As
 			.hero-image img {
 				display: block;
 				margin: 0 auto;
+				max-width: 1080px;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
 			}
 		</style>
 	</head>
 
-	<body>
+	<body class="essay-surface">
 		<Header />
 		<main>
 			<article>
 				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+					{
+						heroImage && (
+							<Image
+								src={heroImage}
+								alt=""
+								widths={[480, 720, 1080, 1440]}
+								sizes="(max-width: 720px) 100vw, 1080px"
+							/>
+						)
+					}
 				</div>
 				<div class="prose">
 					<div class="title">
@@ -75,6 +67,7 @@ const { title, description, pubDate, updatedDate, heroImage, canonicalURL } = As
 							}
 						</div>
 						<h1>{title}</h1>
+						{subtitle && <p class="subtitle">{subtitle}</p>}
 						<hr />
 					</div>
 					<slot />

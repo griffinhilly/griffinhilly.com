@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { SITE_TITLE } from '../consts';
 ---
 
@@ -14,23 +15,73 @@ import { SITE_TITLE } from '../consts';
 		<Header />
 		<main>
 			<h1>Projects</h1>
-			<p>Things I've built.</p>
+			<p class="intro">Things I've built and things I'm building.</p>
 
-			<ul>
-				<li>
-					<a href="https://griffinhilly.github.io/open-knowledge-graph/">Open Knowledge Graph</a> —
-					an open-source prerequisite knowledge graph: 2,628 topics across 19 domains of
+			<div class="card-grid">
+				<ProjectCard
+					title="Open Knowledge Graph"
+					href="https://griffinhilly.github.io/open-knowledge-graph/"
+				>
+					An open-source prerequisite knowledge graph: 2,628 topics across 19 domains of
 					human knowledge.
-					<span>(<a href="https://github.com/griffinhilly/open-knowledge-graph">source</a>)</span>
-				</li>
-				<li>
-					<a href="https://x.com/GriffinHilly/status/2024462131135934862">NBA Draft Anti-Tanking Proposal</a> —
-					My proposed solution to the NBA's tanking issues, centered around forcing
-					lottery teams to trade picks amongst themselves and thus align incentive to win.
-					<span>(<a href="https://github.com/griffinhilly/nba-tanking-fix-simulator">source</a>)</span>
-				</li>
-			</ul>
+				</ProjectCard>
+
+				<ProjectCard
+					title="NBA Draft Anti-Tanking Proposal"
+					href="https://x.com/GriffinHilly/status/2024462131135934862"
+					sourceHref="https://github.com/griffinhilly/nba-tanking-fix-simulator"
+				>
+					My proposed solution to the NBA's tanking issues, centered around forcing lottery
+					teams to trade picks amongst themselves and thus align incentive to win.
+				</ProjectCard>
+
+				<ProjectCard title="Agencyism" href="https://agencyism.org" draft={true}>
+					A philosophical framework built around agency — the capacity for, and tendency
+					toward, rational autonomy.
+				</ProjectCard>
+
+				<ProjectCard
+					title="Claude Code Synthesis"
+					href="https://github.com/griffinhilly/claude-code-synthesis"
+					draft={true}
+				>
+					Patterns and workflow for agentic software development — a synthesis of how to
+					build with Claude Code.
+				</ProjectCard>
+
+				<ProjectCard title="Canons" draft={true}>
+					Three curated reading lists — the Cosmos (229), Silicon Valley (50), and Western
+					(126) canons.
+				</ProjectCard>
+
+				<ProjectCard title="Bottom Billion and Beyond" badge="Currently building" draft={true}>
+					An atlas of development traps — interactive data visualization on the economics of
+					extreme poverty. [layered title TBD]
+				</ProjectCard>
+			</div>
 		</main>
 		<Footer />
+
+		<style>
+			main {
+				width: 960px;
+			}
+			.intro {
+				color: var(--text-muted);
+				font-size: 1.1rem;
+				margin-top: -0.25rem;
+				margin-bottom: 2rem;
+			}
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1.25rem;
+			}
+			@media (max-width: 720px) {
+				.card-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</body>
 </html>

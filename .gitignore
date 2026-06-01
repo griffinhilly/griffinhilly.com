@@ -23,8 +23,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# COMP files — internal planning artifacts, kept local (repo is public)
+# COMP files + planning artifacts — internal, kept local (repo is public)
 CLAUDE.md
 ORIENT.md
 MEMORY.md
 PLAN.md
+REDESIGN.md
