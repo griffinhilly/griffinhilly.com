@@ -29,3 +29,8 @@ ORIENT.md
 MEMORY.md
 PLAN.md
 REDESIGN.md
+
+# Agencyism ledger prototype (throwaway review page; ledger data is unpublished)
+.ledger-data.json
+src/data/ledger-prototype.json
+src/pages/ledger-prototype.astro
