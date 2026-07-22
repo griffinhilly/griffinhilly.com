@@ -31,7 +31,8 @@ const { title, description, subtitle, pubDate, updatedDate, heroImage, canonical
 			.hero-image img {
 				display: block;
 				margin: 0 auto;
-				max-width: 1080px;
+				max-width: min(1080px, 100%);
+				height: auto;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
 			}
@@ -75,5 +76,63 @@ const { title, description, subtitle, pubDate, updatedDate, heroImage, canonical
 			</article>
 		</main>
 		<Footer />
+		<script>
+			// Footnote popovers — show the note in a card at the marker (Substack-style)
+			// instead of jumping to the end. The end-of-page list remains the no-JS fallback.
+			const prose = document.querySelector('.prose');
+			let pop: HTMLElement | null = null;
+
+			function close() {
+				pop?.remove();
+				pop = null;
+				document.removeEventListener('click', onDocClick);
+				document.removeEventListener('keydown', onKey);
+			}
+			function onDocClick(e: MouseEvent) {
+				const t = e.target as HTMLElement;
+				if (pop && !pop.contains(t) && !t.closest('a[data-footnote-ref]')) close();
+			}
+			function onKey(e: KeyboardEvent) {
+				if (e.key === 'Escape') close();
+			}
+
+			document.querySelectorAll<HTMLAnchorElement>('a[data-footnote-ref]').forEach((ref) => {
+				ref.addEventListener('click', (e) => {
+					e.preventDefault();
+					const id = ref.getAttribute('href')?.slice(1) ?? '';
+					const note = document.getElementById(id);
+					if (!note || !prose) return;
+					if (pop?.dataset.for === id) return close(); // second click toggles off
+					close();
+
+					pop = document.createElement('aside');
+					pop.className = 'fn-popover';
+					pop.dataset.for = id;
+					pop.setAttribute('role', 'note');
+
+					const num = document.createElement('span');
+					num.className = 'fn-popover-num';
+					num.textContent = ref.textContent ?? '';
+
+					const x = document.createElement('button');
+					x.className = 'fn-popover-close';
+					x.setAttribute('aria-label', 'Close footnote');
+					x.textContent = '×';
+					x.addEventListener('click', close);
+
+					const content = note.cloneNode(true) as HTMLElement;
+					content.querySelectorAll('[data-footnote-backref]').forEach((a) => a.remove());
+
+					pop.append(num, x, ...content.childNodes);
+					prose.appendChild(pop);
+					const proseRect = prose.getBoundingClientRect();
+					const refRect = ref.getBoundingClientRect();
+					pop.style.top = `${refRect.bottom - proseRect.top + 10}px`;
+
+					document.addEventListener('click', onDocClick);
+					document.addEventListener('keydown', onKey);
+				});
+			});
+		</script>
 	</body>
 </html>

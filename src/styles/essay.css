@@ -108,6 +108,56 @@ body.essay-surface {
 	margin: 1.5em 0;
 }
 
+/* Footnote popover — the in-place card shown when a footnote marker is
+   clicked (BlogPost.astro script). Positioned absolutely within .prose. */
+.essay-surface .prose {
+	position: relative;
+}
+.essay-surface .prose .fn-popover {
+	position: absolute;
+	left: 0.5em;
+	right: 0.5em;
+	z-index: 10;
+	background: #fffefb;
+	border: 1px solid #e6e2dc;
+	border-radius: 10px;
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+	padding: 0.9em 2.4em 0.9em 2.8em;
+	font-size: 0.88em;
+	line-height: 1.55;
+	color: var(--essay-text);
+}
+.essay-surface .prose .fn-popover p {
+	margin: 0 0 0.6em 0;
+}
+.essay-surface .prose .fn-popover p:last-child {
+	margin-bottom: 0;
+}
+.fn-popover-num {
+	position: absolute;
+	left: 1em;
+	top: 0.95em;
+	font-family: var(--font-inter);
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--accent);
+}
+.fn-popover-close {
+	position: absolute;
+	right: 0.5em;
+	top: 0.35em;
+	border: none;
+	background: none;
+	font-size: 1.25em;
+	line-height: 1;
+	padding: 0.25em;
+	cursor: pointer;
+	color: var(--text-muted);
+}
+.fn-popover-close:hover {
+	color: var(--essay-text);
+}
+
 /* Footnotes (markdown) — smaller, muted, sans for tabular feel. */
 .essay-surface .prose .footnotes {
 	font-size: 0.9em;
