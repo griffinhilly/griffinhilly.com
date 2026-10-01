@@ -63,6 +63,7 @@ const fmt = (v: number) => v.toFixed(2);
 			<header class="page-head">
 				<p class="eyebrow">NBA analysis · 2026</p>
 				<h1>Singular</h1>
+				<p class="tagline">Identifying the NBA's Singular talents</p>
 				<div class="prose" data-slot="hero">
 					<p class="hero-line">A player-evaluation model powerful enough to compete with the best public models, and flexible enough to answer any question a front office wants to know.</p>
 				</div>
@@ -329,7 +330,6 @@ const fmt = (v: number) => v.toFixed(2);
 				)}
 			</section>
 
-			<p class="disclosure">Built by Griffin Hilly using Claude Code.</p>
 		</main>
 		<Footer />
 
@@ -346,6 +346,11 @@ const fmt = (v: number) => v.toFixed(2);
 				font-size: 0.85rem;
 				letter-spacing: 0.06em;
 				text-transform: uppercase;
+			}
+			.tagline {
+				margin: -0.4rem 0 0.9rem;
+				color: var(--text-muted);
+				font-size: 1.1rem;
 			}
 			.hero-line {
 				font-size: 1.2rem;
