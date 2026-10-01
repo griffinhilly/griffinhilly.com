@@ -7,7 +7,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://griffinhilly.com',
-	integrations: [mdx(), sitemap()],
+	// /singular is link-only (noindex), so keep it out of the sitemap.
+	integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/singular') })],
 	fonts: [
 		// General surface: Inter body + Geist headings. Essay surface: Newsreader
 		// body + Inter headings. (Phase 2 redesign — locked 2026-05-28 after specimen.)

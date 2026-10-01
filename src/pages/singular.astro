@@ -1,0 +1,632 @@
+---
+/*
+  /singular: a taste of Griffin's NBA analysis project "Singular", for the Chicago Bulls
+  Executive Director, R&D application. Reachable by link only (not in the home grid, projects
+  page or nav), noindex.
+
+  AUTHORSHIP: Griffin writes every sentence of prose. Everything inside a `.fodder` box is a
+  suggested line for him to rewrite. Before going live: grep this file for FODDER, NUM: and
+  PENDING. Each must be gone (rewritten, or filled from the rebuilt data).
+
+  Chart data source (copied by hand; the analysis repo is not part of this build):
+    career-planning/applications/chicago-bulls/singular/data/model/public_asof_v3.json
+    -> corrected_public.regular_season_after_jan6.error_removed_pct and .ci90
+    (Revision 3 run, 2026-10-01 13:03 CT: no January 6 games, priors fitted only on earlier
+    seasons, DARKO from darko.app's own 2026-01-06 values). Summary: agents/w3-base-models/asof_corrected.md.
+  Fair baseline: data/model/dpm_v3.json -> T2.differences
+    ."P4 minus P9 average with learned scale, newcomer value and age" (T2.headline_bar) and
+    ."P4 minus P2 average machinery: layer over RAPM 3 seasons + BPM, with age" (harder bar).
+*/
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+// DARKO checked: corrected_public uses darko.app's own 2026-01-06 values.
+const SHOW_DARKO = true;
+
+// Live mode: fodder blocks Griffin has not filled (and the contact placeholder) are not rendered.
+// Set false to see every fodder box while drafting.
+const HIDE_UNFILLED_FODDER = true;
+const SHOW_FODDER = !HIDE_UNFILLED_FODDER;
+// Minimum viable page (2026-10-01): the model only. The questions section stays in the code.
+const SHOW_QUESTIONS = false;
+
+// Frozen-date test: % of the baseline's weighted squared error removed, with 90% intervals
+// (games resampled).
+const FROZEN = [
+	{ name: 'DPM v3', ours: true, value: 1.255, lo: 1.074, hi: 1.493 },
+	{ name: 'EPM', value: 1.217, lo: 1.017, hi: 1.449 },
+	{ name: 'xRAPM (Engelmann)', value: 1.104, lo: 0.911, hi: 1.327 },
+	{ name: 'DARKO (darko.app, Jan 6)', darko: true, value: 1.094, lo: 0.903, hi: 1.311 },
+];
+const rows = FROZEN.filter((r) => SHOW_DARKO || !r.darko);
+const AXIS_MAX = 1.6;
+const TICKS = [0, 0.5, 1.0, 1.5];
+const pct = (v: number) => `${((v / AXIS_MAX) * 100).toFixed(3)}%`;
+const fmt = (v: number) => v.toFixed(2);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Singular · ${SITE_TITLE}`}
+			description="Singular: an NBA analysis project by Griffin Hilly."
+		/>
+		<meta name="robots" content="noindex" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			{/* 0. Title and hero */}
+			<header class="page-head">
+				<p class="eyebrow">NBA analysis · 2026</p>
+				<h1>Singular</h1>
+				<div class="prose" data-slot="hero">
+					<p class="hero-line">A player-evaluation model powerful enough to compete with the best public models, and flexible enough to answer any question a front office wants to know.</p>
+				</div>
+			</header>
+
+			{/* How it works: plain description of scripts/dpm_v3.py; Griffin may rewrite this slot. */}
+			<section id="how-it-works" class="how-it-works" data-slot="how-it-works">
+				<h2>How it works</h2>
+				<ul>
+					<li>
+						In: box-score rates, adjusted for opponents, and a lineup-based RAPM rating, for offense
+						and defense, blended with fitted weights and an age curve.
+					</li>
+					<li>Fitted: each season's weights come from earlier seasons only.</li>
+					<li>
+						Predicts: the scoring margin, per 100 possessions, of every lineup it has not seen.
+					</li>
+				</ul>
+			</section>
+
+			{/* 1. The base model */}
+			<section id="base-model">
+				<h2>At the cutting edge</h2>
+				{SHOW_FODDER && (
+					<div class="fodder" data-slot="base-model">
+						<span class="fodder-tag">FODDER: Griffin rewrites</span>
+						<p>
+							Everything starts with the base model: how good is each player, and how good might he
+							become. Ours is DPM v3. We froze it on January 6, 2026, and scored it on every lineup
+							for the rest of the regular season.
+						</p>
+						<p>
+							It finished level with EPM, the best public model, and clearly ahead of DARKO.
+							Engelmann's xRAPM is close.
+						</p>
+						<p>
+							DPM v3 adds +0.052 over the same-machinery average of RAPM and BPM, ahead in 18 of 18
+							held-out seasons. Against the harder bar, where RAPM and BPM each get their own fitted
+							weight, it still adds +0.040 and leads in 17 of 18.
+						</p>
+						<p>
+							The next test is prospective: a freeze in the 2026-27 season.
+						</p>
+					</div>
+				)}
+
+				<figure class="chart" aria-labelledby="chart-title">
+					<figcaption>
+						<p id="chart-title" class="chart-title">
+							Frozen-date test: 2025-26 regular season after January 6
+						</p>
+						<p class="chart-unit">
+							% of a home-court-only baseline's prediction error removed (higher is better)
+						</p>
+					</figcaption>
+
+					<div class="bars" role="list">
+						{
+							rows.map((r) => (
+								<div class={`bar-row${r.ours ? ' ours' : ''}`} role="listitem">
+									<span class="bar-label">{r.name}</span>
+									<span class="bar-track">
+										{TICKS.map((t) => (
+											<span class="grid" style={`left:${pct(t)}`} aria-hidden="true" />
+										))}
+										<span class="bar" style={`width:${pct(r.value)}`} />
+										<span
+											class="ci"
+											style={`left:${pct(r.lo)};width:calc(${pct(r.hi)} - ${pct(r.lo)})`}
+											aria-hidden="true"
+										/>
+									</span>
+									<span class="bar-value">
+										{fmt(r.value)}
+										<span class="sr-only">
+											%, 90% interval {fmt(r.lo)} to {fmt(r.hi)}
+										</span>
+									</span>
+								</div>
+							))
+						}
+						<div class="axis" aria-hidden="true">
+							<span class="axis-spacer" />
+							<span class="axis-track">
+								{
+									TICKS.map((t) => (
+										<span class="tick" style={`left:${pct(t)}`}>
+											{t === 0 ? '0%' : `${t.toFixed(1)}%`}
+										</span>
+									))
+								}
+							</span>
+							<span class="axis-spacer-r" />
+						</div>
+					</div>
+
+					<div class="legend" aria-hidden="true">
+						<span><i class="key-bar"></i>Point estimate</span>
+						<span><i class="key-ci"></i>90% interval</span>
+					</div>
+
+					<dl class="data-label">
+						<dt>Test</dt>
+						<dd>
+							Ratings as of 2026-01-06 predict the point margin per 100 possessions of 21,037 lineup
+							stints in the 689 regular-season games from January 7 on. No rating uses a January 6
+							game; our priors are fitted only on earlier seasons.
+						</dd>
+						<dt>Score</dt>
+						<dd>
+							Share of the home-court-only baseline's weighted squared error that each rating
+							removes, in percent. Single stints are very noisy, so every rating removes only about
+							1%; the gaps between ratings are the result.
+						</dd>
+						<dt>vs EPM</dt>
+						<dd>DPM v3 +0.038 (games −0.042 to +0.119; teams −0.068 to +0.142): level.</dd>
+						<dt>vs DARKO</dt>
+						<dd>DPM v3 +0.162 (games +0.082 to +0.249; teams +0.075 to +0.241): ahead.</dd>
+						<dt>Fair baseline</dt>
+						<dd>
+							Next-season lineups, held out, 2008-09 to 2025-26, percentage points of error removed:<br />
+							+0.052 (+0.043 to +0.061) over the same-machinery average of RAPM and BPM, ahead in 18 of
+							18 seasons.<br />
+							+0.040 (+0.032 to +0.049) when RAPM and BPM each get their own fitted weight, ahead in 17 of
+							18.
+						</dd>
+					</dl>
+					<p class="source-line">
+						90% intervals from resampled games and teams; EPM and xRAPM from the SportsandMath
+						panel posted Jan 6, 2026; DARKO from darko.app.
+					</p>
+				</figure>
+			</section>
+
+			{/* 2. Throughline */}
+			<section id="throughline" class="prose-only">
+				<h2>Data and the eye test</h2>
+				{SHOW_FODDER && (
+					<div class="fodder" data-slot="throughline">
+						<span class="fodder-tag">FODDER: Griffin rewrites</span>
+						<p>
+							How does one franchise gain an edge over the other 29? With data and the eye test,
+							working together.
+						</p>
+						<p>
+							The data shows where to look. The eye sees what the data cannot. What the eye sees
+							becomes the next question for the data, and the answer sharpens the eye.
+						</p>
+						<p>The decision stays with the people who make it.</p>
+					</div>
+				)}
+			</section>
+
+			{/* 3. Questions answered */}
+			{SHOW_QUESTIONS && (
+				<section id="questions">
+					<h2>Questions answered</h2>
+
+					<article class="question">
+						<h3>Does Caleb Wilson look more like a future #1 or a #2?</h3>
+						{SHOW_FODDER && (
+							<div class="fodder" data-slot="q-wilson">
+								<span class="fodder-tag">FODDER: Griffin rewrites</span>
+								<p>
+									Draft slot and age cannot tell a future #1 from a #2, and the test had the power to see it
+									if they could. That part is for tracking and the eye test. His body is rare for his size.
+								</p>
+							</div>
+						)}
+						<p class="evidence">
+							<span class="ev-tag">Evidence</span>
+							2026 combine, against participants within 2 inches of his height: standing and max verticals
+							beat 98% and 97%. Among
+							players who became a #1 or a #2, draft slot and age separate them at AUC 0.49-0.57 across three
+							definitions (103-117 players); every 90% interval includes 0.50, and anything above 0.57-0.67
+							is ruled out. The test had 80% power to catch a separator of AUC 0.69-0.71.
+						</p>
+					</article>
+
+					<article class="question">
+						<h3>Does a champion need a star creator?</h3>
+						{SHOW_FODDER && (
+							<div class="fodder" data-slot="q-champion">
+								<span class="fodder-tag">FODDER: Griffin rewrites</span>
+								<p>
+									Not always, but it helps. Teams with a star creator won more titles than their
+									pre-playoff odds predicted. Some champions won without one.
+								</p>
+							</div>
+						)}
+						<p class="evidence">
+							<span class="ev-tag">Evidence</span>
+							Usage rule declared before results; 708 playoff teams, 1980-81 to 2024-25. Star-creator teams
+							won 33 titles where their pre-playoff odds implied 26.3 (90% chance range 21-31). Title odds
+							×2.26 (90%: 1.39 to 4.40). All 7 rule variants point the same way; the strictest one's
+							interval includes no effect. 12 of the 45 champions had no star creator under the declared rule.
+						</p>
+					</article>
+
+					<article class="question">
+						<h3>Should one big playoff run change how we value a player?</h3>
+						{SHOW_FODDER && (
+							<div class="fodder" data-slot="q-playoffs">
+								<span class="fodder-tag">FODDER: Griffin rewrites</span>
+								<p>
+									Barely. Once you know a player's regular season, his playoff minutes add almost nothing
+									to predicting his playoff games.
+								</p>
+							</div>
+						)}
+						<p class="evidence">
+							<span class="ev-tag">Evidence</span>
+							Letting each player's playoff rating move off his regular-season rating improves prediction of
+							held-out playoff games by a median 0.04% of the error (best single postseason: 0.45%). 29
+							postseasons, 1996-97 to 2025-26 (2019-20 not included); 5,818 player-postseasons.
+						</p>
+					</article>
+				</section>
+			)}
+
+			{/* 4. Questions to come */}
+			<section id="to-come" class="prose-only">
+				<h2>Questions to come</h2>
+				{SHOW_FODDER && (
+					<div class="fodder" data-slot="to-come">
+						<span class="fodder-tag">FODDER: Griffin rewrites</span>
+						<p>
+							Public data takes this far. You have the data, so bring me in. With full tracking, the
+							same desk answers questions like these:
+						</p>
+						<ul>
+							<li>
+								Athleticism for every player in every game: speed, burst, first step, and how they
+								change with age.
+							</li>
+							<li>Wilson's defensive fit as a roamer and help defender, from his first NBA minutes.</li>
+							<li>Every screen: its angle, the coverage, and what it produced.</li>
+							<li>Every cap-legal trade the Bulls can make, found and priced automatically.</li>
+						</ul>
+					</div>
+				)}
+			</section>
+
+			{/* 5. How it was built */}
+			<section id="how-built" class="prose-only">
+				<h2>How it was built</h2>
+				{SHOW_FODDER && (
+					<div class="fodder" data-slot="how-built">
+						<span class="fodder-tag">FODDER: Griffin rewrites</span>
+						<p>
+							I built Singular with Claude Code and a team of AI agents. I set the questions, the
+							designs and the standards; the agents built the code and ran the analysis.
+						</p>
+						<p>
+							Spec-blind AI critic agents attacked every result. Claims that failed were narrowed or
+							withdrawn, and the record of those corrections is part of the work.
+						</p>
+					</div>
+				)}
+				{SHOW_FODDER && (
+					<p class="contact">
+						<span class="num-pending">[CONTACT: Griffin's contact line, PLACEHOLDER]</span>
+					</p>
+				)}
+			</section>
+
+			<p class="disclosure">Built by Griffin Hilly using Claude Code.</p>
+		</main>
+		<Footer />
+
+		<style>
+			main {
+				width: 760px;
+			}
+			section {
+				margin-top: 3rem;
+			}
+			.eyebrow {
+				margin: 0 0 0.25rem;
+				color: var(--text-muted);
+				font-size: 0.85rem;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+			.hero-line {
+				font-size: 1.2rem;
+				line-height: 1.45;
+			}
+			h2 {
+				font-size: 1.44em;
+				padding-bottom: 0.4rem;
+				border-bottom: 1px solid var(--border);
+				margin-bottom: 1rem;
+			}
+			h3 {
+				font-size: 1.15em;
+			}
+
+			/* Fodder: suggested lines Griffin rewrites. Must all be gone before live. */
+			.fodder {
+				position: relative;
+				border: 2px dashed #c2410c;
+				border-radius: 8px;
+				padding: 1.6rem 1rem 0.25rem;
+				margin: 0.75rem 0 1.25rem;
+				background: #fff7ed;
+			}
+			.fodder-tag {
+				position: absolute;
+				top: -0.75rem;
+				left: 0.75rem;
+				padding: 0 0.4rem;
+				background: #c2410c;
+				color: #fff;
+				font-family: var(--mono);
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				border-radius: 4px;
+				line-height: 1.5rem;
+			}
+			.fodder ul {
+				margin-top: 0;
+				padding-left: 1.2rem;
+			}
+			.num-pending {
+				font-family: var(--mono);
+				font-size: 0.82em;
+				background: #fef3c7;
+				color: #7c2d12;
+				border: 1px solid #f59e0b;
+				border-radius: 4px;
+				padding: 0 0.3em;
+			}
+			.pending-block {
+				display: block;
+				margin: 0.5rem 0 1rem;
+				padding: 0.4rem 0.6rem;
+			}
+
+			/* Chart: native HTML/CSS, drawn to scale from 0. */
+			.chart {
+				margin: 1.5rem 0 0;
+				padding: 1.25rem;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 10px;
+			}
+			.chart-title {
+				margin: 0;
+				font-family: var(--font-heading);
+				font-weight: 600;
+				font-size: 1.05rem;
+			}
+			.chart-unit {
+				margin: 0.15rem 0 0.75rem;
+				color: var(--text-muted);
+				font-size: 0.9rem;
+			}
+			.bars {
+				--label-w: 10.5rem;
+				--value-w: 3rem;
+			}
+			.bar-row,
+			.axis {
+				display: grid;
+				grid-template-columns: var(--label-w) 1fr var(--value-w);
+				align-items: center;
+				column-gap: 0.75rem;
+			}
+			.bar-row {
+				min-height: 2.25rem;
+			}
+			.bar-label {
+				font-size: 0.95rem;
+			}
+			.bar-row.ours .bar-label,
+			.bar-row.ours .bar-value {
+				font-weight: 700;
+			}
+			.bar-track,
+			.axis-track {
+				position: relative;
+				height: 1.25rem;
+			}
+			.grid {
+				position: absolute;
+				top: -0.5rem;
+				bottom: -0.5rem;
+				width: 1px;
+				background: var(--border);
+			}
+			.bar {
+				position: absolute;
+				left: 0;
+				top: 0.2rem;
+				bottom: 0.2rem;
+				background: #a3a3a3;
+				border-radius: 0 3px 3px 0;
+			}
+			.bar-row.ours .bar {
+				background: #ce1141; /* Bulls red */
+			}
+			.ci {
+				position: absolute;
+				top: 50%;
+				height: 0.7rem;
+				transform: translateY(-50%);
+				border-left: 2px solid var(--text);
+				border-right: 2px solid var(--text);
+				background: linear-gradient(var(--text), var(--text)) center / 100% 2px no-repeat;
+			}
+			.bar-value {
+				font-variant-numeric: tabular-nums;
+				font-size: 0.95rem;
+				text-align: right;
+			}
+			.axis {
+				margin-top: 0.35rem;
+			}
+			.axis-track {
+				height: 1.1rem;
+			}
+			.tick {
+				position: absolute;
+				transform: translateX(-50%);
+				color: var(--text-muted);
+				font-size: 0.75rem;
+				white-space: nowrap;
+			}
+			.tick:first-child {
+				transform: none;
+			}
+			.legend {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.25rem;
+				margin: 0.9rem 0 0;
+				font-size: 0.82rem;
+				color: var(--text-muted);
+			}
+			.legend i {
+				display: inline-block;
+				vertical-align: middle;
+				margin-right: 0.4rem;
+			}
+			.key-bar {
+				width: 1.2rem;
+				height: 0.6rem;
+				background: #a3a3a3;
+				border-radius: 2px;
+			}
+			.key-ci {
+				width: 1.2rem;
+				height: 0.6rem;
+				border-left: 2px solid var(--text);
+				border-right: 2px solid var(--text);
+				background: linear-gradient(var(--text), var(--text)) center / 100% 2px no-repeat;
+			}
+
+			/* Data labels */
+			.data-label {
+				display: grid;
+				grid-template-columns: 8.5rem 1fr;
+				gap: 0.35rem 1rem;
+				margin: 1.25rem 0 0;
+				padding-top: 1rem;
+				border-top: 1px solid var(--border);
+				font-size: 0.85rem;
+				line-height: 1.45;
+				color: var(--text-muted);
+			}
+			.data-label dt {
+				font-weight: 600;
+				color: var(--text);
+			}
+			.data-label dd {
+				margin: 0;
+			}
+			#how-built .data-label {
+				border-top: none;
+				padding-top: 0;
+			}
+
+			.question {
+				margin-bottom: 2.25rem;
+			}
+			.evidence {
+				font-size: 0.88rem;
+				color: var(--text-muted);
+				line-height: 1.55;
+			}
+			.ev-tag {
+				display: inline-block;
+				margin-right: 0.4rem;
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--text);
+			}
+			/* A prose-only section with no prose and no fodder (live mode) is not shown. */
+			section.prose-only:not(:has(.prose, .fodder)) {
+				display: none;
+			}
+			.how-it-works ul {
+				margin: 0;
+				padding-left: 1.2rem;
+			}
+			.how-it-works li {
+				margin-bottom: 0.35rem;
+			}
+			.source-line {
+				margin: 0.75rem 0 0;
+				font-size: 0.8rem;
+				color: var(--text-muted);
+			}
+			.disclosure {
+				margin-top: 1rem;
+				font-size: 0.85rem;
+				color: var(--text-muted);
+			}
+			.contact {
+				margin-top: 1.5rem;
+			}
+
+			@media (max-width: 560px) {
+				.chart {
+					padding: 1rem 0.85rem;
+				}
+				.bars {
+					--label-w: 0px;
+					--value-w: 2.6rem;
+				}
+				.bar-row {
+					grid-template-areas:
+						'label label'
+						'track value';
+					grid-template-columns: 1fr var(--value-w);
+					row-gap: 0.15rem;
+					margin-bottom: 0.5rem;
+				}
+				.bar-label {
+					grid-area: label;
+				}
+				.bar-row .bar-track {
+					grid-area: track;
+				}
+				.bar-value {
+					grid-area: value;
+				}
+				.axis {
+					grid-template-columns: 1fr var(--value-w);
+				}
+				.axis-spacer {
+					display: none;
+				}
+				.data-label {
+					grid-template-columns: 1fr;
+				}
+				.data-label dd {
+					margin-bottom: 0.5rem;
+				}
+			}
+		</style>
+	</body>
+</html>

@@ -34,3 +34,6 @@ REDESIGN.md
 .ledger-data.json
 src/data/ledger-prototype.json
 src/pages/ledger-prototype.astro
+
+# Griffin prose drafts for /singular (local only)
+drafts/
