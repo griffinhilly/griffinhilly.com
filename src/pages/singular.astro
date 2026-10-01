@@ -35,7 +35,7 @@ const SHOW_QUESTIONS = false;
 // Frozen-date test: % of the baseline's weighted squared error removed, with 90% intervals
 // (games resampled).
 const FROZEN = [
-	{ name: 'DPM v3', ours: true, value: 1.255, lo: 1.074, hi: 1.493 },
+	{ name: 'SiPM', ours: true, value: 1.255, lo: 1.074, hi: 1.493 },
 	{ name: 'EPM', value: 1.217, lo: 1.017, hi: 1.449 },
 	{ name: 'xRAPM (Engelmann)', value: 1.104, lo: 0.911, hi: 1.327 },
 	{ name: 'DARKO (darko.app, Jan 6)', darko: true, value: 1.094, lo: 0.903, hi: 1.311 },
@@ -70,7 +70,7 @@ const fmt = (v: number) => v.toFixed(2);
 
 			{/* How it works: plain description of scripts/dpm_v3.py; Griffin may rewrite this slot. */}
 			<section id="how-it-works" class="how-it-works" data-slot="how-it-works">
-				<h2>How it works</h2>
+				<h2>How Singular Plus-Minus (SiPM) works</h2>
 				<ul>
 					<li>
 						In: box-score rates and a lineup-based RAPM rating, for offense
@@ -91,7 +91,7 @@ const fmt = (v: number) => v.toFixed(2);
 						<span class="fodder-tag">FODDER: Griffin rewrites</span>
 						<p>
 							Everything starts with the base model: how good is each player, and how good might he
-							become. Ours is DPM v3. We froze it on January 6, 2026, and scored it on every lineup
+							become. Ours is SiPM. We froze it on January 6, 2026, and scored it on every lineup
 							for the rest of the regular season.
 						</p>
 						<p>
@@ -99,7 +99,7 @@ const fmt = (v: number) => v.toFixed(2);
 							Engelmann's xRAPM is close.
 						</p>
 						<p>
-							DPM v3 adds +0.052 over the same-machinery average of RAPM and BPM, ahead in 18 of 18
+							SiPM adds +0.052 over the same-machinery average of RAPM and BPM, ahead in 18 of 18
 							held-out seasons. Against the harder bar, where RAPM and BPM each get their own fitted
 							weight, it still adds +0.040 and leads in 17 of 18.
 						</p>
@@ -178,9 +178,9 @@ const fmt = (v: number) => v.toFixed(2);
 							1%; the gaps between ratings are the result.
 						</dd>
 						<dt>vs EPM</dt>
-						<dd>DPM v3 +0.038 (games −0.042 to +0.119; teams −0.068 to +0.142): level.</dd>
+						<dd>SiPM +0.038 (games −0.042 to +0.119; teams −0.068 to +0.142): level.</dd>
 						<dt>vs DARKO</dt>
-						<dd>DPM v3 +0.162 (games +0.082 to +0.249; teams +0.075 to +0.241): ahead.</dd>
+						<dd>SiPM +0.162 (games +0.082 to +0.249; teams +0.075 to +0.241): ahead.</dd>
 						<dt>Fair baseline</dt>
 						<dd>
 							Next-season lineups, held out, 2008-09 to 2025-26, percentage points of error removed:<br />
