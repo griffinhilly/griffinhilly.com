@@ -9,13 +9,13 @@
   PENDING. Each must be gone (rewritten, or filled from the rebuilt data).
 
   Chart data source (copied by hand; the analysis repo is not part of this build):
-    career-planning/applications/chicago-bulls/singular/data/model/public_asof_v3.json
-    -> corrected_public.regular_season_after_jan6.error_removed_pct and .ci90
-    (Revision 3 run, 2026-10-01 13:03 CT: no January 6 games, priors fitted only on earlier
-    seasons, DARKO from darko.app's own 2026-01-06 values). Summary: agents/w3-base-models/asof_corrected.md.
-  Fair baseline: data/model/dpm_v3.json -> T2.differences
-    ."P4 minus P9 average with learned scale, newcomer value and age" (T2.headline_bar) and
-    ."P4 minus P2 average machinery: layer over RAPM 3 seasons + BPM, with age" (harder bar).
+    career-planning/applications/chicago-bulls/singular/data/model/asof_jan6full.json modes.oracle
+    -> score and ci90_twoway (teams x games; the interval the placebo test found calibrated).
+    Full re-run 2026-10-02; proposed by agents/live-page-update/apply_numbers.py on 2026-10-02 09:33.
+    DARKO: darko.app asof=2026-01-05 (games before Jan 6). Replay line: data/model/asof_replay.json
+    runs[*].pooled['DARKO | H30 | oos'].
+  Fair baseline: review/critics-postfix/work/t2_recompute_nosus_min250.json contrasts['P4 - P9bb']
+    (3-season RAPM + Basketball-Reference BPM above 250 minutes, same learned layer; reproduces dpm_v3.json T2).
 */
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
@@ -33,15 +33,15 @@ const SHOW_FODDER = !HIDE_UNFILLED_FODDER;
 const SHOW_QUESTIONS = false;
 
 // Frozen-date test: % of the baseline's weighted squared error removed, with 90% intervals
-// (games resampled).
+// (teams and games resampled together).
 const FROZEN = [
-	{ name: 'SiPM', ours: true, value: 1.255, lo: 1.074, hi: 1.493 },
-	{ name: 'EPM', value: 1.217, lo: 1.017, hi: 1.449 },
-	{ name: 'xRAPM (Engelmann)', value: 1.104, lo: 0.911, hi: 1.327 },
-	{ name: 'DARKO (darko.app, Jan 6)', darko: true, value: 1.094, lo: 0.903, hi: 1.311 },
+	{ name: 'SiPM', ours: true, value: 1.246, lo: 0.843, hi: 1.738 },
+	{ name: 'EPM', value: 1.207, lo: 0.794, hi: 1.724 },
+	{ name: 'xRAPM (Engelmann)', value: 1.096, lo: 0.700, hi: 1.607 },
+	{ name: 'DARKO (darko.app, Jan 6)', darko: true, value: 1.097, lo: 0.707, hi: 1.602 },
 ];
 const rows = FROZEN.filter((r) => SHOW_DARKO || !r.darko);
-const AXIS_MAX = 1.6;
+const AXIS_MAX = 1.8;
 const TICKS = [0, 0.5, 1.0, 1.5];
 const pct = (v: number) => `${((v / AXIS_MAX) * 100).toFixed(3)}%`;
 const fmt = (v: number) => v.toFixed(2);
@@ -96,13 +96,11 @@ const fmt = (v: number) => v.toFixed(2);
 							for the rest of the regular season.
 						</p>
 						<p>
-							It finished level with EPM, the best public model, and level with DARKO across the season.
+							It finished level with EPM, the best public model, and level with DARKO across the replay dates.
 							Engelmann's xRAPM is close.
 						</p>
 						<p>
-							SiPM adds +0.052 over the same-machinery average of RAPM and BPM, ahead in 18 of 18
-							held-out seasons. Against the harder bar, where RAPM and BPM each get their own fitted
-							weight, it still adds +0.040 and leads in 17 of 18.
+							Against the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given the same learned layer), SiPM adds +0.016, ahead in 13 of 18 held-out seasons, most of it in the last nine.
 						</p>
 						<p>
 							The next test is prospective: a freeze in the 2026-27 season.
@@ -179,20 +177,18 @@ const fmt = (v: number) => v.toFixed(2);
 							1%; the gaps between ratings are the result.
 						</dd>
 						<dt>vs EPM</dt>
-						<dd>SiPM +0.038 (games −0.042 to +0.119; teams −0.068 to +0.142): level.</dd>
+						<dd>Level: SiPM +0.039 (90% −0.103 to +0.165).</dd>
+						<dt>vs public average</dt>
+						<dd>Level with the average of the four public models: SiPM +0.034 (90% −0.112 to +0.161).</dd>
 						<dt>vs DARKO</dt>
-						<dd>On January 6: SiPM +0.162 (games +0.082 to +0.249; teams +0.075 to +0.241), ahead on that date. Across every game day of the 2025-26 season: level.</dd>
+						<dd>Level across the replay: 135 game days of 2025-26 and weekly dates in 2024-25 and 2023-24, each scored on the next 30 days. The replay cannot separate the two. On January 6 alone SiPM led by +0.149: that clears a 90% interval (+0.022 to +0.269) but not a 97.5% one (−0.022 to +0.319).</dd>
 						<dt>Fair baseline</dt>
 						<dd>
-							Next-season lineups, held out, 2008-09 to 2025-26, percentage points of error removed:<br />
-							+0.052 (+0.043 to +0.061) over the same-machinery average of RAPM and BPM, ahead in 18 of
-							18 seasons.<br />
-							+0.040 (+0.032 to +0.049) when RAPM and BPM each get their own fitted weight, ahead in 17 of
-							18.
+							Ahead of the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given SiPM's learned layer), next-season lineups held out 2008-09 to 2025-26: +0.016 percentage points of error removed (90% CI +0.008 to +0.023), ahead in 13 of 18 seasons, most of it in the last nine.
 						</dd>
 					</dl>
 					<p class="source-line">
-						90% intervals from resampled games and teams; EPM and xRAPM from the SportsandMath
+						90% intervals resample teams and games together (the only method our placebo test found calibrated); EPM and xRAPM from the SportsandMath
 						panel posted Jan 6, 2026; DARKO from darko.app. LEBRON is not shown: we could not verify the date of its values. In the 85 playoff games, LEBRON scored best.
 					</p>
 				</figure>
@@ -257,9 +253,9 @@ const fmt = (v: number) => v.toFixed(2);
 						<p class="evidence">
 							<span class="ev-tag">Evidence</span>
 							Usage rule declared before results; 708 playoff teams, 1980-81 to 2024-25. Star-creator teams
-							won 33 titles where their pre-playoff odds implied 26.3 (90% chance range 21-31). Title odds
-							×2.26 (90%: 1.39 to 4.40). All 7 rule variants point the same way; the strictest one's
-							interval includes no effect. 12 of the 45 champions had no star creator under the declared rule.
+							won 32 titles where their pre-playoff odds implied 26.0 (90% chance range 21-31). Title odds
+							×2.06 (90%: 1.25 to 3.96). All 7 rule variants point the same way; the strictest one's
+							interval includes no effect. 13 of the 45 champions had no star creator under the declared rule.
 						</p>
 					</article>
 
@@ -277,8 +273,7 @@ const fmt = (v: number) => v.toFixed(2);
 						<p class="evidence">
 							<span class="ev-tag">Evidence</span>
 							Letting each player's playoff rating move off his regular-season rating improves prediction of
-							held-out playoff games by a median 0.04% of the error (best single postseason: 0.45%). 29
-							postseasons, 1996-97 to 2025-26 (2019-20 not included); 5,818 player-postseasons.
+							held-out playoff games by a median 0.04% of the error (best single postseason: 0.45%). 30 postseasons, 1996-97 to 2025-26; 6,092 player-postseasons.
 						</p>
 					</article>
 				</section>
