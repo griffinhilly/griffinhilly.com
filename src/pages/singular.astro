@@ -35,7 +35,7 @@ const SHOW_QUESTIONS = false;
 // Frozen-date test: % of the baseline's weighted squared error removed, with 90% intervals
 // (teams and games resampled together).
 const FROZEN = [
-	{ name: 'SiPM', ours: true, value: 1.246, lo: 0.843, hi: 1.738 },
+	{ name: 'SiPM', ours: true, value: 1.266, lo: 0.845, hi: 1.757 },
 	{ name: 'EPM', value: 1.207, lo: 0.794, hi: 1.724 },
 	{ name: 'xRAPM (Engelmann)', value: 1.096, lo: 0.700, hi: 1.607 },
 	{ name: 'DARKO (darko.app, Jan 6)', darko: true, value: 1.097, lo: 0.707, hi: 1.602 },
@@ -100,7 +100,7 @@ const fmt = (v: number) => v.toFixed(2);
 							Engelmann's xRAPM is close.
 						</p>
 						<p>
-							Against the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given the same learned layer), SiPM adds +0.016, ahead in 13 of 18 held-out seasons, most of it in the last nine.
+							Against the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given the same learned layer), SiPM adds +0.017, ahead in 12 of 18 held-out seasons, most of it in the last nine.
 						</p>
 						<p>
 							The next test is prospective: a freeze in the 2026-27 season.
@@ -177,14 +177,14 @@ const fmt = (v: number) => v.toFixed(2);
 							1%; the gaps between ratings are the result.
 						</dd>
 						<dt>vs EPM</dt>
-						<dd>Level: SiPM +0.039 (90% −0.103 to +0.165).</dd>
+						<dd>Level: SiPM +0.059 (90% −0.082 to +0.195).</dd>
 						<dt>vs public average</dt>
-						<dd>Level with the average of the four public models: SiPM +0.034 (90% −0.112 to +0.161).</dd>
+						<dd>Level with the average of the four public models: SiPM +0.053 (90% −0.085 to +0.190).</dd>
 						<dt>vs DARKO</dt>
-						<dd>Level across the replay: 135 game days of 2025-26 and weekly dates in 2024-25 and 2023-24, each scored on the next 30 days. The replay cannot separate the two. On January 6 alone SiPM led by +0.149: that clears a 90% interval (+0.022 to +0.269) but not a 97.5% one (−0.022 to +0.319).</dd>
+						<dd>Level across the replay: 135 game days of 2025-26 and weekly dates in 2024-25 and 2023-24, each scored on the next 30 days. The replay cannot separate the two. On January 6 alone SiPM led by +0.169: that clears a 90% interval (+0.037 to +0.298) but not a 97.5% one (−0.012 to +0.355).</dd>
 						<dt>Fair baseline</dt>
 						<dd>
-							Ahead of the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given SiPM's learned layer), next-season lineups held out 2008-09 to 2025-26: +0.016 percentage points of error removed (90% CI +0.008 to +0.023), ahead in 13 of 18 seasons, most of it in the last nine.
+							Ahead of the fairest bar we built (3-season RAPM plus Basketball-Reference BPM, given SiPM's learned layer), next-season lineups held out 2008-09 to 2025-26: +0.017 percentage points of error removed (90% CI +0.009 to +0.025), ahead in 12 of 18 seasons, most of it in the last nine.
 						</dd>
 					</dl>
 					<p class="source-line">
