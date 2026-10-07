@@ -31,6 +31,16 @@ const posts = (await getCollection('blog'))
 			<section class="block">
 				<SectionHeader title="Projects" href="/projects" linkLabel="See all →" />
 				<div class="card-grid">
+					<ProjectCard title="Singular" href="/singular" badge="In Progress">
+						A player-evaluation model powerful enough to compete with the best public models, and
+						flexible enough to answer any question a front office wants to know.
+					</ProjectCard>
+
+					<ProjectCard title="NBA Ranker" href="https://nba-ranker.pages.dev" draft={true}>
+						A crowd-consensus all-time NBA player ranking. Reorder the list, vote on
+						head-to-head matchups, and watch every input move the global consensus.
+					</ProjectCard>
+
 					<ProjectCard
 						title="Open Knowledge Graph"
 						href="https://griffinhilly.github.io/open-knowledge-graph/"
@@ -43,20 +53,6 @@ const posts = (await getCollection('blog'))
 						A philosophical framework built around agency — the capacity for, and tendency
 						toward, rational autonomy.
 					</ProjectCard>
-
-					<ProjectCard
-						title="Claude Code Synthesis"
-						href="https://github.com/griffinhilly/claude-code-synthesis"
-						draft={true}
-					>
-						Patterns and workflow for agentic software development — a synthesis of how to
-						build with Claude Code.
-					</ProjectCard>
-
-					<ProjectCard title="NBA Ranker" href="https://nba-ranker.pages.dev" draft={true}>
-						A crowd-consensus all-time NBA player ranking. Reorder the list, vote on
-						head-to-head matchups, and watch every input move the global consensus.
-					</ProjectCard>
 				</div>
 			</section>
 
@@ -67,11 +63,6 @@ const posts = (await getCollection('blog'))
 					<ProjectCard title="Bottom Billion and Beyond" badge="Currently building" draft={true}>
 						An atlas of development traps — interactive data visualization on the economics
 						of extreme poverty. [layered title TBD]
-					</ProjectCard>
-
-					<ProjectCard title="Land-Value Tax Transition" badge="Currently building" draft={true}>
-						A quantitative model of what announcing a property-tax-to-LVT transition would
-						do to land prices, mortgage and CRE loan books, and bank capital.
 					</ProjectCard>
 				</div>
 			</section>
@@ -95,7 +86,7 @@ const posts = (await getCollection('blog'))
 
 			<!-- About blurb -->
 			<section class="block about">
-				<SectionHeader title="About" href="/about" linkLabel="More →" />
+				<SectionHeader title="About" />
 				<p class="about-blurb">
 					Fixed income trader. Amateur philosopher. Eternal student.<br />
 					Husband to Madi Hilly. Father of two and counting. Proud Chicagoan.
