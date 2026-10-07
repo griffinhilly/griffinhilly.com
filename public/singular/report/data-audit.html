@@ -1,0 +1,201 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data audit</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Errors found in the providers' own NBA data, grouped by source, with their size, what they distort and how each was handled.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600&display=swap">
+<style>
+:root{--bg:#f7f5f1;--panel:#ffffff;--ink:#1d1b19;--muted:#615b53;--line:#e2ddd4;--accent:#b4431f;--accent2:#1f5f8b;
+--ok:#4b7a36;--ex:#8b6a00;--doc:#1f5f8b;--op:#b4431f;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151413;--panel:#1e1c1a;--ink:#efeae2;--muted:#aaa398;--line:#36322d;
+--accent:#e2774f;--accent2:#6fb0dc;--ok:#93bf78;--ex:#d9a62a;--doc:#6fb0dc;--op:#e88a62;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151413;--panel:#1e1c1a;--ink:#efeae2;--muted:#aaa398;--line:#36322d;
+--accent:#e2774f;--accent2:#6fb0dc;--ok:#93bf78;--ex:#d9a62a;--doc:#6fb0dc;--op:#e88a62;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:28px 16px 64px}
+h1,h2{font-family:"IBM Plex Serif",Georgia,serif;text-wrap:balance;line-height:1.22}
+h1{font-size:2.5rem;margin:0 0 .4rem;letter-spacing:-.01em}
+.back{font-size:.9rem;margin:0 0 1.2rem}.back a{color:var(--accent2)}
+.kicker{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin:0 0 .4rem}
+h2{font-size:1.5rem;margin:2.8rem 0 .5rem;padding-top:.7rem;border-top:2px solid var(--ink)}
+h2 .cnt{font-family:"IBM Plex Mono",monospace;font-size:1rem;color:var(--muted);font-weight:500;margin-left:.4rem}
+p{margin:.55rem 0;max-width:70ch}
+.src-note{color:var(--muted);font-size:.92rem;margin:.1rem 0 .6rem}
+.stats{display:flex;flex-wrap:wrap;gap:12px 28px;margin:1rem 0 1rem}
+.stat b{display:block;font-family:"IBM Plex Mono",monospace;font-size:1.75rem;color:var(--accent2);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:.84rem;color:var(--muted);display:block;max-width:22ch}
+.bench{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px 12px;margin:14px 0;overflow-x:auto}
+.bench table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+.bench th{font-weight:600;text-align:left;border-bottom:1px solid var(--ink);padding:4px 10px 4px 0;font-size:.8rem;color:var(--muted);vertical-align:bottom}
+.bench td{border-bottom:1px solid var(--line);padding:5px 10px 5px 0;vertical-align:top}
+.bench td a{color:inherit;text-decoration-color:var(--line)}
+.bench .num{text-align:right;white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:.84rem}
+.bench th.num{font-family:inherit}
+.bench tr.tot td{font-weight:600;border-top:1px solid var(--ink);border-bottom:0}
+@media (max-width:560px){.bench{padding:10px 8px}.bench table{font-size:.82rem}.bench th{font-size:.72rem;padding-right:6px}.bench td{padding-right:6px}.bench th.num{white-space:normal}}
+ul.rc{list-style:none;padding:0;margin:.4rem 0 0;border-top:1px solid var(--line)}
+ul.rc li{padding:.75rem 0;border-bottom:1px solid var(--line)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:.3rem}
+.tag{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600;display:inline-block;padding:1px 8px;border-radius:999px;border:1px solid}
+.tag.fixed{color:var(--ok);border-color:var(--ok)}.tag.excluded{color:var(--ex);border-color:var(--ex)}
+.tag.documented{color:var(--doc);border-color:var(--doc)}.tag.open{color:var(--op);border-color:var(--op)}
+.prov{font-size:.8rem;color:var(--muted)}
+.d{margin:.15rem 0;max-width:72ch}
+.e{margin:.15rem 0;max-width:72ch;font-size:.92rem;color:var(--muted)}
+.e b{color:var(--ink);font-weight:600}
+.left{font-size:.86rem;color:var(--muted);margin:.25rem 0 0;max-width:72ch}
+</style></head><body><main class="wrap">
+<p class="back"><a href="/singular/report/">&larr; Back to the report</a></p>
+<p class="kicker">Appendix</p><h1>Data audit</h1>
+<p>Every data source in the analysis was audited column by column. The list below covers only errors in the providers' own data: NBA.com feeds, public datasets copied from them, Basketball-Reference, Barttorvik and other public sources. Each error was corrected, kept out of the analysis, or flagged where it is used.</p>
+<div class="stats">
+<div class="stat"><b>49</b><span>errors in provider data</span></div>
+<div class="stat"><b>37</b><span>corrected</span></div>
+<div class="stat"><b>6</b><span>kept out of the analysis</span></div>
+<div class="stat"><b>6</b><span>flagged where used</span></div>
+</div>
+<h2>Errors by source</h2><div class="bench"><table><thead><tr><th>Source</th><th class="num">Errors</th><th class="num">Corrected</th><th class="num">Kept out</th><th class="num">Flagged</th></tr></thead><tbody>
+<tr><td><a href="#box-scores">Box scores</a></td><td class="num">14</td><td class="num">8</td><td class="num">4</td><td class="num">2</td></tr>
+<tr><td><a href="#play-by-play">Play-by-play</a></td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#tracking-dashboards">Tracking dashboards</a></td><td class="num">13</td><td class="num">12</td><td class="num">0</td><td class="num">1</td></tr>
+<tr><td><a href="#synergy-play-types">Synergy play types</a></td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#draft-and-combine">Draft and combine</a></td><td class="num">6</td><td class="num">4</td><td class="num">0</td><td class="num">2</td></tr>
+<tr><td><a href="#contracts-and-transactions">Contracts and transactions</a></td><td class="num">2</td><td class="num">0</td><td class="num">1</td><td class="num">1</td></tr>
+<tr><td><a href="#player-bios">Player bios</a></td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#college-and-international">College and international</a></td><td class="num">4</td><td class="num">4</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#third-party-player-ratings">Third-party player ratings</a></td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#several-sources">Several sources</a></td><td class="num">2</td><td class="num">1</td><td class="num">1</td><td class="num">0</td></tr>
+<tr class="tot"><td>All sources</td><td class="num">49</td><td class="num">37</td><td class="num">6</td><td class="num">6</td></tr></tbody></table></div>
+<h2 id="box-scores">Box scores<span class="cnt">14</span></h2>
+<p class="src-note">Game and season box scores.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Stored final scores are wrong in 33 games (20 from 1996-2018, 13 in 1989), including two stored ties.</p><p class="e"><b>Would distort:</b> Standings (2004-05 Portland one win short, Toronto one over) and game margins.</p>
+</li>
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">1982-83 box scores lack offensive and defensive rebound splits on 5,309 rows, and some steals.</p><p class="e"><b>Would distort:</b> Rebound and steal rates in any study that starts in 1982-83.</p>
+</li>
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">From 1976 to 1985, some scorers show 0 minutes in nearly every game (one 1984-85 player: 0 minutes in 80 games).</p><p class="e"><b>Would distort:</b> Per-minute rates for about 250 player-seasons in 1982-85.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Box-score minutes are written as &quot;22:60&quot; instead of &quot;23:00&quot; on about 60 rows in 2024-26.</p><p class="e"><b>Would distort:</b> Minutes totals, by 0.4 minutes per affected row, when parsed as written.</p>
+</li>
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Stats the league did not record are stored as 0: blocks and steals before 1973-74, turnovers before 1977-78, plus-minus before 1996-97, game minutes before 1982-83. About 60,000 early game rows show impossible shooting lines, such as makes above attempts.</p><p class="e"><b>Would distort:</b> Any shooting or per-minute study before 1982-83.</p>
+</li>
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">1946-54 coverage is thin (1949-50: 122 of 561 games), and George Mikan carries 7 duplicate rows copied from Ed Mikan.</p><p class="e"><b>Would distort:</b> Career totals that reach back to 1946-54.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Label slips: Goga Bitadze stored as &quot;ga&quot; on 470 rows, blank playoff labels in 1982-95, and two spellings of preseason.</p><p class="e"><b>Would distort:</b> Name lookups and game-type filters.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">1984-85 team rebound totals include team rebounds: 6.77 more per team-game than the player sums.</p><p class="e"><b>Would distort:</b> Team rebound rates in 1984-85.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Final scores are rotated or swapped in 6 games (games 5-7 of a 1981 East semifinal and 3 others), and one 1974-75 record reads 41-41 instead of 40-42.</p><p class="e"><b>Would distort:</b> Margins and records in those seasons.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Team turnovers in the 2000-01 playoffs are double the player sum in 11 of 142 team-games (3 more in 2003-04). Team turnovers for 1985-95 regular seasons leave out team-charged turnovers.</p><p class="e"><b>Would distort:</b> Playoff possessions in 2000-01, and offensive Win Shares for 1985-95 (3-7% low).</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Player-game rows for 1973-95: phantom 0-minute scorer rows (84 team-games in 1982-83), missing rows in 1984-95 (113 team-games, 778 points), short minutes in 1984-85, and bogus playoff rows.</p><p class="e"><b>Would distort:</b> Per-minute rates and games played in 1982-85, and point totals in 1984-95.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Live box-score files for 15 games froze as partial in-game snapshots (minutes far below 240), and live files are not updated after official stat corrections.</p><p class="e"><b>Would distort:</b> Minutes and games-missed reasons in those games.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Player box sums differ from the team box in about 40 team-games of 1996-2002 (steals, fouls, assists, blocks).</p><p class="e"><b>Would distort:</b> Team totals rebuilt from player rows, in under 0.1% of team-games per stat.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Points differ from 2 x FGM + 3PM + FTM in 44 player-game rows from 1955-56 to 1963-64.</p><p class="e"><b>Would distort:</b> Points before 1964, by a few.</p>
+</li>
+</ul>
+<h2 id="play-by-play">Play-by-play<span class="cnt">2</span></h2>
+<p class="src-note">Event-by-event game logs.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">2019-20 play-by-play mixes two feed formats: substitutions do not balance in 221 games, only 12,053 of 16,200 steals carry a player, and 9 games are cut short.</p><p class="e"><b>Would distort:</b> 2019-20 lineup ratings and any steal-based measure that season.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Small play-by-play gaps: 3 games absent, 4,820 padded action labels in 2000-01, 3 impossible shot distances (up to 1,640 ft), and 2 games one point short.</p><p class="e"><b>Would distort:</b> Little beyond those games.</p>
+</li>
+</ul>
+<h2 id="tracking-dashboards">Tracking dashboards<span class="cnt">13</span></h2>
+<p class="src-note">NBA.com tracking: hustle, speed and distance, defended shots, passes, matchups (who guarded whom) and Hawk-Eye shot logs.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Catch-and-shoot and pull-up three-point makes and attempts are blank where the true value is zero.</p><p class="e"><b>Would distort:</b> Shooting on those shots for 316 and 257 player-seasons, if blanks are treated as missing.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Corrupt tracking in three 2025-26 games: 39 regular-season player rows average above 6 mph, up to 22.6 mph.</p><p class="e"><b>Would distort:</b> Season speed and distance for every player in those games.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">The 2024-25 file of shots defended within 6 feet was served wrong on one day: 235 players had more attempts under 6 feet than under 10 feet (89,679 in all, against 71,396 two days later).</p><p class="e"><b>Would distort:</b> Rim-protection numbers for 2024-25.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">The 2015-16 regular-season hustle file covers 2 games but is served as a season. Box-outs and loose balls read 0 before 2017-18, when they were not tracked.</p><p class="e"><b>Would distort:</b> Hustle rates in 2015-16, and box-out trends that treat untracked zeros as real.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Defended shot attempts sum to 108-112% of league attempts from 2017-18 to 2023-24, because several defenders share one shot.</p><p class="e"><b>Would distort:</b> Defended-shot totals compared across seasons.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Tracking definitions changed in 2025-26: seconds per touch +34%, drives +49%, passes received per pass made from 1.000 to 0.883.</p><p class="e"><b>Would distort:</b> Year-over-year drive, touch and possession comparisons into 2025-26.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Matchup data (who guarded whom) doubles partial possessions in 69 games, mostly late in 2018-19.</p><p class="e"><b>Would distort:</b> Matchup possession counts, expected attempts and guarded-height averages.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Season tracking rows carry the player&#x27;s latest team. 77 rows name a team he never played for that season.</p><p class="e"><b>Would distort:</b> Team assignment and team-change flags.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com (Hawk-Eye)</span></div><p class="d">The Hawk-Eye shot log returns 30 shots twice.</p><p class="e"><b>Would distort:</b> Shot counts for the players involved.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">Tracking files contradict themselves: play-type points per possession stored rounded in 18 files, rebound contest splits that do not sum to totals, and assists above potential assists on 102 rows.</p><p class="e"><b>Would distort:</b> Shares and rates above 100% unless clipped.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com tracking</span></div><p class="d">The 2024-25 defended-threes dashboard serves a stale copy unless the request changes: 2-point plus 3-point attempts miss the total for 63% of players.</p><p class="e"><b>Would distort:</b> Three-point defense for 2024-25.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">NBA.com</span></div><p class="d">Definitions changed without notice: 2024-25 playoff tracking already uses the 2025-26 definitions, and play-by-play shot distance reads 0 ft for most corner threes in the legacy feed.</p><p class="e"><b>Would distort:</b> Any trend that pools playoff tracking or shot distance across the change.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">The passes file includes players passing to themselves (34 rows per file), and bulk play-by-play has about 35 impossible shot coordinates.</p><p class="e"><b>Would distort:</b> Pass totals and shot charts, slightly.</p>
+</li>
+</ul>
+<h2 id="synergy-play-types">Synergy play types<span class="cnt">3</span></h2>
+<p class="src-note">Offensive and defensive play-type tables.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com (Synergy play types)</span></div><p class="d">2023-24 offensive tables have no rows for some high-usage players, and regular-season files drop rows under 10 possessions without saying so.</p><p class="e"><b>Would distort:</b> Play-type shares and volumes, when a missing row is read as zero.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com (Synergy play types)</span></div><p class="d">Defensive play types changed meaning in 2023-24: defensive possessions exceed offensive ones by 6-23%, and the ball-handler share jumped from 0.28 to 0.41.</p><p class="e"><b>Would distort:</b> Defensive play-type trends across 2023-24.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com (Synergy play types)</span></div><p class="d">2025-26 play-type files count about 4% fewer games than the box score.</p><p class="e"><b>Would distort:</b> Play-type volume per game or per 36, 4-7% low.</p>
+</li>
+</ul>
+<h2 id="draft-and-combine">Draft and combine<span class="cnt">6</span></h2>
+<p class="src-note">Draft history, combine measurements and drills, public draft datasets.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">The player file codes undrafted players as pick -1 or -22, and -22 also means &quot;drafted, pick unknown&quot; (1,323 players).</p><p class="e"><b>Would distort:</b> Draft-slot studies: undrafted players read as top picks. One era table counted 933 player-seasons as No. 1 picks.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Combine max vertical changed protocol around 2013: max minus standing went from about 4-5 in to 5.5-6.75 in. 8 rows show max below standing.</p><p class="e"><b>Would distort:</b> Leap percentiles pooled across eras.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">NBA.com</span></div><p class="d">Combine ids and measurements: 23 NBA players carry a non-NBA or wrong id, numeric and feet-inch fields disagree (one wingspan by 4 in), and 61 of 76 barefoot heights in 2007 are rounded down.</p><p class="e"><b>Would distort:</b> Links from the combine to NBA careers, and 2007 height and length measures.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Public pre-draft dataset</span></div><p class="d">2010 ages are class-year values (off by up to 1.34 years), the international flag is empty for 2010-15, and unranked prospects are coded 0.</p><p class="e"><b>Would distort:</b> Draft-age effects and international splits in draft studies.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">NBA.com</span></div><p class="d">From 2021, combine shooting drills are mislabelled: one spot holds the whole 25-shot spot-up drill, and one off-dribble field holds a 30-shot total.</p><p class="e"><b>Would distort:</b> Drill shooting by spot and range.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">NBA.com</span></div><p class="d">Draft history disagrees with the player file on 2 rows: a draft year, and a 10th-round pick given as round 0, pick 0.</p><p class="e"><b>Would distort:</b> Two 1950s draft records.</p>
+</li>
+</ul>
+<h2 id="contracts-and-transactions">Contracts and transactions<span class="cnt">2</span></h2>
+<p class="src-note">Contracts, salaries, options and transactions.</p><ul class="rc">
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Basketball-Reference</span></div><p class="d">The 2013-14 team salary table is incomplete: 419 salaried players against 487 on rosters.</p><p class="e"><b>Would distort:</b> Payroll and contract pricing for 2013-14.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">Basketball-Reference</span></div><p class="d">Team contract pages omit some dead-money cap hits: 3 rows, $5.08M in 2026-27.</p><p class="e"><b>Would distort:</b> Team payroll totals for 2026-27.</p>
+</li>
+</ul>
+<h2 id="player-bios">Player bios<span class="cnt">2</span></h2>
+<p class="src-note">Birth dates, heights and player ids.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">The player file holds 97 birth dates of 1900-01-01 and lists one player as 15 at his debut.</p><p class="e"><b>Would distort:</b> Ages, aging curves and age at draft.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Six players carry a second player id that NBA.com does not use, which splits their careers (one has 466 games under the old id).</p><p class="e"><b>Would distort:</b> Career totals and aging curves for those players.</p>
+</li>
+</ul>
+<h2 id="college-and-international">College and international<span class="cnt">4</span></h2>
+<p class="src-note">College (Barttorvik) and international league totals.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Barttorvik</span></div><p class="d">Birth dates of the form YYYY-10-15 are class-based placeholders: 28.7% of a draft comparison pool, median error 151 days, max 2.3 years.</p><p class="e"><b>Would distort:</b> Age at draft for college prospects.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Barttorvik</span></div><p class="d">One player id covers unrelated players (12 ids). NBA.com&#x27;s awards feed also gives one player another same-name player&#x27;s award.</p><p class="e"><b>Would distort:</b> College careers and award histories joined by player.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Basketball-Reference</span></div><p class="d">French league and Spanish ACB 2025-26 totals do not add up: points differ from the sum of 2-point, 3-point and free-throw points on 331 rows.</p><p class="e"><b>Would distort:</b> Shooting splits and per-40 rates for players moving between those leagues and the NBA.</p>
+<p class="left">Still to do: 130 of 268 French league players still lack a usable 2-point split.</p>
+</li>
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Barttorvik</span></div><p class="d">Per-game stats use a different game count from games played in 2008, 2015 and 2017-26. 15-20% of rows are off by more than 5%.</p><p class="e"><b>Would distort:</b> Season totals rebuilt from per-game numbers, and college-to-NBA translations.</p>
+</li>
+</ul>
+<h2 id="third-party-player-ratings">Third-party player ratings<span class="cnt">1</span></h2>
+<p class="src-note">Public player-rating sets.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Public metric panel</span></div><p class="d">One rating column is about a month older than the panel&#x27;s posting date, and the file carries no dates.</p><p class="e"><b>Would distort:</b> Comparisons of public ratings on a fixed date.</p>
+</li>
+</ul>
+<h2 id="several-sources">Several sources<span class="cnt">2</span></h2>
+<p class="src-note">Smaller defects spread across several providers.</p><ul class="rc">
+<li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Barttorvik and ESPN</span></div><p class="d">Barttorvik stores some heights as &quot;4-0&quot; (48 in), and ESPN&#x27;s final 2026 draft board has two tied overall ranks.</p><p class="e"><b>Would distort:</b> Height comparisons for college players and draft-board rankings.</p>
+</li>
+<li><div class="meta"><span class="tag excluded">Kept out of the analysis</span><span class="prov">Several providers</span></div><p class="d">Further provider files that no part of the analysis reads carry their own defects, such as a 0-100 percentage scale in 2019 live box files.</p><p class="e"><b>Would distort:</b> Nothing in this analysis; any study that reads those files.</p>
+<p class="left">Still to do: One newer study reads one of these columns; a check flags it.</p>
+</li>
+</ul>
+</main></body></html>
