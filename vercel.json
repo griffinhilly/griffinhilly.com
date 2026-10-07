@@ -1,0 +1,8 @@
+{
+  "redirects": [
+    { "source": "/singular/report", "destination": "/singular/", "permanent": true },
+    { "source": "/singular/report/", "destination": "/singular/", "permanent": true },
+    { "source": "/singular/report/data-audit.html", "destination": "/singular/data-audit.html", "permanent": true },
+    { "source": "/singular/report/report.pdf", "destination": "/singular/report.pdf", "permanent": true }
+  ]
+}
