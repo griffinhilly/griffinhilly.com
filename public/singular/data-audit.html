@@ -51,10 +51,10 @@ ul.rc li{padding:.75rem 0;border-bottom:1px solid var(--line)}
 <p class="kicker">Appendix</p><h1>Data audit</h1>
 <p>Every data source in the analysis was audited column by column. The list below covers only errors in the providers' own data: NBA.com feeds, public datasets copied from them, Basketball-Reference, Barttorvik and other public sources. Each error was corrected, kept out of the analysis, or flagged where it is used.</p>
 <div class="stats">
-<div class="stat"><b>49</b><span>errors in provider data</span></div>
+<div class="stat"><b>50</b><span>errors in provider data</span></div>
 <div class="stat"><b>37</b><span>corrected</span></div>
 <div class="stat"><b>6</b><span>kept out of the analysis</span></div>
-<div class="stat"><b>6</b><span>flagged where used</span></div>
+<div class="stat"><b>7</b><span>flagged where used</span></div>
 </div>
 <h2>Errors by source</h2><div class="bench"><table><thead><tr><th>Source</th><th class="num">Errors</th><th class="num">Corrected</th><th class="num">Kept out</th><th class="num">Flagged</th></tr></thead><tbody>
 <tr><td><a href="#box-scores">Box scores</a></td><td class="num">14</td><td class="num">8</td><td class="num">4</td><td class="num">2</td></tr>
@@ -63,11 +63,11 @@ ul.rc li{padding:.75rem 0;border-bottom:1px solid var(--line)}
 <tr><td><a href="#synergy-play-types">Synergy play types</a></td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td></tr>
 <tr><td><a href="#draft-and-combine">Draft and combine</a></td><td class="num">6</td><td class="num">4</td><td class="num">0</td><td class="num">2</td></tr>
 <tr><td><a href="#contracts-and-transactions">Contracts and transactions</a></td><td class="num">2</td><td class="num">0</td><td class="num">1</td><td class="num">1</td></tr>
-<tr><td><a href="#player-bios">Player bios</a></td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><a href="#player-bios">Player bios</a></td><td class="num">3</td><td class="num">2</td><td class="num">0</td><td class="num">1</td></tr>
 <tr><td><a href="#college-and-international">College and international</a></td><td class="num">4</td><td class="num">4</td><td class="num">0</td><td class="num">0</td></tr>
 <tr><td><a href="#third-party-player-ratings">Third-party player ratings</a></td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
 <tr><td><a href="#several-sources">Several sources</a></td><td class="num">2</td><td class="num">1</td><td class="num">1</td><td class="num">0</td></tr>
-<tr class="tot"><td>All sources</td><td class="num">49</td><td class="num">37</td><td class="num">6</td><td class="num">6</td></tr></tbody></table></div>
+<tr class="tot"><td>All sources</td><td class="num">50</td><td class="num">37</td><td class="num">6</td><td class="num">7</td></tr></tbody></table></div>
 <h2 id="box-scores">Box scores<span class="cnt">14</span></h2>
 <p class="src-note">Game and season box scores.</p><ul class="rc">
 <li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Stored final scores are wrong in 33 games (20 from 1996-2018, 13 in 1989), including two stored ties.</p><p class="e"><b>Would distort:</b> Standings (2004-05 Portland one win short, Toronto one over) and game margins.</p>
@@ -166,11 +166,13 @@ ul.rc li{padding:.75rem 0;border-bottom:1px solid var(--line)}
 <li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">Basketball-Reference</span></div><p class="d">Team contract pages omit some dead-money cap hits: 3 rows, $5.08M in 2026-27.</p><p class="e"><b>Would distort:</b> Team payroll totals for 2026-27.</p>
 </li>
 </ul>
-<h2 id="player-bios">Player bios<span class="cnt">2</span></h2>
+<h2 id="player-bios">Player bios<span class="cnt">3</span></h2>
 <p class="src-note">Birth dates, heights and player ids.</p><ul class="rc">
 <li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">The player file holds 97 birth dates of 1900-01-01 and lists one player as 15 at his debut.</p><p class="e"><b>Would distort:</b> Ages, aging curves and age at draft.</p>
 </li>
 <li><div class="meta"><span class="tag fixed">Corrected</span><span class="prov">Kaggle box-score dataset (copy of NBA records)</span></div><p class="d">Six players carry a second player id that NBA.com does not use, which splits their careers (one has 466 games under the old id).</p><p class="e"><b>Would distort:</b> Career totals and aging curves for those players.</p>
+</li>
+<li><div class="meta"><span class="tag documented">Flagged where it is used</span><span class="prov">NBA.com</span></div><p class="d">Listed heights follow two standards: players who left before the league&#x27;s 2019 re-measurement keep older in-shoes listings, about 0.65 in taller against combine measurements than players listed since.</p><p class="e"><b>Would distort:</b> Any comparison that pools heights across 2019, such as height-based position groups.</p>
 </li>
 </ul>
 <h2 id="college-and-international">College and international<span class="cnt">4</span></h2>
