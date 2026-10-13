@@ -2,19 +2,21 @@
 // A plain data module, not a content collection (CLAUDE.md: no `projects` collection).
 // Descriptions are Griffin's words; `draft: true` marks placeholder copy awaiting his rewrite.
 import type { ImageMetadata } from 'astro';
-import okgTall from '../assets/projects/okg-tall.webp';
+import okgRadial from '../assets/projects/okg-radial.webp';
 import singularTall from '../assets/projects/singular-tall.webp';
 
 export interface Project {
 	title: string;
 	description: string;
-	// featured = full-width section with a scrolling preview; more = full-width row; works = named only
-	tier: 'featured' | 'more' | 'works';
+	// featured = full-width section with an animated preview; works = named only, no link
+	tier: 'featured' | 'works';
 	inProgress?: boolean; // shows the hourglass; leave off for work Griffin is happy to show as it stands
 	href?: string;
 	cta?: string;
 	sourceHref?: string;
-	preview?: ImageMetadata; // tall full-page screenshot that scrolls inside the frame
+	preview?: ImageMetadata; // screenshot shown inside the frame
+	// pan = a tall page scrolls inside the frame; zoom = the image zooms in as you scroll down, out as you scroll up
+	motion?: 'pan' | 'zoom';
 	previewLabel?: string; // address shown in the frame's bar
 	draft?: boolean;
 }
@@ -27,8 +29,9 @@ export const projects: Project[] = [
 		tier: 'featured',
 		href: 'https://openknowledgegraph.com/',
 		cta: 'Explore the graph',
-		preview: okgTall,
+		preview: okgRadial,
 		previewLabel: 'openknowledgegraph.com',
+		motion: 'zoom',
 	},
 	{
 		title: 'Singular',
@@ -39,22 +42,16 @@ export const projects: Project[] = [
 		cta: 'Read the report',
 		preview: singularTall,
 		previewLabel: 'griffinhilly.com/singular',
+		motion: 'pan',
 	},
+	// NBA Ranker hidden 2026-10-13 while its Supabase database is down; restore with tier 'featured' or 'works'.
+	// NBA Draft Anti-Tanking Proposal removed 2026-10-13 (Griffin: fold into Singular; the NBA chose another measure).
 	{
-		title: 'NBA Ranker',
+		title: 'One Billion Years',
 		description:
-			'A crowd-consensus all-time NBA player ranking. Reorder the list, vote on head-to-head matchups, and watch every input move the global consensus.',
-		tier: 'more',
-		href: 'https://nba-ranker.pages.dev',
-		draft: true,
-	},
-	{
-		title: 'NBA Draft Anti-Tanking Proposal',
-		description:
-			"My proposed solution to the NBA's tanking issues, centered around forcing lottery teams to trade picks amongst themselves and thus align incentive to win.",
-		tier: 'more',
-		href: 'https://x.com/GriffinHilly/status/2024462131135934862',
-		sourceHref: 'https://github.com/griffinhilly/nba-tanking-fix-simulator',
+			"There's been little focus on the most tangible benefits of AI deployment: saving 1 billion years of human life annually.",
+		tier: 'works',
+		inProgress: true,
 	},
 	{
 		title: 'Agencyism',

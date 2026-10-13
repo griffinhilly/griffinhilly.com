@@ -1,8 +1,8 @@
 ---
 // Projects, one per row. Featured projects get a full-width section with a live preview:
-// a browser-style frame that tilts flat as it scrolls into view while the site inside it
-// scrolls on its own. Other live work gets a full-width row; work in progress is named
-// with an hourglass. Static and complete without JS or with reduced motion.
+// a browser-style frame that tilts flat as it scrolls into view. Inside it, a tall page
+// scrolls on its own (motion 'pan') or the image zooms in as you scroll down and back out
+// as you scroll up (motion 'zoom'). Work in progress is named with an hourglass. Static and complete without JS or with reduced motion.
 import { Image } from 'astro:assets';
 import { byTier } from '../data/projects';
 import Hourglass from './Hourglass.astro';
@@ -36,7 +36,7 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 					)}
 				</div>
 				{p.preview && (
-					<div class="frame" data-preview>
+					<div class="frame" data-preview data-motion={p.motion ?? 'pan'}>
 						<div class="bar" aria-hidden="true">
 							<i />
 							<i />
@@ -56,30 +56,6 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 					</div>
 				)}
 			</a>
-		))
-	}
-</section>
-
-<section class="sect">
-	<SectionHeader title="More" />
-	{
-		byTier('more').map((p) => (
-			<div class="row">
-				<div>
-					<a class="stretch" href={p.href} {...ext(p.href)}>
-						<h3>{p.title}</h3>
-					</a>
-					<p class:list={{ 'is-draft': p.draft }}>{p.description}</p>
-				</div>
-				<span class="row-links mono">
-					{p.sourceHref && (
-						<a class="src" href={p.sourceHref} target="_blank" rel="noopener">
-							source ↗
-						</a>
-					)}
-					<span class="arr">{arrow(p.href)}</span>
-				</span>
-			</div>
 		))
 	}
 </section>
@@ -122,9 +98,13 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 			f.style.transform = `perspective(1400px) rotateX(${(1 - enter) * 16}deg) scale(${0.93 + 0.07 * enter})`;
 			f.style.opacity = String(0.55 + 0.45 * enter);
 			if (img && win) {
-				const travel = Math.max(0, img.offsetHeight - win.clientHeight);
 				const pass = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (vh * 0.85 + r.height * 0.4)));
-				img.style.transform = `translateY(${-pass * travel}px)`;
+				if (f.dataset.motion === 'zoom') {
+					img.style.transform = `scale(${1 + 0.35 * pass})`;
+				} else {
+					const travel = Math.max(0, img.offsetHeight - win.clientHeight);
+					img.style.transform = `translateY(${-pass * travel}px)`;
+				}
 			}
 		}
 	}
@@ -195,8 +175,7 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 	.feature:hover .go {
 		border-color: var(--accent);
 	}
-	.feature:hover .arr,
-	.row:hover .arr {
+	.feature:hover .arr {
 		transform: translateX(3px);
 	}
 
@@ -251,6 +230,11 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 		height: auto;
 		will-change: transform;
 	}
+	[data-motion='zoom'] .window :global(img) {
+		height: 100%;
+		object-fit: cover;
+		transform-origin: 50% 50%;
+	}
 
 	/* Full-width rows */
 	.row {
@@ -267,37 +251,6 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 		color: var(--ink2);
 		font-size: 0.95rem;
 		max-width: 64ch;
-	}
-	.stretch {
-		text-decoration: none;
-	}
-	.stretch::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-	}
-	.row:hover h3 {
-		color: var(--accent);
-	}
-	.quiet:hover h3 {
-		color: inherit;
-	}
-	.row-links {
-		display: flex;
-		gap: 16px;
-		align-items: center;
-	}
-	.row-links .arr {
-		color: var(--accent);
-		font-size: 1rem;
-	}
-	.src {
-		position: relative;
-		z-index: 1;
-		text-decoration: none;
-	}
-	.src:hover {
-		color: var(--accent);
 	}
 
 	@media (max-width: 640px) {
