@@ -1,0 +1,52 @@
+/*
+  Griffin Hilly — personal chart palette (locked 2026-10-12).
+  Served at https://griffinhilly.com/brand/palette.css for articles and interactives.
+  Series order is fixed: assign --gh-s1, --gh-s2, ... in order and never cycle.
+  Validated colour-blind safe for neighbouring pairs in both modes (dataviz validator).
+  Scatter plots and maps: use only the first three. Dark chart surfaces no lighter than #121512.
+  Dark is the default; light applies under prefers-color-scheme: light or [data-theme="light"].
+*/
+:root {
+	--gh-s1: #994f20; /* brown */
+	--gh-s2: #8b9039; /* olive */
+	--gh-s3: #a968bc; /* purple */
+	--gh-s4: #398b50; /* forest */
+	--gh-s5: #538ae6; /* cobalt */
+	--gh-s6: #c84243; /* red */
+	--gh-s7: #29a8a4; /* teal */
+	--gh-s8: #a87520; /* ochre */
+	--gh-surface: #111411;
+	--gh-ink: #ecebe5;
+	--gh-ink-muted: #b9bcb3;
+	--gh-rule: #262c27;
+}
+:root[data-theme='light'] {
+	--gh-s1: #7e3a06;
+	--gh-s2: #7c8028;
+	--gh-s3: #76338a;
+	--gh-s4: #176938;
+	--gh-s5: #3065cc;
+	--gh-s6: #a92229;
+	--gh-s7: #079296;
+	--gh-s8: #a97416;
+	--gh-surface: #fbfbf8;
+	--gh-ink: #151915;
+	--gh-ink-muted: #454b45;
+	--gh-rule: #dfdfd6;
+}
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme='dark']) {
+		--gh-s1: #7e3a06;
+		--gh-s2: #7c8028;
+		--gh-s3: #76338a;
+		--gh-s4: #176938;
+		--gh-s5: #3065cc;
+		--gh-s6: #a92229;
+		--gh-s7: #079296;
+		--gh-s8: #a97416;
+		--gh-surface: #fbfbf8;
+		--gh-ink: #151915;
+		--gh-ink-muted: #454b45;
+		--gh-rule: #dfdfd6;
+	}
+}

@@ -10,36 +10,36 @@ export default defineConfig({
 	// /singular is link-only (noindex), so keep it out of the sitemap.
 	integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/singular') })],
 	fonts: [
-		// General surface: Inter body + Geist headings. Essay surface: Newsreader
-		// body + Inter headings. (Phase 2 redesign — locked 2026-05-28 after specimen.)
+		// Night Shift redesign (2026-10-12): Schibsted Grotesk for headings + interface,
+		// Literata for essay reading text, JetBrains Mono for labels and dates.
 		{
 			provider: fontProviders.google(),
-			name: 'Inter',
-			cssVariable: '--font-inter',
+			name: 'Schibsted Grotesk',
+			cssVariable: '--font-ui',
 			weights: [400, 500, 600, 700],
 			styles: ['normal', 'italic'],
 			subsets: ['latin'],
-			fallbacks: ['system-ui', 'sans-serif'],
+			fallbacks: ['Helvetica Neue', 'Arial', 'sans-serif'],
 			display: 'swap',
 		},
 		{
 			provider: fontProviders.google(),
-			name: 'Geist',
-			cssVariable: '--font-geist',
-			weights: [500, 600, 700],
-			styles: ['normal'],
-			subsets: ['latin'],
-			fallbacks: ['system-ui', 'sans-serif'],
-			display: 'swap',
-		},
-		{
-			provider: fontProviders.google(),
-			name: 'Newsreader',
-			cssVariable: '--font-newsreader',
+			name: 'Literata',
+			cssVariable: '--font-read',
 			weights: [400, 600],
 			styles: ['normal', 'italic'],
 			subsets: ['latin'],
 			fallbacks: ['Georgia', 'serif'],
+			display: 'swap',
+		},
+		{
+			provider: fontProviders.google(),
+			name: 'JetBrains Mono',
+			cssVariable: '--font-mono',
+			weights: [400, 500],
+			styles: ['normal'],
+			subsets: ['latin'],
+			fallbacks: ['ui-monospace', 'Consolas', 'monospace'],
 			display: 'swap',
 		},
 	],

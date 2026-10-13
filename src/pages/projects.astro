@@ -2,7 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import ProjectTiers from '../components/ProjectTiers.astro';
 import { SITE_TITLE } from '../consts';
 ---
 
@@ -14,70 +14,26 @@ import { SITE_TITLE } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<h1>Projects</h1>
-			<p class="intro">Things I've built and things I'm building.</p>
-
-			<div class="card-grid">
-				<ProjectCard title="Singular" href="/singular" badge="In Progress">
-					A player-evaluation model powerful enough to compete with the best public models, and
-					flexible enough to answer any question a front office wants to know.
-				</ProjectCard>
-
-				<ProjectCard
-					title="Open Knowledge Graph"
-					href="https://griffinhilly.github.io/open-knowledge-graph/"
-				>
-					An open-source prerequisite knowledge graph: more than 15,000 topics across 19 domains of
-					human knowledge.
-				</ProjectCard>
-
-				<ProjectCard
-					title="NBA Draft Anti-Tanking Proposal"
-					href="https://x.com/GriffinHilly/status/2024462131135934862"
-					sourceHref="https://github.com/griffinhilly/nba-tanking-fix-simulator"
-				>
-					My proposed solution to the NBA's tanking issues, centered around forcing lottery
-					teams to trade picks amongst themselves and thus align incentive to win.
-				</ProjectCard>
-
-				<ProjectCard title="Agencyism" href="https://abundanceagendad.substack.com" draft={true}>
-					A philosophical framework built around agency — the capacity for, and tendency
-					toward, rational autonomy.
-				</ProjectCard>
-
-				<ProjectCard title="NBA Ranker" href="https://nba-ranker.pages.dev" draft={true}>
-					A crowd-consensus all-time NBA player ranking. Reorder the list, vote on
-					head-to-head matchups, and watch every input move the global consensus.
-				</ProjectCard>
-
-				<ProjectCard title="Bottom Billion and Beyond" badge="Currently building" draft={true}>
-					An atlas of development traps — interactive data visualization on the economics of
-					extreme poverty. [layered title TBD]
-				</ProjectCard>
-
-			</div>
+			<section class="intro">
+				<h1>Projects</h1>
+				<p>Things I've built and things I'm building.</p>
+			</section>
+			<ProjectTiers />
 		</main>
 		<Footer />
-
 		<style>
-			main {
-				width: 960px;
-			}
 			.intro {
-				color: var(--text-muted);
+				padding-block: 48px 8px;
+			}
+			.intro h1 {
+				font-size: clamp(2.2rem, 6vw, 3.2rem);
+				letter-spacing: -0.03em;
+				line-height: 1.05;
+			}
+			.intro p {
+				color: var(--ink2);
 				font-size: 1.1rem;
-				margin-top: -0.25rem;
-				margin-bottom: 2rem;
-			}
-			.card-grid {
-				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 1.25rem;
-			}
-			@media (max-width: 720px) {
-				.card-grid {
-					grid-template-columns: 1fr;
-				}
+				margin: 12px 0 0;
 			}
 		</style>
 	</body>

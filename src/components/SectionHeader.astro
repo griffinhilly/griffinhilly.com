@@ -18,25 +18,24 @@ const { title, href, linkLabel = 'See all →' } = Astro.props;
 		align-items: baseline;
 		justify-content: space-between;
 		gap: 1em;
-		margin: 0 0 1.2rem 0;
-		padding-bottom: 0.5rem;
-		border-bottom: 1px solid var(--border);
+		padding-bottom: 10px;
+		margin-bottom: 6px;
+		border-bottom: 1px solid var(--rule);
 	}
 	.section-header h2 {
-		margin: 0;
-		font-size: 1.3rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
+		font: 500 0.82rem/1.2 var(--f-ui);
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--ink3);
 	}
 	.section-header a {
 		flex: none;
-		font-family: var(--font-body);
-		font-size: 0.95rem;
-		font-weight: 500;
+		font-size: 0.88rem;
+		color: var(--ink2);
 		text-decoration: none;
 		white-space: nowrap;
 	}
 	.section-header a:hover {
-		text-decoration: underline;
+		color: var(--accent);
 	}
 </style>

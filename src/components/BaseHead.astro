@@ -35,8 +35,18 @@ const resolvedCanonicalURL = canonicalURL ?? new URL(Astro.url.pathname, Astro.s
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-inter" preload />
-<Font cssVariable="--font-geist" />
+<Font cssVariable="--font-ui" preload />
+<Font cssVariable="--font-mono" />
+
+<!-- Theme: follow the system unless the reader picked one with the header toggle. Runs before paint. -->
+<script is:inline>
+	try {
+		const t = localStorage.getItem('theme');
+		if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+	} catch (e) {}
+</script>
+<meta name="theme-color" content="#0b0d0b" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f4f3ee" media="(prefers-color-scheme: light)" />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={resolvedCanonicalURL} />

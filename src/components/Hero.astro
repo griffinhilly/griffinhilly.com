@@ -1,55 +1,62 @@
 ---
 interface Props {
 	name: string;
-	positioning: string; // the one-line positioning statement
-	subtitle?: string;
-	placeholder?: boolean; // true while copy is awaiting Griffin's words
+	positioning: string; // the one-line positioning statement (Griffin's words)
+	bio?: string; // short about line (Griffin's words)
+	now?: string; // small status pill above the name, e.g. what he's working on
 }
-const { name, positioning, subtitle, placeholder = false } = Astro.props;
+const { name, positioning, bio, now } = Astro.props;
 ---
 
 <section class="hero">
+	{now && <span class="now mono"><b aria-hidden="true"></b>{now}</span>}
 	<h1>{name}</h1>
-	<p class:list={['positioning', { placeholder }]}>{positioning}</p>
-	{subtitle && <p class:list={['subtitle', { placeholder }]}>{subtitle}</p>}
+	<p class="lede">{positioning}</p>
+	{bio && <p class="bio">{bio}</p>}
 </section>
 
 <style>
 	.hero {
-		padding: 2.5rem 0 2.75rem;
+		padding-block: 64px 48px;
 	}
-	.hero h1 {
-		font-size: 3.2rem;
-		line-height: 1.05;
-		margin: 0 0 0.4rem 0;
-		letter-spacing: -0.03em;
+	.now {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		padding: 4px 12px;
+		background: var(--surface);
 	}
-	.positioning {
-		font-size: 1.35rem;
-		line-height: 1.35;
-		color: var(--text);
-		max-width: none;
-		margin: 0 0 0.5rem 0;
-		font-weight: 500;
+	.now b {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--accent);
+		box-shadow: 0 0 0 4px var(--glow);
 	}
-	.subtitle {
-		font-size: 1.05rem;
-		color: var(--text-muted);
-		max-width: 52ch;
+	h1 {
+		font-size: clamp(2.6rem, 7vw, 4.4rem);
+		line-height: 1.02;
+		letter-spacing: -0.035em;
+		margin: 22px 0 14px;
+	}
+	.lede {
+		font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+		color: var(--ink2);
+		max-width: 34ch;
 		margin: 0;
+		text-wrap: balance;
 	}
-	/* Visible flag for un-written copy (dev only; remove markers when filled). */
-	.placeholder {
-		color: var(--accent);
-		border-left: 3px dashed rgba(35, 55, 255, 0.4);
-		padding-left: 0.6em;
+	.bio {
+		margin: 28px 0 0;
+		color: var(--ink3);
+		font-size: 0.95rem;
+		max-width: 52ch;
 	}
-	@media (max-width: 720px) {
-		.hero h1 {
-			font-size: 2.4rem;
-		}
-		.positioning {
-			font-size: 1.2rem;
+	@media (max-width: 640px) {
+		.hero {
+			padding-block: 40px 32px;
 		}
 	}
 </style>

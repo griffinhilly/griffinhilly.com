@@ -1,12 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
+import EssayListItem from '../components/EssayListItem.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
+import ProjectTiers from '../components/ProjectTiers.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import EssayListItem from '../components/EssayListItem.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog'))
@@ -24,110 +24,27 @@ const posts = (await getCollection('blog'))
 		<main>
 			<Hero
 				name="Griffin Hilly"
+				now="Now: Singular"
 				positioning="Finding my comparative advantage on an uncertain frontier."
+				bio="Quant trader. Amateur philosopher. Eternal student. Husband to Madi Hilly. Father of two and counting. Proud Chicagoan."
 			/>
 
-			<!-- Projects (curated subset; full set at /projects) -->
-			<section class="block">
-				<SectionHeader title="Projects" href="/projects" linkLabel="See all →" />
-				<div class="card-grid">
-					<ProjectCard title="Singular" href="/singular" badge="In Progress">
-						A player-evaluation model powerful enough to compete with the best public models, and
-						flexible enough to answer any question a front office wants to know.
-					</ProjectCard>
+			<ProjectTiers allLink />
 
-					<ProjectCard title="NBA Ranker" href="https://nba-ranker.pages.dev" draft={true}>
-						A crowd-consensus all-time NBA player ranking. Reorder the list, vote on
-						head-to-head matchups, and watch every input move the global consensus.
-					</ProjectCard>
-
-					<ProjectCard
-						title="Open Knowledge Graph"
-						href="https://griffinhilly.github.io/open-knowledge-graph/"
-					>
-						An open-source prerequisite knowledge graph: more than 15,000 topics across 19 domains of
-						human knowledge.
-					</ProjectCard>
-
-					<ProjectCard title="Agencyism" href="https://abundanceagendad.substack.com" draft={true}>
-						A philosophical framework built around agency — the capacity for, and tendency
-						toward, rational autonomy.
-					</ProjectCard>
-				</div>
-			</section>
-
-			<!-- Currently building -->
-			<section class="block">
-				<SectionHeader title="Currently building" />
-				<div class="card-grid">
-					<ProjectCard title="Bottom Billion and Beyond" badge="Currently building" draft={true}>
-						An atlas of development traps — interactive data visualization on the economics
-						of extreme poverty. [layered title TBD]
-					</ProjectCard>
-				</div>
-			</section>
-
-			<!-- Writing -->
-			<section class="block">
+			<section class="sect">
 				<SectionHeader title="Writing" href="/blog" linkLabel="All writing →" />
-				<div class="essay-list">
-					{
-						posts.map((post) => (
-							<EssayListItem
-								href={`/blog/${post.id}/`}
-								title={post.data.title}
-								description={post.data.description}
-								pubDate={post.data.pubDate}
-							/>
-						))
-					}
-				</div>
-			</section>
-
-			<!-- About blurb -->
-			<section class="block about">
-				<SectionHeader title="About" />
-				<p class="about-blurb">
-					Quant trader. Amateur philosopher. Eternal student.<br />
-					Husband to Madi Hilly. Father of two and counting. Proud Chicagoan.
-				</p>
+				{
+					posts.map((post) => (
+						<EssayListItem
+							href={`/blog/${post.id}/`}
+							title={post.data.title}
+							description={post.data.subtitle ?? post.data.description}
+							pubDate={post.data.pubDate}
+						/>
+					))
+				}
 			</section>
 		</main>
 		<Footer />
-
-		<style>
-			main {
-				width: 960px;
-			}
-			.block {
-				margin: 0 0 3.25rem 0;
-			}
-			.card-grid {
-				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 1.25rem;
-			}
-			.essay-list {
-				display: flex;
-				flex-direction: column;
-			}
-			.about-blurb {
-				font-size: 1.1rem;
-				line-height: 1.6;
-				color: var(--text);
-				max-width: 60ch;
-			}
-			.about-blurb.placeholder {
-				color: var(--accent);
-				font-style: italic;
-				border-left: 3px dashed rgba(35, 55, 255, 0.4);
-				padding-left: 0.7em;
-			}
-			@media (max-width: 720px) {
-				.card-grid {
-					grid-template-columns: 1fr;
-				}
-			}
-		</style>
 	</body>
 </html>

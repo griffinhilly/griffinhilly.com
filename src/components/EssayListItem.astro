@@ -1,6 +1,4 @@
 ---
-import FormattedDate from './FormattedDate.astro';
-
 interface Props {
 	href: string;
 	title: string;
@@ -8,59 +6,48 @@ interface Props {
 	pubDate: Date;
 }
 const { href, title, description, pubDate } = Astro.props;
+const iso = pubDate.toISOString().slice(0, 10);
 ---
 
 <a class="essay-item" href={href}>
-	<span class="date"><FormattedDate date={pubDate} /></span>
+	<time class="mono" datetime={iso}>{iso}</time>
 	<span class="body">
-		<span class="title">{title}</span>
-		{description && <span class="desc">{description}</span>}
+		<strong>{title}</strong>
+		{description && <em>{description}</em>}
 	</span>
 </a>
 
 <style>
 	.essay-item {
-		display: flex;
-		gap: 1.25rem;
-		padding: 0.9rem 0;
-		border-bottom: 1px solid var(--border);
+		display: grid;
+		grid-template-columns: 110px minmax(0, 1fr);
+		gap: 16px;
+		padding: 16px 0;
+		border-bottom: 1px solid var(--rule);
 		text-decoration: none;
-		color: var(--text);
 	}
-	.essay-item:hover .title {
-		color: var(--accent);
+	time {
+		padding-top: 3px;
 	}
-	.date {
-		flex: none;
-		width: 7.5em;
-		color: var(--text-muted);
-		font-size: 0.9rem;
-		padding-top: 0.15em;
-	}
-	.body {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-	}
-	.title {
+	strong {
+		display: block;
 		font-weight: 600;
 		font-size: 1.05rem;
 		letter-spacing: -0.01em;
 		transition: color 0.15s ease;
 	}
-	.desc {
-		color: var(--text-muted);
-		font-size: 0.95rem;
-		line-height: 1.45;
+	.essay-item:hover strong {
+		color: var(--accent);
+	}
+	em {
+		font-style: normal;
+		color: var(--ink3);
+		font-size: 0.93rem;
 	}
 	@media (max-width: 560px) {
 		.essay-item {
-			flex-direction: column;
-			gap: 0.2rem;
-		}
-		.date {
-			width: auto;
-			font-size: 0.82rem;
+			grid-template-columns: 1fr;
+			gap: 2px;
 		}
 	}
 </style>

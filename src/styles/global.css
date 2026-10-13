@@ -1,169 +1,205 @@
 /*
-  Global stylesheet — GENERAL SURFACE (home, /about, /projects, /blog index).
-  Essay pages (/blog/[slug]) layer src/styles/essay.css on top via BlogPost.astro.
-  Phase 2 redesign (2026-05-28): Inter body + Geist headings, modular scale 1.2,
-  flat warm-off-white palette (no gradient). Originally based on Bear Blog's CSS.
+  Global stylesheet — Night Shift redesign (2026-10-12).
+  Dark-first; light mode follows the reader's system setting or the header toggle
+  (data-theme on <html>, set before paint in BaseHead.astro).
+  Type: Schibsted Grotesk (UI + headings), Literata (essay text), JetBrains Mono (labels).
+  Chart series colours (--s1..--s8) are Griffin's locked personal palette; the same
+  values are published for interactives at /brand/palette.css. Never cycle them.
+  Essay pages layer src/styles/essay.css on top via BlogPost.astro.
 */
 
 :root {
-	/* --- Semantic palette (general surface) --- */
-	--bg: #fafafa; /* warm off-white, not pure #fff */
-	--surface: #ffffff; /* cards */
-	--text: #1a1a1a; /* near-black */
-	--text-muted: #525252; /* secondary text, dates, captions */
-	--border: #e5e5e5; /* card outlines, hr */
-	--accent: #2337ff; /* links */
-	--accent-hover: #000d8a;
+	color-scheme: dark;
+	--bg: #0b0d0b;
+	--surface: #111411;
+	--raise: #181c18;
+	--ink: #ecebe5;
+	--ink2: #b9bcb3;
+	--ink3: #868b82;
+	--rule: #262c27;
+	--accent: #7fc48a; /* links, shipped state */
+	--accent-strong: #a4d8ad;
+	--wip: #c9963a; /* in-progress state */
+	--glow: rgba(57, 139, 80, 0.2);
+	--shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
-	/* --- Essay surface palette (used by essay.css) --- */
-	--essay-bg: #fdfcfa; /* cream paper */
-	--essay-text: #2a2a2a;
+	/* Personal palette, dark steps (series order is fixed) */
+	--s1: #994f20; /* brown */
+	--s2: #8b9039; /* olive */
+	--s3: #a968bc; /* purple */
+	--s4: #398b50; /* forest */
+	--s5: #538ae6; /* cobalt */
+	--s6: #c84243; /* red */
+	--s7: #29a8a4; /* teal */
+	--s8: #a87520; /* ochre */
 
-	/* --- Type stacks --- */
-	--font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
-	--font-heading: var(--font-geist), var(--font-inter), system-ui, sans-serif;
-	--font-serif: var(--font-newsreader), Georgia, 'Times New Roman', serif;
-	--mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--f-ui: var(--font-ui), 'Helvetica Neue', Arial, sans-serif;
+	--f-read: var(--font-read), Georgia, serif;
+	--f-mono: var(--font-mono), ui-monospace, Consolas, monospace;
 
-	--box-shadow:
-		0 1px 2px rgba(15, 18, 25, 0.04), 0 4px 12px rgba(15, 18, 25, 0.06);
+	/* Legacy names, kept so older pages (ledger prototype) still resolve */
+	--text: var(--ink);
+	--text-muted: var(--ink2);
+	--border: var(--rule);
+	--font-body: var(--f-ui);
+	--font-heading: var(--f-ui);
+	--font-serif: var(--f-read);
+	--mono: var(--f-mono);
+	--box-shadow: var(--shadow);
+	--black: 236, 235, 229;
+	--gray: 185, 188, 179;
+	--gray-light: 38, 44, 39;
+}
 
-	/* --- Legacy RGB triples (kept so locked components still resolve) --- */
-	--black: 26, 26, 26;
-	--gray: 82, 82, 82;
-	--gray-dark: 42, 42, 42;
-	--gray-light: 229, 229, 229;
+:root[data-theme='light'] {
+	color-scheme: light;
+	--bg: #f4f3ee;
+	--surface: #fbfbf8;
+	--raise: #ffffff;
+	--ink: #151915;
+	--ink2: #454b45;
+	--ink3: #6a7069;
+	--rule: #dfdfd6;
+	--accent: #176938;
+	--accent-strong: #0f4f29;
+	--wip: #8a5c0e;
+	--glow: rgba(23, 105, 56, 0.1);
+	--shadow: 0 10px 30px rgba(20, 25, 20, 0.08);
+	--s1: #7e3a06;
+	--s2: #7c8028;
+	--s3: #76338a;
+	--s4: #176938;
+	--s5: #3065cc;
+	--s6: #a92229;
+	--s7: #079296;
+	--s8: #a97416;
+	--black: 21, 25, 21;
+	--gray: 69, 75, 69;
+	--gray-light: 223, 223, 214;
+}
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme='dark']) {
+		color-scheme: light;
+		--bg: #f4f3ee;
+		--surface: #fbfbf8;
+		--raise: #ffffff;
+		--ink: #151915;
+		--ink2: #454b45;
+		--ink3: #6a7069;
+		--rule: #dfdfd6;
+		--accent: #176938;
+		--accent-strong: #0f4f29;
+		--wip: #8a5c0e;
+		--glow: rgba(23, 105, 56, 0.1);
+		--shadow: 0 10px 30px rgba(20, 25, 20, 0.08);
+		--s1: #7e3a06;
+		--s2: #7c8028;
+		--s3: #76338a;
+		--s4: #176938;
+		--s5: #3065cc;
+		--s6: #a92229;
+		--s7: #079296;
+		--s8: #a97416;
+		--black: 21, 25, 21;
+		--gray: 69, 75, 69;
+		--gray-light: 223, 223, 214;
+	}
 }
 
 * {
 	box-sizing: border-box;
 }
 
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
 body {
-	font-family: var(--font-body);
 	margin: 0;
-	padding: 0;
-	text-align: left;
+	padding-inline: 16px;
+	font: 400 16px/1.6 var(--f-ui);
 	background: var(--bg);
-	color: var(--text);
-	font-size: 17px;
-	line-height: 1.6;
-	word-wrap: break-word;
+	background-image: radial-gradient(900px 420px at 50% -140px, var(--glow), transparent 70%);
+	background-repeat: no-repeat;
+	color: var(--ink);
 	overflow-wrap: break-word;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
-main {
-	width: 760px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+main,
+.wrap {
+	max-width: 880px;
+	margin: 0 auto;
 }
 
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0.5rem 0;
-	color: var(--text);
-	font-family: var(--font-heading);
-	font-weight: 700;
-	line-height: 1.2;
-	letter-spacing: -0.015em;
-}
-
-/* Modular scale 1.2 (base 17px) */
-h1 {
-	font-size: 2.074em;
-	line-height: 1.15;
-}
-h2 {
-	font-size: 1.728em;
-}
-h3 {
-	font-size: 1.44em;
-	font-weight: 600;
-}
 h4 {
-	font-size: 1.2em;
+	margin: 0;
+	font-family: var(--f-ui);
 	font-weight: 600;
-}
-h5 {
-	font-size: 1em;
-	font-weight: 600;
-}
-
-strong,
-b {
-	font-weight: 700;
+	letter-spacing: -0.015em;
+	line-height: 1.2;
+	text-wrap: balance;
 }
 
 a {
-	color: var(--accent);
-	text-underline-offset: 2px;
-}
-a:hover {
-	color: var(--accent-hover);
+	color: inherit;
 }
 
-p {
-	margin-bottom: 1em;
-}
-
-textarea,
-input {
-	font-size: 16px;
-	font-family: var(--font-body);
-}
-
-table {
-	width: 100%;
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+	border-radius: 4px;
 }
 
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 8px;
 }
 
 code {
-	font-family: var(--mono);
-	font-size: 0.9em;
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
+	font-family: var(--f-mono);
+	font-size: 0.88em;
+	padding: 1px 5px;
+	background: var(--raise);
+	border: 1px solid var(--rule);
 	border-radius: 4px;
 }
 
 pre {
-	padding: 1.5em;
-	border-radius: 8px;
+	padding: 1.2em;
+	border-radius: 10px;
+	overflow-x: auto;
+	background: var(--surface);
+	border: 1px solid var(--rule);
 }
 pre > code {
 	all: unset;
 }
 
-blockquote {
-	border-left: 3px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.2em;
-}
-
 hr {
 	border: none;
-	border-top: 1px solid var(--border);
+	border-top: 1px solid var(--rule);
 }
 
-@media (max-width: 720px) {
-	body {
-		font-size: 16px;
-	}
-	main {
-		padding: 1.5em 1em;
-	}
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+/* Shared bits */
+.mono {
+	font-family: var(--f-mono);
+	font-size: 0.78rem;
+	letter-spacing: 0.02em;
+	color: var(--ink3);
+}
+
+.sect {
+	padding-block: 28px;
 }
 
 .sr-only {
@@ -174,8 +210,18 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	clip: rect(1px 1px 1px 1px);
-	clip: rect(1px, 1px, 1px, 1px);
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+
+/* Placeholder copy awaiting Griffin's own words */
+.is-draft {
+	font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+		animation: none !important;
+	}
 }

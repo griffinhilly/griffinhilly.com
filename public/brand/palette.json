@@ -1,0 +1,24 @@
+{
+  "name": "Griffin Hilly personal palette",
+  "locked": "2026-10-12",
+  "rules": [
+    "Assign series colours in this order; never cycle.",
+    "Scatter plots, maps and small multiples: first three colours only.",
+    "Dark chart surfaces no lighter than #121512.",
+    "Brown, olive, forest and red look alike to red-green colour-blind readers: label series directly or with a legend."
+  ],
+  "series": [
+    { "name": "Brown",  "light": "#7e3a06", "dark": "#994f20" },
+    { "name": "Olive",  "light": "#7c8028", "dark": "#8b9039" },
+    { "name": "Purple", "light": "#76338a", "dark": "#a968bc" },
+    { "name": "Forest", "light": "#176938", "dark": "#398b50" },
+    { "name": "Cobalt", "light": "#3065cc", "dark": "#538ae6" },
+    { "name": "Red",    "light": "#a92229", "dark": "#c84243" },
+    { "name": "Teal",   "light": "#079296", "dark": "#29a8a4" },
+    { "name": "Ochre",  "light": "#a97416", "dark": "#a87520" }
+  ],
+  "surfaces": {
+    "light": { "bg": "#f4f3ee", "surface": "#fbfbf8", "ink": "#151915", "muted": "#454b45", "rule": "#dfdfd6", "accent": "#176938" },
+    "dark":  { "bg": "#0b0d0b", "surface": "#111411", "ink": "#ecebe5", "muted": "#b9bcb3", "rule": "#262c27", "accent": "#7fc48a" }
+  }
+}

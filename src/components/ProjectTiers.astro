@@ -1,0 +1,314 @@
+---
+// Projects, one per row. Featured projects get a full-width section with a live preview:
+// a browser-style frame that tilts flat as it scrolls into view while the site inside it
+// scrolls on its own. Other live work gets a full-width row; work in progress is named
+// with an hourglass. Static and complete without JS or with reduced motion.
+import { Image } from 'astro:assets';
+import { byTier } from '../data/projects';
+import Hourglass from './Hourglass.astro';
+import SectionHeader from './SectionHeader.astro';
+
+interface Props {
+	allLink?: boolean;
+}
+const { allLink = false } = Astro.props;
+const ext = (href?: string) => (href?.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {});
+const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
+---
+
+<section class="sect">
+	<SectionHeader title="Projects" href={allLink ? '/projects' : undefined} linkLabel="All projects →" />
+	{
+		byTier('featured').map((p) => (
+			<a class="feature" href={p.href} {...ext(p.href)}>
+				<div class="head">
+					<div>
+						<h3>
+							{p.title}
+							{p.inProgress && <Hourglass />}
+						</h3>
+						<p class:list={{ 'is-draft': p.draft }}>{p.description}</p>
+					</div>
+					{p.cta && (
+						<span class="go">
+							{p.cta} <span class="arr">{arrow(p.href)}</span>
+						</span>
+					)}
+				</div>
+				{p.preview && (
+					<div class="frame" data-preview>
+						<div class="bar" aria-hidden="true">
+							<i />
+							<i />
+							<i />
+							<span>{p.previewLabel}</span>
+						</div>
+						<div class="window">
+							<Image
+								src={p.preview}
+								alt={`Preview of ${p.title}`}
+								widths={[640, 1280]}
+								sizes="(max-width: 900px) 100vw, 880px"
+								loading="lazy"
+								data-pan
+							/>
+						</div>
+					</div>
+				)}
+			</a>
+		))
+	}
+</section>
+
+<section class="sect">
+	<SectionHeader title="More" />
+	{
+		byTier('more').map((p) => (
+			<div class="row">
+				<div>
+					<a class="stretch" href={p.href} {...ext(p.href)}>
+						<h3>{p.title}</h3>
+					</a>
+					<p class:list={{ 'is-draft': p.draft }}>{p.description}</p>
+				</div>
+				<span class="row-links mono">
+					{p.sourceHref && (
+						<a class="src" href={p.sourceHref} target="_blank" rel="noopener">
+							source ↗
+						</a>
+					)}
+					<span class="arr">{arrow(p.href)}</span>
+				</span>
+			</div>
+		))
+	}
+</section>
+
+<section class="sect">
+	<SectionHeader title="In the works" />
+	{
+		byTier('works').map((p) => (
+			<div class="row quiet">
+				<div>
+					<h3>{p.title}</h3>
+					<p class:list={{ 'is-draft': p.draft }}>{p.description}</p>
+				</div>
+				{p.inProgress && <Hourglass label />}
+			</div>
+		))
+	}
+</section>
+
+<script>
+	// Scroll-linked preview: tilt flat on entry, then pan the screenshot as the frame crosses the viewport.
+	const frames = [...document.querySelectorAll<HTMLElement>('[data-preview]')];
+	const still = matchMedia('(prefers-reduced-motion: reduce)');
+	let ticking = false;
+
+	function update() {
+		ticking = false;
+		const vh = innerHeight;
+		for (const f of frames) {
+			const r = f.getBoundingClientRect();
+			if (r.bottom < -100 || r.top > vh + 100) continue;
+			const img = f.querySelector<HTMLImageElement>('[data-pan]');
+			const win = f.querySelector<HTMLElement>('.window');
+			if (still.matches) {
+				f.style.transform = '';
+				if (img) img.style.transform = '';
+				continue;
+			}
+			const enter = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.75)));
+			f.style.transform = `perspective(1400px) rotateX(${(1 - enter) * 16}deg) scale(${0.93 + 0.07 * enter})`;
+			f.style.opacity = String(0.55 + 0.45 * enter);
+			if (img && win) {
+				const travel = Math.max(0, img.offsetHeight - win.clientHeight);
+				const pass = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (vh * 0.85 + r.height * 0.4)));
+				img.style.transform = `translateY(${-pass * travel}px)`;
+			}
+		}
+	}
+	const request = () => {
+		if (!ticking) {
+			ticking = true;
+			requestAnimationFrame(update);
+		}
+	};
+	if (frames.length) {
+		addEventListener('scroll', request, { passive: true });
+		addEventListener('resize', request);
+		still.addEventListener('change', request);
+		frames.forEach((f) => f.querySelector('img')?.addEventListener('load', request));
+		update();
+	}
+</script>
+
+<style>
+	h3 {
+		font-size: 1.08rem;
+	}
+
+	/* Featured: one project per full-width section */
+	.feature {
+		display: block;
+		text-decoration: none;
+		padding-block: 28px 44px;
+		border-bottom: 1px solid var(--rule);
+	}
+	.feature .head {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 12px 24px;
+		flex-wrap: wrap;
+		margin-bottom: 22px;
+	}
+	.feature h3 {
+		font-size: clamp(1.6rem, 4vw, 2.2rem);
+		letter-spacing: -0.025em;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.feature p {
+		margin: 8px 0 0;
+		color: var(--ink2);
+		max-width: 56ch;
+	}
+	.go {
+		flex: none;
+		font-weight: 500;
+		font-size: 0.95rem;
+		color: var(--accent);
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		padding: 8px 16px;
+		background: var(--surface);
+		transition:
+			border-color 0.2s ease,
+			background 0.2s ease;
+	}
+	.arr {
+		display: inline-block;
+		transition: transform 0.2s ease;
+	}
+	.feature:hover .go {
+		border-color: var(--accent);
+	}
+	.feature:hover .arr,
+	.row:hover .arr {
+		transform: translateX(3px);
+	}
+
+	.frame {
+		border: 1px solid var(--rule);
+		border-radius: 14px;
+		overflow: hidden;
+		background: var(--surface);
+		box-shadow: var(--shadow);
+		transform-origin: 50% 0%;
+		will-change: transform;
+		transition:
+			border-color 0.25s ease,
+			box-shadow 0.25s ease;
+	}
+	.feature:hover .frame {
+		border-color: var(--accent);
+		box-shadow:
+			0 0 0 4px var(--glow),
+			var(--shadow);
+	}
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 10px 14px;
+		border-bottom: 1px solid var(--rule);
+		background: var(--raise);
+	}
+	.bar i {
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: var(--rule);
+	}
+	.bar span {
+		margin-left: 10px;
+		font: 400 0.74rem/1 var(--f-mono);
+		color: var(--ink3);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.window {
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: var(--raise);
+	}
+	.window :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		will-change: transform;
+	}
+
+	/* Full-width rows */
+	.row {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 6px 24px;
+		align-items: center;
+		padding: 20px 0;
+		border-bottom: 1px solid var(--rule);
+	}
+	.row p {
+		margin: 4px 0 0;
+		color: var(--ink2);
+		font-size: 0.95rem;
+		max-width: 64ch;
+	}
+	.stretch {
+		text-decoration: none;
+	}
+	.stretch::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+	.row:hover h3 {
+		color: var(--accent);
+	}
+	.quiet:hover h3 {
+		color: inherit;
+	}
+	.row-links {
+		display: flex;
+		gap: 16px;
+		align-items: center;
+	}
+	.row-links .arr {
+		color: var(--accent);
+		font-size: 1rem;
+	}
+	.src {
+		position: relative;
+		z-index: 1;
+		text-decoration: none;
+	}
+	.src:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 640px) {
+		.window {
+			aspect-ratio: 4 / 3;
+		}
+		.feature {
+			padding-block: 22px 34px;
+		}
+		.row {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
