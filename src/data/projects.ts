@@ -49,7 +49,7 @@ export const projects: Project[] = [
 	{
 		title: 'One Billion Years',
 		description:
-			"There's been little focus on the most tangible benefits of AI deployment: saving 1 billion years of human life annually.",
+			"There's been little focus on the most tangible benefits of AI deployment: saving one billion years of human life annually.",
 		tier: 'works',
 		inProgress: true,
 	},
