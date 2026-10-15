@@ -4,7 +4,7 @@
 // scrolls on its own (motion 'pan') or the image zooms in as you scroll down and back out
 // as you scroll up (motion 'zoom'). Work in progress is named with an hourglass. Static and complete without JS or with reduced motion.
 import { Image } from 'astro:assets';
-import { byTier } from '../data/projects';
+import { byTier, explorations } from '../data/projects';
 import Hourglass from './Hourglass.astro';
 import SectionHeader from './SectionHeader.astro';
 
@@ -71,6 +71,25 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 				</div>
 				{p.inProgress && <Hourglass label />}
 			</div>
+		))
+	}
+</section>
+
+<section class="sect">
+	<SectionHeader title="Explorations" />
+	{
+		explorations.map((x) => (
+			<a class="ex" href={x.href}>
+				<Image src={x.thumb} alt="" widths={[240, 480]} sizes="200px" loading="lazy" />
+				<div>
+					<h3>{x.title}</h3>
+					<p class:list={{ 'is-draft': x.draft }}>{x.description}</p>
+					<span class="ex-meta mono">
+						{x.date}
+						{x.aiNote && <span> · written with AI agents</span>}
+					</span>
+				</div>
+			</a>
 		))
 	}
 </section>
@@ -253,6 +272,40 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 		max-width: 64ch;
 	}
 
+	/* Explorations: smaller finished pieces, one per row */
+	.ex {
+		display: grid;
+		grid-template-columns: 200px minmax(0, 1fr);
+		gap: 20px;
+		align-items: center;
+		padding: 18px 0;
+		border-bottom: 1px solid var(--rule);
+		text-decoration: none;
+	}
+	.ex :global(img) {
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		object-fit: cover;
+		object-position: top;
+		border-radius: 10px;
+		border: 1px solid var(--rule);
+		display: block;
+		transition: border-color 0.2s ease, transform 0.2s ease;
+	}
+	.ex:hover :global(img) {
+		border-color: var(--accent);
+		transform: translateY(-2px);
+	}
+	.ex:hover h3 {
+		color: var(--accent);
+	}
+	.ex p {
+		margin: 4px 0 6px;
+		color: var(--ink2);
+		font-size: 0.95rem;
+		max-width: 60ch;
+	}
+
 	@media (max-width: 640px) {
 		.window {
 			aspect-ratio: 4 / 3;
@@ -262,6 +315,11 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 		}
 		.row {
 			grid-template-columns: 1fr;
+		}
+		.ex {
+			grid-template-columns: 112px minmax(0, 1fr);
+			gap: 14px;
+			align-items: start;
 		}
 	}
 </style>

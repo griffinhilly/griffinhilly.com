@@ -4,6 +4,7 @@
 import type { ImageMetadata } from 'astro';
 import okgRadial from '../assets/projects/okg-radial.webp';
 import singularTall from '../assets/projects/singular-tall.webp';
+import imaxThumb from '../assets/explorations/imax.webp';
 
 export interface Project {
 	title: string;
@@ -72,3 +73,29 @@ export const projects: Project[] = [
 ];
 
 export const byTier = (tier: Project['tier']) => projects.filter((p) => p.tier === tier);
+
+// Explorations: smaller finished pieces hosted under public/explorations/<slug>/ as-is.
+// `aiNote` marks pieces whose text agents wrote (Griffin's disclosure rule for econ / AI-safety pages).
+
+export interface Exploration {
+	title: string;
+	description: string;
+	href: string;
+	thumb: ImageMetadata;
+	date: string; // YYYY-MM
+	aiNote?: boolean;
+	draft?: boolean;
+}
+
+// AI buildout explainer (One Buildout, Four Futures) held back 2026-10-15 for a general-audience edit (Griffin).
+export const explorations: Exploration[] = [
+	{
+		title: 'An Odyssey for The Odyssey',
+		description:
+			'The nearest 70mm IMAX theatre by driving time, for every part of the continental US.',
+		href: '/explorations/imax-70mm/',
+		thumb: imaxThumb,
+		date: '2026-07',
+		draft: true,
+	},
+];
