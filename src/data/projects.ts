@@ -7,6 +7,7 @@ import singularTall from '../assets/projects/singular-tall.webp';
 import imaxThumb from '../assets/explorations/imax.webp';
 import babyNamesThumb from '../assets/explorations/baby-names.webp';
 import mlbThumb from '../assets/explorations/mlb-playoffs.webp';
+import workflowThumb from '../assets/explorations/agent-workflow.webp';
 
 export interface Project {
 	title: string;
@@ -97,6 +98,15 @@ export const explorations: Exploration[] = [
 			'A plate-appearance simulator plays out the rest of the 2026 postseason 20,000 times, with projected lineups and rotations. Updated daily through the World Series.',
 		href: '/explorations/mlb-playoffs-2026/',
 		thumb: mlbThumb,
+		date: '2026-10',
+		draft: true,
+	},
+	{
+		title: 'Agent workflow',
+		description:
+			'Running dozens of Claude Code sessions from a phone: an always-on desktop, a written brief for each task, and a pipeline that files saved posts.',
+		href: '/explorations/agent-workflow/',
+		thumb: workflowThumb,
 		date: '2026-10',
 		draft: true,
 	},
