@@ -6,6 +6,7 @@ import okgRadial from '../assets/projects/okg-radial.webp';
 import singularTall from '../assets/projects/singular-tall.webp';
 import imaxThumb from '../assets/explorations/imax.webp';
 import babyNamesThumb from '../assets/explorations/baby-names.webp';
+import mlbThumb from '../assets/explorations/mlb-playoffs.webp';
 
 export interface Project {
 	title: string;
@@ -90,6 +91,15 @@ export interface Exploration {
 
 // AI buildout explainer (One Buildout, Four Futures) held back 2026-10-15 for a general-audience edit (Griffin).
 export const explorations: Exploration[] = [
+	{
+		title: '2026 playoff odds',
+		description:
+			'A plate-appearance simulator plays out the rest of the 2026 postseason 20,000 times, with projected lineups and rotations. Updated daily through the World Series.',
+		href: '/explorations/mlb-playoffs-2026/',
+		thumb: mlbThumb,
+		date: '2026-10',
+		draft: true,
+	},
 	{
 		title: 'An Odyssey for The Odyssey',
 		description:
