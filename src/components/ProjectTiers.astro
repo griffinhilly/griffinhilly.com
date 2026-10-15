@@ -79,7 +79,7 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 	<SectionHeader title="Explorations" />
 	{
 		explorations.map((x) => (
-			<a class="ex" href={x.href}>
+			<a class="ex" href={x.href} {...ext(x.href)}>
 				<Image src={x.thumb} alt="" widths={[240, 480]} sizes="200px" loading="lazy" />
 				<div>
 					<h3>{x.title}</h3>

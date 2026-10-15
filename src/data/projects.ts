@@ -5,6 +5,7 @@ import type { ImageMetadata } from 'astro';
 import okgRadial from '../assets/projects/okg-radial.webp';
 import singularTall from '../assets/projects/singular-tall.webp';
 import imaxThumb from '../assets/explorations/imax.webp';
+import babyNamesThumb from '../assets/explorations/baby-names.webp';
 
 export interface Project {
 	title: string;
@@ -96,6 +97,15 @@ export const explorations: Exploration[] = [
 		href: '/explorations/imax-70mm/',
 		thumb: imaxThumb,
 		date: '2026-07',
+		draft: true,
+	},
+	{
+		title: 'Baby Name Taste Map',
+		description:
+			'Type a name you like and get an endless stream of names with the same feel, plus a map of thousands of names clustered by style.',
+		href: 'https://griffinhilly.github.io/baby-names/',
+		thumb: babyNamesThumb,
+		date: '2026-06',
 		draft: true,
 	},
 ];
