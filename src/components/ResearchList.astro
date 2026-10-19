@@ -1,0 +1,57 @@
+---
+// Home-page list of research entries; each row links to its anchor on /research.
+import { research } from '../data/research';
+import SectionHeader from './SectionHeader.astro';
+---
+
+<section class="sect">
+	<SectionHeader title="Research" href="/research" linkLabel="All research →" />
+	{
+		research.map((r) => (
+			<a class="rrow" href={`/research#${r.id}`}>
+				<div>
+					<h3>{r.title}</h3>
+					<p class:list={{ 'is-draft': r.draft && r.summary.startsWith('[') }}>{r.summary}</p>
+				</div>
+				<span class="mono st">{r.status}</span>
+			</a>
+		))
+	}
+</section>
+
+<style>
+	.rrow {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 6px 24px;
+		align-items: center;
+		padding: 18px 0;
+		border-bottom: 1px solid var(--rule);
+		text-decoration: none;
+	}
+	.rrow h3 {
+		font-size: 1.08rem;
+	}
+	.rrow:hover h3 {
+		color: var(--accent);
+	}
+	.rrow p {
+		margin: 4px 0 0;
+		color: var(--ink2);
+		font-size: 0.95rem;
+		max-width: 64ch;
+	}
+	.st {
+		font-size: 0.74rem;
+		color: var(--ink3);
+		white-space: nowrap;
+	}
+	@media (max-width: 640px) {
+		.rrow {
+			grid-template-columns: 1fr;
+		}
+		.st {
+			white-space: normal;
+		}
+	}
+</style>

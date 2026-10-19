@@ -10,8 +10,10 @@ import SectionHeader from './SectionHeader.astro';
 
 interface Props {
 	allLink?: boolean;
+	home?: boolean; // home page shows only explorations flagged `home`
 }
-const { allLink = false } = Astro.props;
+const { allLink = false, home = false } = Astro.props;
+const shownExplorations = home ? explorations.filter((x) => x.home) : explorations;
 const ext = (href?: string) => (href?.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {});
 const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 ---
@@ -75,10 +77,10 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 	}
 </section>
 
-<section class="sect">
-	<SectionHeader title="Explorations" />
+<section class="sect" id="explorations">
+	<SectionHeader title="Explorations" href={home ? '/projects#explorations' : undefined} linkLabel="All explorations →" />
 	{
-		explorations.map((x) => (
+		shownExplorations.map((x) => (
 			<a class="ex" href={x.href} {...ext(x.href)}>
 				<Image src={x.thumb} alt="" widths={[240, 480]} sizes="200px" loading="lazy" />
 				<div>

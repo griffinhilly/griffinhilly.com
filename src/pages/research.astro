@@ -1,0 +1,104 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { research } from '../data/research';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Research · ${SITE_TITLE}`} description="AI safety research by Griffin Hilly." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro">
+				<h1>Research</h1>
+				<p>Making my quantitative skills work for my philosophical curiosities.</p>
+			</section>
+			{
+				research.map((r) => (
+					<section class="entry" id={r.id}>
+						<p class="status mono">{r.status}</p>
+						<h2>{r.title}</h2>
+						{r.body.map((para) => (
+							<p class:list={{ 'is-draft': r.draft && para.startsWith('[') }}>{para}</p>
+						))}
+						{r.log && (
+							<ul class="log">
+								{r.log.map((l) => (
+									<li>
+										<span class="mono">{l.date}</span> {l.text}
+									</li>
+								))}
+							</ul>
+						)}
+						{r.links && (
+							<p class="links">
+								{r.links.map((l) => (
+									<a href={l.href}>{l.label}</a>
+								))}
+							</p>
+						)}
+					</section>
+				))
+			}
+			<section class="entry" id="writing">
+				<p class="status mono">Writing</p>
+				<h2><a href="/blog/whose-constitution/">Whose Constitution</a></h2>
+				<p>Finding your humanity · Feb 2026</p>
+			</section>
+		</main>
+		<Footer />
+		<style>
+			.intro {
+				padding-block: 48px 8px;
+			}
+			.intro h1 {
+				font-size: clamp(2.2rem, 6vw, 3.2rem);
+				letter-spacing: -0.03em;
+				line-height: 1.05;
+			}
+			.intro p {
+				color: var(--ink2);
+				font-size: 1.1rem;
+				margin: 12px 0 0;
+				max-width: 60ch;
+			}
+			.entry {
+				padding-block: 28px;
+				border-bottom: 1px solid var(--rule);
+				scroll-margin-top: 24px;
+			}
+			.entry h2 {
+				font-size: clamp(1.35rem, 3.2vw, 1.7rem);
+				letter-spacing: -0.02em;
+				margin: 6px 0 12px;
+			}
+			.entry p {
+				color: var(--ink2);
+				max-width: 64ch;
+			}
+			.status {
+				font-size: 0.78rem;
+				color: var(--ink3);
+				margin: 0;
+			}
+			.log {
+				margin: 12px 0 0;
+				padding-left: 1.1em;
+				color: var(--ink2);
+				font-size: 0.92rem;
+			}
+			.log .mono {
+				color: var(--ink3);
+				margin-right: 6px;
+			}
+			.links a {
+				margin-right: 16px;
+			}
+		</style>
+	</body>
+</html>

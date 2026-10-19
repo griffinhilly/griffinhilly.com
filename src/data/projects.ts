@@ -8,6 +8,7 @@ import imaxThumb from '../assets/explorations/imax.webp';
 import babyNamesThumb from '../assets/explorations/baby-names.webp';
 import mlbThumb from '../assets/explorations/mlb-playoffs.webp';
 import workflowThumb from '../assets/explorations/agent-workflow.webp';
+// import polymarketThumb from '../assets/explorations/polymarket.webp'; // Polymarket held back 2026-10-18 (Griffin unsure); page + thumb stay untracked
 
 export interface Project {
 	title: string;
@@ -37,26 +38,9 @@ export const projects: Project[] = [
 		previewLabel: 'openknowledgegraph.com',
 		motion: 'zoom',
 	},
-	{
-		title: 'Singular',
-		description:
-			'A player-evaluation model powerful enough to compete with the best public models, and flexible enough to answer any question a front office wants to know.',
-		tier: 'featured',
-		href: '/singular',
-		cta: 'Read the report',
-		preview: singularTall,
-		previewLabel: 'griffinhilly.com/singular',
-		motion: 'pan',
-	},
+	// Singular moved to Explorations 2026-10-18 (Griffin: off the home page, still on /projects).
 	// NBA Ranker hidden 2026-10-13 while its Supabase database is down; restore with tier 'featured' or 'works'.
 	// NBA Draft Anti-Tanking Proposal removed 2026-10-13 (Griffin: fold into Singular; the NBA chose another measure).
-	{
-		title: 'One Billion Years',
-		description:
-			"There's been little focus on the most tangible benefits of AI deployment: saving one billion years of human life annually.",
-		tier: 'works',
-		inProgress: true,
-	},
 	{
 		title: 'Agencyism',
 		description:
@@ -66,13 +50,13 @@ export const projects: Project[] = [
 		draft: true,
 	},
 	{
-		title: 'Bottom Billion and Beyond',
+		title: 'One Billion Years',
 		description:
-			'An atlas of development traps — interactive data visualization on the economics of extreme poverty.',
+			"There's been little focus on the most tangible benefits of AI deployment: saving one billion years of human life annually.",
 		tier: 'works',
 		inProgress: true,
-		draft: true,
 	},
+	// Bottom Billion and Beyond moved to the Research section (src/data/research.ts) 2026-10-18.
 ];
 
 export const byTier = (tier: Project['tier']) => projects.filter((p) => p.tier === tier);
@@ -88,25 +72,47 @@ export interface Exploration {
 	date: string; // YYYY-MM
 	aiNote?: boolean;
 	draft?: boolean;
+	home?: boolean; // also listed on the home page (Griffin 2026-10-18: Agent workflow only)
 }
 
 // AI buildout explainer (One Buildout, Four Futures) held back 2026-10-15 for a general-audience edit (Griffin).
 export const explorations: Exploration[] = [
-	{
-		title: '2026 playoff odds',
-		description:
-			'A plate-appearance simulator plays out the rest of the 2026 postseason 20,000 times, with projected lineups and rotations. Updated daily through the World Series.',
-		href: '/explorations/mlb-playoffs-2026/',
-		thumb: mlbThumb,
-		date: '2026-10',
-		draft: true,
-	},
 	{
 		title: 'Agent workflow',
 		description:
 			'Running dozens of Claude Code sessions from a phone: an always-on desktop, a written brief for each task, and a pipeline that files saved posts.',
 		href: '/explorations/agent-workflow/',
 		thumb: workflowThumb,
+		date: '2026-10',
+		draft: true,
+		home: true,
+	},
+	// Polymarket edge test held back 2026-10-18 (Griffin: "I just don't know how to feel about Polymarket yet").
+	// {
+	// 	title: 'Polymarket edge test',
+	// 	description:
+	// 		'How often Polymarket prices came true, how much of the miss survives trading costs (about 1.6¢ per market), and whether posting orders beats taking them.',
+	// 	href: '/explorations/polymarket/',
+	// 	thumb: polymarketThumb,
+	// 	date: '2026-10',
+	// 	aiNote: true,
+	// 	draft: true,
+	// 	home: true,
+	// },
+	{
+		title: 'Singular',
+		description:
+			'A player-evaluation model powerful enough to compete with the best public models, and flexible enough to answer any question a front office wants to know.',
+		href: '/singular',
+		thumb: singularTall,
+		date: '2026-10',
+	},
+	{
+		title: '2026 playoff odds',
+		description:
+			'A plate-appearance simulator plays out the rest of the 2026 postseason 20,000 times, with projected lineups and rotations. Updated daily through the World Series.',
+		href: '/explorations/mlb-playoffs-2026/',
+		thumb: mlbThumb,
 		date: '2026-10',
 		draft: true,
 	},

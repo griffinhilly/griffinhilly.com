@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import ProjectTiers from '../components/ProjectTiers.astro';
+import ResearchList from '../components/ResearchList.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -24,12 +25,14 @@ const posts = (await getCollection('blog'))
 		<main>
 			<Hero
 				name="Griffin Hilly"
-				now="Now: Singular"
+				now="Now: AI safety research"
 				positioning="Finding my comparative advantage on an uncertain frontier."
 				bio="Quant trader. Amateur philosopher. Eternal student. Husband to Madi Hilly. Father of two and counting. Proud Chicagoan."
 			/>
 
-			<ProjectTiers allLink />
+			<ResearchList />
+
+			<ProjectTiers allLink home />
 
 			<section class="sect">
 				<SectionHeader title="Writing" href="/blog" linkLabel="All writing →" />
