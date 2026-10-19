@@ -27,7 +27,10 @@ const posts = (await getCollection('blog'))
 				name="Griffin Hilly"
 				now="Now: AI safety research"
 				positioning="Finding my comparative advantage on an uncertain frontier."
-				bio="Quant trader. Amateur philosopher. Eternal student. Husband to Madi Hilly. Father of two and counting. Proud Chicagoan."
+				bio={[
+					'Quant researcher. Amateur philosopher. Eternal student.',
+					'Husband to Madi Hilly. Father of two and counting. Proud Chicagoan.',
+				]}
 			/>
 
 			<ResearchList />

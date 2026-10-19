@@ -2,7 +2,7 @@
 interface Props {
 	name: string;
 	positioning: string; // the one-line positioning statement (Griffin's words)
-	bio?: string; // short about line (Griffin's words)
+	bio?: string[]; // short about lines, one per line break (Griffin's words)
 	now?: string; // small status pill above the name, e.g. what he's working on
 }
 const { name, positioning, bio, now } = Astro.props;
@@ -12,7 +12,7 @@ const { name, positioning, bio, now } = Astro.props;
 	{now && <span class="now mono"><b aria-hidden="true"></b>{now}</span>}
 	<h1>{name}</h1>
 	<p class="lede">{positioning}</p>
-	{bio && <p class="bio">{bio}</p>}
+	{bio && <p class="bio">{bio.map((line, i) => <>{i > 0 && <br />}{line}</>)}</p>}
 </section>
 
 <style>

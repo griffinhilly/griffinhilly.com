@@ -44,10 +44,9 @@ export const projects: Project[] = [
 	{
 		title: 'Agencyism',
 		description:
-			'A philosophical framework built around agency — the capacity for, and tendency toward, rational autonomy.',
+			'A philosophical framework built around agency — the capacity for, and tendency toward, rational autonomous will.',
 		tier: 'works',
 		inProgress: true,
-		draft: true,
 	},
 	{
 		title: 'One Billion Years',
@@ -84,7 +83,6 @@ export const explorations: Exploration[] = [
 		href: '/explorations/agent-workflow/',
 		thumb: workflowThumb,
 		date: '2026-10',
-		draft: true,
 		home: true,
 	},
 	// Polymarket edge test held back 2026-10-18 (Griffin: "I just don't know how to feel about Polymarket yet").
@@ -114,7 +112,6 @@ export const explorations: Exploration[] = [
 		href: '/explorations/mlb-playoffs-2026/',
 		thumb: mlbThumb,
 		date: '2026-10',
-		draft: true,
 	},
 	{
 		title: 'An Odyssey for The Odyssey',
@@ -123,7 +120,6 @@ export const explorations: Exploration[] = [
 		href: '/explorations/imax-70mm/',
 		thumb: imaxThumb,
 		date: '2026-07',
-		draft: true,
 	},
 	{
 		title: 'Baby Name Taste Map',
@@ -132,6 +128,5 @@ export const explorations: Exploration[] = [
 		href: 'https://griffinhilly.github.io/baby-names/',
 		thumb: babyNamesThumb,
 		date: '2026-06',
-		draft: true,
 	},
 ];
