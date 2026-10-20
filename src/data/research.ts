@@ -22,6 +22,7 @@ export const research: ResearchEntry[] = [
 			'How far will models push us to be our best selves? Split by salience and stakes.',
 		body: [
 			'Autonomy strikes me as being among the least gameable targets for alignment. However, there is a tension in resisting voluntary disempowerment if that requires the models override users’ autonomy. Where salient examples offer clear lines against approving of gradual disempowerment, I believe there are external pressures that erode those lines in mundane cases.',
+			'Do AI models resist user pressure to comply with deleterious, disempowering behavior, and does that resistance vary with the salience and stakes of the situation? I ran a pilot comparing 8 models across 10 paired scenarios, each pairing a salient and a mundane version of the same request, at high and low stakes (lasting versus one-time consequences). I found models somewhat more likely to resist in salient cases, but the effect was limited and concentrated in a few of the scenarios. I plan to test this further.',
 		],
 		log: [
 			{ date: '2026-10-17', text: 'Design drafted: 10 scenario skeletons, each in 4 versions (salient or mundane, high or low stakes). Multi-turn test harness built.' },
