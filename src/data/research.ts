@@ -10,10 +10,24 @@ export interface ResearchEntry {
 	body: string[]; // paragraphs on /research
 	log?: { date: string; text: string }[];
 	links?: { label: string; href: string }[];
+	href?: string; // when set, the home row and the /research title link here instead of the anchor
 	draft?: boolean;
 }
 
 export const research: ResearchEntry[] = [
+	{
+		id: 'ai-safety-compendium',
+		title: 'AI safety compendium',
+		status: 'Survey · Oct 2026',
+		// Factual line from the compendium page itself; Griffin may replace it with his own.
+		summary:
+			'19 published maps of AI-safety work, compared side by side. 91 approaches in 10 groups. 41 people and organisations who shaped the field.',
+		body: [
+			'19 published maps of AI-safety work, compared side by side. 91 approaches in 10 groups. 41 people and organisations who shaped the field.',
+		],
+		href: '/explorations/ai-safety/',
+		links: [{ label: 'Open the compendium →', href: '/explorations/ai-safety/' }],
+	},
 	{
 		id: 'voluntary-disempowerment',
 		title: 'Voluntary disempowerment: salient vs. mundane cases',

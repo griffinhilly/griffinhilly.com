@@ -8,7 +8,7 @@ import SectionHeader from './SectionHeader.astro';
 	<SectionHeader title="Research" href="/research" linkLabel="All research →" />
 	{
 		research.map((r) => (
-			<a class="rrow" href={`/research#${r.id}`}>
+			<a class="rrow" href={r.href ?? `/research#${r.id}`}>
 				<div>
 					<h3>{r.title}</h3>
 					<p class:list={{ 'is-draft': r.draft && r.summary.startsWith('[') }}>{r.summary}</p>

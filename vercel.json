@@ -1,5 +1,7 @@
 {
   "redirects": [
+    { "source": "/ai-safety-takes", "destination": "/explorations/ai-safety/", "permanent": false },
+    { "source": "/ai-safety-takes/", "destination": "/explorations/ai-safety/", "permanent": false },
     { "source": "/singular/report", "destination": "/singular/", "permanent": true },
     { "source": "/singular/report/", "destination": "/singular/", "permanent": true },
     { "source": "/singular/report/data-audit.html", "destination": "/singular/data-audit.html", "permanent": true },
