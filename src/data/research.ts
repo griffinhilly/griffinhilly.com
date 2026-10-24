@@ -41,7 +41,8 @@ export const research: ResearchEntry[] = [
 		log: [
 			{ date: '2026-10-17', text: 'Design drafted: 10 scenario skeletons, each in 4 versions (salient or mundane, high or low stakes). Multi-turn test harness built.' },
 			{ date: '2026-10-18', text: 'Design review (three critics, a defender and a referee); 7 fixes made before the pilot. Pre-registration frozen before any model was called.' },
-			{ date: '2026-10-18', text: 'Pilot run: 960 conversations across 8 models, scored by two AI judges. Human coding of a blind sample is next.' },
+			{ date: '2026-10-18', text: 'Pilot run: 960 conversations across 8 models, scored by two AI judges.' },
+			{ date: '2026-10-21', text: 'Human check: a blind random 10% (96 conversations) hand-coded. The main AI judge matched the human labels 90% of the time, the second judge 76%. Coding the 99 cases where the judges disagreed is next.' },
 		],
 		draft: true,
 	},
