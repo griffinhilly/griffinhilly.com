@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Method | Singular</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="How SiPM is built and tested.">
+<script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/singular/assets/palette.css"><link rel="stylesheet" href="/singular/assets/hub.css">
+
+</head><body>
+<header class="top"><div class="bar"><a class="brand" href="/singular/">Singular</a><nav><a href="/singular/">Players</a><a href="/singular/tests/">Tests</a><a href="/singular/method/" aria-current="page">Method</a><a href="/singular/report/"><span class="hs">Bulls report</span><span class="hm">Report</span></a></nav><button class="theme" type="button" aria-label="Switch light or dark" onclick="var r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=d==='light'?'dark':'light';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button></div></header>
+<main class="col">
+<div class="method"><h1>Method</h1>
+<p class="lede">How the ratings are built, how they are tested, and how the data are checked.</p>
+<h2 id="sipm">The rating: SiPM</h2>
+<p>SiPM rates a player's effect on his team's scoring margin, in points per 100 possessions. Zero is an average player; offence plus defence equals the net rating.</p>
+<p>It has two parts. The first is a lineup rating: a regularised plus-minus over every lineup, with a prior that decays over past seasons and an adjustment for shooting luck. The second is a box-score estimate, adjusted for the strength of the opponents. A final layer combines the two, with weights fitted on how well they predict the next season's lineup results, and adds an age curve that differs by player quality.</p>
+<h2 id="projections">Projections</h2>
+<p><b>This season.</b> The 2026-27 rating starts from his SiPM rating last season, moved one year forward: where players with his rating, age and minutes stood a season later. After each game, a game-level rating (a fixed map from one game's box line to SiPM's offence and defence) updates a running estimate, and the projection moves with it. Rookies start from an estimate based on draft slot.</p>
+<p><b>Five-season outlook.</b> The mean rating over 2026-27 to 2030-31, with 10th and 90th percentiles, if he plays. It reflects age, current level and how players like him have moved. Tested on 2,330 player forecasts made in 2013-14 to 2020-21 (fitted only on earlier seasons), its typical error is 1.16 points per 100, against 1.51 for assuming his rating stays where it is; the 80% range held 82% of outcomes.</p>
+<p><b>Best season ahead.</b> His expected rating in his best season of the next five, the age he is likely to reach it, and the chance that some later season beats this one. A typical path can be flat while the best season still lies ahead: careers zigzag around the trend. All three are fitted on what happened next to players with the same rating, age and minutes since 2007-08.</p>
+<p><b>Projected stats.</b> Usage and minutes come from a trajectory model that includes a role-change block: who left his team, who arrived, and whether the top option is gone. Shooting and per-75 stats come from a short-term box-score forecast that weights recent games more.</p>
+<h2 id="validation">How it is tested</h2>
+<p>Every score below is out of sample: the forecasts are scored on seasons and dates the model never saw when it was fitted.</p>
+<div class="stats">
+<div class="kpi"><div class="k">Team test</div><div class="v">0.81</div><div class="s">correlation with next season's team net rating, 2008-09 to 2025-26 (540 team-seasons); last season's own net rating gets 0.59</div></div>
+<div class="kpi"><div class="k">Calibration</div><div class="v">0.98</div><div class="s">slope: a point of forecast is a point of margin (90% interval 0.93 to 1.03)</div></div>
+</div>
+<p><b>Against the leading public models.</b> Ratings from SiPM, DARKO and EPM were frozen on each date and scored on the next 30 days of game margins. SiPM is level with both: every interval includes zero (6 of 6 comparisons).</p>
+<div class="tws"><table class="data"><thead><tr><th class="l">Comparison</th><th>Dates</th><th>Difference<small>90% interval</small></th><th class="l">Reading</th></tr></thead>
+<tbody><tr><td class="l">SiPM minus DARKO <span class="muted">(every game day, 2025-26)</span></td><td>135</td><td>+0.14 <span class="muted">(−0.17 to +0.38)</span></td><td class="l">level</td></tr><tr><td class="l">SiPM minus DARKO <span class="muted">(every week, 2025-26)</span></td><td>21</td><td>+0.19 <span class="muted">(−0.16 to +0.39)</span></td><td class="l">level</td></tr><tr><td class="l">SiPM minus DARKO <span class="muted">(every week, 2024-25)</span></td><td>21</td><td>−0.25 <span class="muted">(−0.56 to +0.12)</span></td><td class="l">level</td></tr><tr><td class="l">SiPM minus DARKO <span class="muted">(every week, 2023-24)</span></td><td>21</td><td>−0.01 <span class="muted">(−0.37 to +0.25)</span></td><td class="l">level</td></tr><tr><td class="l">SiPM minus EPM <span class="muted">(game days with an archived EPM, 2025-26)</span></td><td>22</td><td>+0.07 <span class="muted">(−0.10 to +0.24)</span></td><td class="l">level</td></tr><tr><td class="l">SiPM minus EPM <span class="muted">(weeks with an archived EPM, 2025-26)</span></td><td>3</td><td>+0.12 <span class="muted">(−0.09 to +0.30)</span></td><td class="l">level</td></tr></tbody></table></div>
+<p class="note">Difference: percentage points of forecast error removed, SiPM minus the other model; above 0 favours SiPM. EPM rows use the copies archived on each date.</p>
+<h2 id="data">Data checks</h2>
+<p>Every source is audited for errors before use. The audit has traced 76 root causes: 52 in the providers' data and 24 in our own processing. 58 are fixed, 9 excluded, 9 documented, and 0 open. <a href="/singular/report/data-audit.html">Full audit</a>.</p>
+<p>Providers sometimes change data without notice. After our September pull, NBA.com re-issued its 2024-25 player-tracking data on its newer Hawk-Eye definitions. A routine check caught the jump; the 24 affected files were re-pulled and the results built on them re-run. No headline result flipped: the shot-making rating's correlation with the NBA's Hawk-Eye shot-making moved from 0.71 to 0.70.</p>
+</div>
+</main>
+<footer class="foot"><div class="col">Data through October 23, 2026. Ratings in points per 100 possessions; 0 is an average player.
+<a href="/singular/method/">How the model works</a>. By <a href="https://griffinhilly.com/">Griffin Hilly</a>.</div></footer>
+</body></html>
