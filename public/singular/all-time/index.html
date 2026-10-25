@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All-time NBA player ratings | Singular</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Career rating trajectories for every NBA player since 1951-52.">
+<script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/singular/assets/palette.css"><link rel="stylesheet" href="/singular/assets/hub.css">
+<script src="/singular/assets/alltime.js" defer></script>
+</head><body>
+<header class="top"><div class="bar wide"><a class="brand" href="/singular/">Singular</a><nav><a href="/singular/">Players</a><a href="/singular/all-time/" aria-current="page">All-time</a><a href="/singular/tests/">Tests</a><a href="/singular/method/">Method</a><a href="/singular/report/"><span class="hs">Bulls report</span><span class="hm">Report</span></a></nav><button class="theme" type="button" aria-label="Switch light or dark" onclick="var r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=d==='light'?'dark':'light';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button></div></header>
+<main class="wide">
+<div class="head-row"><div><h1>All-time</h1>
+<p class="lede">Every NBA player since 1951-52, rated against the league of his own time. Sort by any column; click a name for his career trajectory.</p></div></div>
+<div class="viewbar"><span class="seg big" role="group" aria-label="Rating basis"><button type="button" data-basis="box">Box score, every era</button><button type="button" data-basis="full">Best available</button></span></div>
+<div class="controls" role="search"><input id="q" type="search" placeholder="Search players" aria-label="Search players" autocomplete="off">
+<div class="fl"><select id="dec" aria-label="Debut decade"><option value="">Any debut decade</option><option value="1950">1950s</option><option value="1960">1960s</option><option value="1970">1970s</option><option value="1980">1980s</option><option value="1990">1990s</option><option value="2000">2000s</option><option value="2010">2010s</option><option value="2020">2020s</option></select>
+<label>Min. seasons of 1,000+ min <select id="minq" aria-label="Minimum qualifying seasons"><option value="0">0</option><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option></select></label>
+<label><input id="act" type="checkbox"> Active only</label></div></div>
+<div class="subbar"><span id="count" aria-live="polite"></span></div>
+<div class="tw"><table id="at" class="data"><thead><tr><th class="xw">#</th><th class="l stk"><button type="button" data-k="name">Name</button></th><th class="l"><button type="button" data-k="first">Years</button></th><th class=""><button type="button" data-k="q_seasons">Seasons<small>1,000+ min</small></button></th><th class=""><button type="button" data-k="gp">Games</button></th>
+<th class="kc sep"><button type="button" data-k="best5">Best 5<small>consecutive</small></button></th><th class=""><button type="button" data-k="best3">Best 3</button></th><th class=""><button type="button" data-k="best">Best season</button></th><th class="l">Season</th><th class=""><button type="button" data-k="career">Career<small>weighted</small></button></th></tr></thead><tbody></tbody></table></div>
+<p><button type="button" id="more" class="lnk" hidden>Show more</button></p>
+<p class="note"><b>Box score, every era</b> uses only the box-score rating, the one measure that exists from 1951-52 to today, so players from different decades are compared on the same footing. It cannot see most defence or the lineup effects the full rating captures: great defenders and big men are understated, and before 1973-74, when steals and blocks were first recorded, more so. <b>Best available</b> uses the full SiPM rating where it exists (1996-97 on) and the box-score rating before; the full rating spreads wider at the top, so in this view recent players rank higher partly because of the measure. Ratings are points per 100 possessions above an average player of that season. Best 3 and best 5 are consecutive seasons of 1,000+ minutes.</p>
+<h2>What each era can measure</h2><ul class="notes"><li><b>1951-52 to 1972-73.</b> Box score without steals, blocks, turnovers or the rebound split; minutes often estimated (R² 0.58 against the full rating on held-out seasons).</li><li><b>1973-74 to 1982-83.</b> Box score with some stats filled from season totals (R² 0.70 against the full rating on held-out seasons).</li><li><b>1983-84 to 1995-96.</b> Full box score, no lineup data (R² 0.73 against the full rating on held-out seasons).</li><li><b>1996-97 to 2006-07.</b> Full sipm, fitted with the model&#x27;s final weights (approximate).</li><li><b>2007-08 on.</b> Full sipm.</li></ul>
+</main>
+<footer class="foot"><div class="wide">Ratings in points per 100 possessions; 0 is an average player.
+<a href="/singular/method/">How the model works</a>. By <a href="https://griffinhilly.com/">Griffin Hilly</a>.</div></footer>
+</body></html>

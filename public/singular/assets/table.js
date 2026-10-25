@@ -69,7 +69,7 @@ function render(){
    if(c.k==='bar'){out.push('<td class="'+cl+'">'+bar(r)+'</td>');continue}
    var v=val(r,c);out.push('<td class="'+cl+'"'+shade(c,v)+'>'+(c.k==='peak_age'&&r.peak_now?'now':fmt(v,c))+'</td>')}
   out.push('</tr>')}
- $('#t tbody').innerHTML=out.join('')||'<tr><td colspan="'+cs.length+'" class="empty l">No players match these filters.</td></tr>';
+ $('#t tbody').innerHTML=out.join('')||'<tr><td colspan="'+cs.length+'" class="empty l">No current players match these filters.'+(st.q?' <a href="/singular/all-time/?q='+encodeURIComponent(st.q)+'">Search every player since 1951</a>':'')+'</td></tr>';
  $('#count').textContent=list.length+' of '+rows.length+' players';
  var noStd=!rows.some(function(r){return r.r_std!=null});
  $('#empty-note').hidden=!(noStd&&st.view!=='proj');

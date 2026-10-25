@@ -125,6 +125,8 @@ table.data .sep{border-left:1px solid var(--rule)}
 .crumbs form{display:flex;gap:6px}
 .crumbs input{font:inherit;font-size:.85rem;background:var(--raise);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:4px 8px;width:11em}
 .pnav a{margin-left:12px}
+#at thead th{top:0}
+#at small.act{font:500 .68rem var(--f-mono);color:var(--ink3)}
 .bio{color:var(--ink2);margin:.35rem 0 0}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:18px 0 4px}
 .kpi{background:var(--raise);border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
