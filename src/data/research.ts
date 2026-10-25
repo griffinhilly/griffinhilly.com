@@ -19,11 +19,11 @@ export const research: ResearchEntry[] = [
 		id: 'ai-safety-compendium',
 		title: 'AI safety compendium',
 		status: 'Survey · Oct 2026',
-		// Factual line from the compendium page itself; Griffin may replace it with his own.
+		// Griffin's coverage line from the compendium intro (2026-10-25); keep counts in step with the page.
 		summary:
-			'19 published maps of AI-safety work, compared side by side. 91 approaches in 10 groups. 41 people and organisations who shaped the field.',
+			'Thus far, my attempted mapping has covered 218 sources, producing 129 unique ideas across 11 category groups.',
 		body: [
-			'19 published maps of AI-safety work, compared side by side. 91 approaches in 10 groups. 41 people and organisations who shaped the field.',
+			'Thus far, my attempted mapping has covered 218 sources, producing 129 unique ideas across 11 category groups.',
 		],
 		href: '/explorations/ai-safety/',
 		links: [{ label: 'Open the compendium →', href: '/explorations/ai-safety/' }],
