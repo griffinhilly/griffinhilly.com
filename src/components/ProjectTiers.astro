@@ -88,7 +88,6 @@ const arrow = (href?: string) => (href?.startsWith('http') ? '↗' : '→');
 					<p class:list={{ 'is-draft': x.draft }}>{x.description}</p>
 					<span class="ex-meta mono">
 						{x.date}
-						{x.aiNote && <span> · written with AI agents</span>}
 					</span>
 				</div>
 			</a>

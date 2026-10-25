@@ -61,7 +61,6 @@ export const projects: Project[] = [
 export const byTier = (tier: Project['tier']) => projects.filter((p) => p.tier === tier);
 
 // Explorations: smaller finished pieces hosted under public/explorations/<slug>/ as-is.
-// `aiNote` marks pieces whose text agents wrote (Griffin's disclosure rule for econ / AI-safety pages).
 
 export interface Exploration {
 	title: string;
@@ -69,7 +68,6 @@ export interface Exploration {
 	href: string;
 	thumb: ImageMetadata;
 	date: string; // YYYY-MM
-	aiNote?: boolean;
 	draft?: boolean;
 	home?: boolean; // also listed on the home page (Griffin 2026-10-18: Agent workflow only)
 }
@@ -93,7 +91,6 @@ export const explorations: Exploration[] = [
 	// 	href: '/explorations/polymarket/',
 	// 	thumb: polymarketThumb,
 	// 	date: '2026-10',
-	// 	aiNote: true,
 	// 	draft: true,
 	// 	home: true,
 	// },
