@@ -1,6 +1,9 @@
 {
   "redirects": [
-    { "source": "/ai-safety-takes", "destination": "/explorations/ai-safety/", "permanent": false },
-    { "source": "/ai-safety-takes/", "destination": "/explorations/ai-safety/", "permanent": false }
+    { "source": "/ai-safety-takes", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
+    { "source": "/ai-safety-takes/", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
+    { "source": "/explorations/ai-safety", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
+    { "source": "/explorations/ai-safety/", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
+    { "source": "/explorations/ai-safety/index.html", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true }
   ]
 }

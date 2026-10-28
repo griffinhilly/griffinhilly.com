@@ -25,8 +25,8 @@ export const research: ResearchEntry[] = [
 		body: [
 			'Thus far, my attempted mapping has covered 227 sources, producing 150 unique ideas across 12 category groups.',
 		],
-		href: '/explorations/ai-safety/',
-		links: [{ label: 'Open the compendium →', href: '/explorations/ai-safety/' }],
+		href: 'https://aisafetycompendium.com/compendium/',
+		links: [{ label: 'aisafetycompendium.com →', href: 'https://aisafetycompendium.com/compendium/' }],
 	},
 	{
 		id: 'voluntary-disempowerment',
