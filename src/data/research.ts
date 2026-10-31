@@ -21,9 +21,9 @@ export const research: ResearchEntry[] = [
 		status: 'Survey · Oct 2026',
 		// Griffin's coverage line from the compendium intro (2026-10-25); keep counts in step with the page.
 		summary:
-			'Thus far, my attempted mapping has covered 227 sources, producing 150 unique ideas across 12 category groups.',
+			'Thus far, my attempted mapping has covered 227 sources, producing 151 unique ideas across 12 category groups.',
 		body: [
-			'Thus far, my attempted mapping has covered 227 sources, producing 150 unique ideas across 12 category groups.',
+			'Thus far, my attempted mapping has covered 227 sources, producing 151 unique ideas across 12 category groups.',
 		],
 		href: 'https://aisafetycompendium.com/compendium/',
 		links: [{ label: 'aisafetycompendium.com →', href: 'https://aisafetycompendium.com/compendium/' }],
