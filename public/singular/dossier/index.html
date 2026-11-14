@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<base href="/singular/dossier/">
+<meta name="robots" content="noindex">
+<meta name="description" content="Player Dossier: every current NBA player's impact, stats, shot chart, comparisons and tested findings, from Singular.">
+<title>Player Dossier | Singular</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a scouting dossier. Sticky player bar, then full-width modules stacked; each module = heading + one primary chart + a plain-language read. */
+:root{
+  --bg:#f4f3ee; --panel:#fbfaf6; --ink:#1c1f1b; --mute:#5d635a; --line:#d9d8cf; --grid:#e6e5dc;
+  --hot:#a92229; --cold:#3065cc; --mid:#c9c7bb; --brown:#7e3a06; --olive:#7c8028; --purple:#76338a; --forest:#176938; --ochre:#a97416;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif; --sans:"Source Sans 3","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121512; --panel:#191d19; --ink:#e7e8e1; --mute:#9aa096; --line:#2d332d; --grid:#232823;
+  --hot:#c84243; --cold:#538ae6; --mid:#4a4f48; --brown:#994f20; --olive:#8b9039; --purple:#a968bc; --forest:#398b50; --ochre:#a87520; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121512; --panel:#191d19; --ink:#e7e8e1; --mute:#9aa096; --line:#2d332d; --grid:#232823;
+  --hot:#c84243; --cold:#538ae6; --mid:#4a4f48; --brown:#994f20; --olive:#8b9039; --purple:#a968bc; --forest:#398b50; --ochre:#a87520; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1360px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.05;font-weight:700}
+h2{font-size:24px;font-weight:700}
+h3{font-size:16px;font-family:var(--sans);font-weight:700}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.mute{color:var(--mute)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px}
+.bar .wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-block:0}
+.brand{font:700 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--brown)}
+#q{flex:1 1 220px;min-width:0;font:16px var(--sans);padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+#q:focus,select:focus,button:focus-visible{outline:2px solid var(--cold);outline-offset:1px}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button,.seg button{font:13px var(--sans);padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);cursor:pointer}
+.quick button:hover,.seg button:hover{border-color:var(--mute)}
+.seg{display:inline-flex;gap:4px;flex-wrap:wrap}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+select{font:14px var(--sans);padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+header.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;padding-block:28px 20px;border-bottom:1px solid var(--line)}
+@media (max-width:760px){header.hero{grid-template-columns:minmax(0,1fr)}}
+section.mod,header.hero>div,.cols>div,.dgrp{min-width:0}
+.meta{display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:10px;color:var(--mute);font-size:15px}
+.meta b{color:var(--ink);font-weight:600}
+.read{margin-top:14px;max-width:62ch;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:13px;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.chip.up{border-color:color-mix(in srgb,var(--hot) 55%,var(--line));}
+.chip.dn{border-color:color-mix(in srgb,var(--cold) 55%,var(--line));}
+.chip b{font-family:var(--mono);font-weight:500}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;align-content:start}
+.fig .k{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.fig .v{font:500 30px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.fig .s{font-size:13px;color:var(--mute)}
+.fig.big .v{font-size:44px;color:var(--brown)}
+section.mod{padding-block:30px 6px;border-bottom:1px solid var(--line);scroll-margin-top:calc(80px + env(safe-area-inset-top,0px))}
+.mhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.lede{max-width:66ch;color:var(--mute);margin:4px 0 14px;font-size:15px}
+.new{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--purple);border:1px solid color-mix(in srgb,var(--purple) 50%,var(--line));padding:1px 6px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.fig .v{font-size:24px}.fig.big .v{font-size:34px}.drow{grid-template-columns:minmax(0,1fr) 70px 28px 50px}.ptrow{grid-template-columns:100px minmax(0,1fr) 44px 36px}}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--mute);font:11px var(--sans)}
+.chart .lab{fill:var(--ink);font:12px var(--sans)}
+.dna{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px 28px}
+.dgrp h3{margin-bottom:6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.drow{display:grid;grid-template-columns:minmax(0,1fr) 96px 30px 54px;gap:8px;align-items:center;font-size:14px;padding:3px 0;border-bottom:1px dotted var(--grid)}
+.drow .val{font:13px var(--mono);text-align:right;color:var(--mute)}
+.drow .pc{font:500 13px var(--mono);text-align:right}
+.track{position:relative;height:10px;background:var(--grid);border-radius:5px}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.track u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.25;left:50%}
+.spark{width:54px;height:18px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--grid)}
+th{font-weight:600;color:var(--mute);position:sticky;top:0;background:var(--panel)}
+td:first-child,th:first-child,td.l,th.l{text-align:left}
+td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr.cur td{background:color-mix(in srgb,var(--ochre) 12%,transparent)}
+.legend{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--mute);flex-wrap:wrap}
+.ramp{width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--cold),var(--mid),var(--hot))}
+.note{font-size:13px;color:var(--mute);max-width:70ch}
+.empty{color:var(--mute);font-style:italic;padding:10px 0}
+.ctx{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+.ptrow{display:grid;grid-template-columns:130px minmax(0,1fr) 52px 44px;gap:8px;align-items:center;font-size:14px;padding:4px 0;border-bottom:1px dotted var(--grid)}
+.ptrow .pb{height:12px;background:var(--grid);border-radius:3px;position:relative}
+.ptrow .pb i{position:absolute;left:0;top:0;bottom:0;background:var(--olive);border-radius:3px}
+footer{padding-top:24px;font-size:13px;color:var(--mute)}
+@media (prefers-reduced-motion:no-preference){.track i{transition:width .4s ease}}
+</style>
+
+<div class="bar"><div class="wrap">
+  <span class="brand">Player Dossier</span>
+  <input id="q" list="plist" placeholder="Find a player (626 current players)" autocomplete="off" aria-label="Find a player">
+  <datalist id="plist"></datalist>
+  <div class="quick" id="quick"></div>
+  <a href="/singular" style="margin-left:auto;font-size:13px;color:var(--mute)">Singular home</a>
+</div></div>
+
+<div class="wrap" id="app"><p class="empty">Loading players…</p></div>
+
+<!-- separately built modules (each file defines one global function; render() calls it when present) -->
+<script src="mods/box.js"></script>
+<script src="mods/compare.js"></script>
+<script src="mods/front.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let META, CUR, SEASON = "2025", SHOTMODE = "eff", POSMODE = 0;
+const shards = {};
+const sname = y => `${y}-${String(+y+1).slice(2)}`;
+const fmt = (v, f) => v == null ? "–" : f === "pct" ? (100*v).toFixed(1) : f === "pct+" ? (v>0?"+":"")+(100*v).toFixed(1) : f === "2" ? v.toFixed(2) : f === "0" ? v.toFixed(0) : v.toFixed(1);
+const sgn = v => v == null ? "–" : (v > 0 ? "+" : "") + v.toFixed(1);
+
+// percentile colour: cold (low) -> neutral -> hot (high)
+function mix(a, b, t){ const p = x => [1,3,5].map(i => parseInt(x.slice(i,i+2),16)); const A=p(a),B=p(b); return "#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join(""); }
+function pcol(p){ const c=css("--cold"), m=css("--mid"), h=css("--hot"); return p < 50 ? mix(c, m, p/50) : mix(m, h, (p-50)/50); }
+function dcol(d, span){ if (d == null || isNaN(d)) return css("--mute"); const t = Math.max(-1, Math.min(1, d/span)); return t < 0 ? mix(css("--mid"), css("--cold"), -t) : mix(css("--mid"), css("--hot"), t); }
+
+async function shard(id){ const k = id % META.nshard; if(!shards[k]) shards[k] = await (await fetch(`players/s${String(k).padStart(2,"0")}.json`)).json(); return shards[k][id]; }
+
+async function boot(){
+  META = await (await fetch("index.json")).json();
+  $("#plist").innerHTML = META.players.map(p => `<option value="${E(p.name)}">${E(p.team||"")} · ${E(p.pos||"")}</option>`).join("");
+  const picks = [1641705, 203999, 1628983, 1630162, 1628369, 1631094, 2544, 201939];
+  $("#quick").innerHTML = picks.map(id => META.players.find(p=>p.id===id)).filter(Boolean).map(p => `<button data-id="${p.id}">${E(p.name.split(" ").slice(-1)[0])}</button>`).join("");
+  $("#quick").onclick = e => { const b = e.target.closest("button"); if (b) go(+b.dataset.id); };
+  $("#q").addEventListener("change", () => { const p = META.players.find(x => x.name.toLowerCase() === $("#q").value.trim().toLowerCase()); if (p) { go(p.id); $("#q").value = ""; } });
+  window.addEventListener("hashchange", route);
+  route();
+}
+function route(){ const m = location.hash.match(/^#p-(\d+)$/);
+  if (!m && typeof renderFront === "function") { CUR = null; renderFront(); window.scrollTo(0,0); return; }
+  show(m ? +m[1] : META.players[0].id); }
+function go(id){ location.hash = "p-" + id; }
+
+async function show(id){
+  const d = await shard(id);
+  if (!d) { $("#app").innerHTML = `<p class="empty">No page for player ${id}.</p>`; return; }
+  CUR = d;
+  const ys = Object.keys(d.dna); SEASON = ys.includes("2025") ? "2025" : ys[ys.length-1] || "2025";
+  render(); window.scrollTo(0,0);
+}
+
+function lab(k){ return META.dna_labels.find(x => x[1] === k); }
+// reliability shrinkage: a percentile from a measure that barely repeats year to year is pulled toward 50 before use
+function shrunk(k, p){ const r = (META.dna_rel || {})[k]; return r == null ? p : 50 + Math.max(0, r) * (p - 50); }
+// style / volume measures: low values describe role, not weakness
+const STYLE = new Set(["miles36","spd_off","spd_def","touch_sec","cs3a36","drives36","pu36","orebch36","drebch36","boxout36","potast36","astpts36","usg","pts36","ftr","cont36","defl36","blk36","stl36","orebpct","drebpct","astpct","grav","grav_off"]);
+
+function render(){
+  const d = CUR, s = d.summary || {}, b = d.bio || {};
+  const ht = b.height ? `${Math.floor(b.height/12)}′${Math.round(b.height%12)}″` : null;
+  const draft = b.draft_year ? (b.draft_pick ? `${b.draft_year} · pick ${b.draft_pick}` : `${b.draft_year} · undrafted`) : null;
+  const dn = d.dna[SEASON];
+  let ups = [], dns = [];
+  if (dn) { const it = dn.items.filter(x => x[2] != null).map(x => [...x, shrunk(x[0], x[2])]);
+    // strengths: shrunk percentile >= 85 (a noisy measure needs a more extreme raw value); weaknesses: only "how well" measures, never style / volume
+    ups = it.filter(x => x[4] >= 85).sort((a,b)=>b[4]-a[4]).slice(0,4);
+    dns = it.filter(x => !STYLE.has(x[0]) && x[4] <= 20).sort((a,b)=>a[4]-b[4]).slice(0,3); }
+  const chip = (x, cls) => `<span class="chip ${cls}">${E(lab(x[0])[2])} <b>${x[2]}</b></span>`;
+  $("#app").innerHTML = `
+  <header class="hero">
+    <div>
+      <div class="brand" style="color:var(--mute)">${E(d.team||"Free agent")} · ${E(d.pos||"")}</div>
+      <h1>${E(d.name)}</h1>
+      <div class="meta">${d.age?`<span>Age <b>${d.age}</b></span>`:""}${ht?`<span>Height <b>${ht}</b></span>`:""}${draft?`<span>Draft <b>${draft}</b></span>`:""}${d.rank?`<span>Rating rank <b>#${d.rank}</b> of ${d.n_ranked}</span>`:""}</div>
+      ${dn ? `<div class="chips">${ups.map(x=>chip(x,"up")).join("")}${dns.map(x=>chip(x,"dn")).join("")}</div>
+      <p class="note" style="margin-top:6px">Chips: league percentile in ${sname(SEASON)} among players with ${META.min_pool}+ minutes (100 = best; for turnovers and points allowed, 100 = fewest). Chosen after discounting measures that barely repeat year to year; low "how much" numbers (miles run, catch-and-shoot volume) describe his role and are never shown as weaknesses.</p>` : ""}
+      ${radar(d)}
+    </div>
+    <div class="figs">
+      <div class="fig big"><div class="k">Rating, rest of 2026-27</div><div class="v">${sgn(s.r_proj)}</div><div class="s">80% range ${sgn(s.r_proj_lo)} to ${sgn(s.r_proj_hi)}</div></div>
+      <div class="fig"><div class="k">Offense / defense</div><div class="v">${sgn(s.r_proj_o)} <span class="mute">/</span> ${sgn(s.r_proj_d)}</div><div class="s">points per 100 possessions vs average</div></div>
+      <div class="fig"><div class="k">This season so far</div><div class="v">${s.gp ? sgn(s.r_std) : "–"}</div><div class="s">${s.gp ? `${s.gp} games, box-score based` : "no 2026-27 games yet"}</div></div>
+      <div class="fig"><div class="k">Next five seasons</div><div class="v">${sgn(s.t5_mean)}</div><div class="s">${s.p_better!=null?`${Math.round(s.p_better)}% chance a later season beats this one`:""}</div></div>
+      ${shortVersion(d)}
+    </div>
+  </header>
+  <nav id="jump" class="quick" style="padding-block:12px;border-bottom:1px solid var(--line)" aria-label="Sections"></nav>
+  ${typeof modCompare === "function" ? modCompare(d) : modTrajectory(d)}
+  ${typeof modBox === "function" ? modBox(d) : ""}
+  ${modPanel(d)}
+  ${modFindings(d)}
+  ${modDNA(d)}
+  ${modLeague(d)}
+  ${modShots(d)}
+  ${modContext(d)}
+  ${modSplits(d)}
+  ${modPlaytypes(d)}
+  ${modOnOff(d)}
+  ${modOnOffHist(d)}
+  ${modLineups(d)}
+  ${modRotation(d)}
+  ${modDefense(d)}
+  ${modPasses(d)}
+  ${modParts(d)}
+  ${modSimNow(d)}
+  ${modComps(d)}
+  ${modArch(d)}
+  ${modConsistency(d)}
+  ${modUpcoming(d)}
+  ${modGames(d)}
+  ${modAvail(d)}
+  ${modSurvival(d)}
+  ${modMilestones(d)}
+  ${modContract(d)}
+  ${modCombine(d)}
+  ${modDraft(d)}
+  ${modCareer(d)}
+  ${modPlayoffs(d)}
+  ${modHofTraj(d)}
+  ${modAwards(d)}
+  <footer>Data through ${E(META.data_through)}. Ratings: Singular SiPM (points per 100 possessions above an average player). Tracking, play types and shot context: NBA.com. Shot locations: NBA play-by-play. Prototype built ${new Date().toISOString().slice(0,10)}.</footer>`;
+  wire();
+}
+
+/* ---------- trajectory ---------- */
+function modTrajectory(d){
+  if (!d.line.length && !d.proj_path.length) return "";
+  const W=1000, H=300, L=40, R=16, T=14, B=28;
+  const pts = d.dots.map(x => [Date.parse(x.date), x.r]), ln = d.line.map(x => [Date.parse(x.date), x.r]);
+  const pj = d.proj_path.map(x => [Date.UTC(x.season+1,1,1), x.mean, x.lo, x.hi]);
+  const xs = [...pts, ...ln, ...pj].map(p=>p[0]), ysv = [...pts.map(p=>p[1]), ...ln.map(p=>p[1]), ...pj.flatMap(p=>[p[2],p[3]])];
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  let y0 = Math.floor(Math.min(-2, ...ysv)), y1 = Math.ceil(Math.max(4, ...ysv));
+  const X = t => L + (t-x0)/(x1-x0||1)*(W-L-R), Y = v => T + (y1-v)/(y1-y0)*(H-T-B);
+  let g = "";
+  for (let v = Math.ceil(y0/2)*2; v <= y1; v += 2) g += `<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?css("--mute"):css("--grid")}" stroke-width="${v===0?1:1}" ${v===0?'stroke-dasharray="3 3"':""}/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v>0?"+":""}${v}</text>`;
+  const y0d = new Date(x0).getUTCFullYear(), y1d = new Date(x1).getUTCFullYear();
+  const step = (y1d - y0d) > 12 ? 2 : 1;
+  for (let y = y0d + 1; y <= y1d; y += step) { const t = Date.UTC(y,0,1); if (t>x0 && t<x1) g += `<text x="${X(t)}" y="${H-8}" text-anchor="middle">${y}</text>`; }
+  const dots = pts.map(p => `<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="1.8" fill="${css("--mute")}" opacity=".35"/>`).join("");
+  const path = ln.length ? `<path d="${ln.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("")}" fill="none" stroke="${css("--brown")}" stroke-width="2.5"/>` : "";
+  let fan = "";
+  if (pj.length) {
+    const st = ln.length ? ln[ln.length-1] : [pj[0][0], pj[0][1]];
+    const up = [[st[0], st[1]], ...pj.map(p=>[p[0],p[3]])], lo = [...pj.map(p=>[p[0],p[2]]).reverse(), [st[0], st[1]]];
+    fan = `<path d="${[...up, ...lo].map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("")}Z" fill="${css("--olive")}" opacity=".18"/>
+      <path d="${[[st[0],st[1]], ...pj.map(p=>[p[0],p[1]])].map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("")}" fill="none" stroke="${css("--olive")}" stroke-width="2" stroke-dasharray="5 4"/>
+      ${pj.map(p=>`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="${css("--olive")}"/><text x="${X(p[0])}" y="${Y(p[3])-6}" text-anchor="middle">${String(new Date(p[0]).getUTCFullYear()-1).slice(2)}-${String(new Date(p[0]).getUTCFullYear()).slice(2)}</text>`).join("")}`;
+  }
+  return `<section class="mod"><div class="mhead"><h2>Impact over time</h2></div>
+  <p class="lede">Each dot is his rating after one game; the brown line smooths them. The dashed olive line is the forecast for the next five seasons, with the shaded 80% range. Zero is an average NBA player.</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Rating trajectory">${g}${dots}${fan}${path}</svg></section>`;
+}
+
+/* ---------- skill DNA ---------- */
+function modDNA(d){
+  const ys = Object.keys(d.dna);
+  if (!ys.length) return `<section class="mod"><h2>Skill profile</h2><p class="empty">No NBA tracking seasons yet.</p></section>`;
+  const dn = d.dna[SEASON];
+  const groups = [...new Set(META.dna_labels.map(x=>x[0]))];
+  const PI = POSMODE && d.posg ? 3 : 2;
+  const PN = {G:"guards", F:"forwards", C:"centers"}[d.posg] || "";
+  const hist = k => ys.map(y => { const it = d.dna[y].items.find(x=>x[0]===k); return it && it[PI]!=null ? [y, it[PI]] : null; }).filter(Boolean);
+  const spark = h => { if (h.length < 2) return `<span></span>`; const w=54, hh=18, n=h.length;
+    const pth = h.map((p,i)=>`${i?"L":"M"}${(i/(n-1)*(w-4)+2).toFixed(1)} ${(hh-2-(p[1]/100)*(hh-4)).toFixed(1)}`).join("");
+    const last = h[n-1]; return `<svg class="spark" viewBox="0 0 ${w} ${hh}" aria-label="percentile by season"><line x1="0" x2="${w}" y1="${hh/2}" y2="${hh/2}" stroke="${css("--grid")}"/><path d="${pth}" fill="none" stroke="${css("--mute")}" stroke-width="1.3"/><circle cx="${w-2}" cy="${(hh-2-(last[1]/100)*(hh-4)).toFixed(1)}" r="2.4" fill="${pcol(last[1])}"/></svg>`; };
+  const body = groups.map(gname => {
+    const rows = META.dna_labels.filter(x=>x[0]===gname).map(([g,k,label,f,low]) => {
+      const it = dn ? dn.items.find(x=>x[0]===k) : null;
+      if (!it) return "";
+      const p = it[PI];
+      return `<div class="drow" title="${E(label)}: ${fmt(it[1],f)}${it[2]!=null?` (league percentile ${it[2]}${it[3]!=null&&PN?`; among ${PN} ${it[3]}`:""})`:""}${(META.dna_rel||{})[it[0]]!=null && META.dna_rel[it[0]]<0.5?` (noisy: repeats year to year at r ${META.dna_rel[it[0]]})`:""}"><span>${E(label)}${(META.dna_rel||{})[it[0]]!=null && META.dna_rel[it[0]]<0.5?` <span class="mute" style="font:10px var(--mono)">noisy</span>`:""}</span>
+        <span class="track"><u></u>${p!=null?`<i style="width:${Math.max(3,p)}%;background:${pcol(p)}"></i>`:""}</span>
+        <span class="pc">${p ?? "–"}</span><span>${spark(hist(k))}</span></div>`; }).join("");
+    return rows ? `<div class="dgrp"><h3>${E(gname)}</h3>${rows}</div>` : "";
+  }).join("");
+  return `<section class="mod"><div class="mhead"><h2>Skill profile<span class="new">trend lines</span></h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">${PN?`<div class="seg" id="posmode"><button data-m="0" aria-pressed="${!POSMODE}">vs league</button><button data-m="1" aria-pressed="${!!POSMODE}">vs ${PN}</button></div>`:""}
+    <label class="mute" style="font-size:14px">Season <select id="dnaSeason">${ys.map(y=>`<option value="${y}" ${y===SEASON?"selected":""}>${sname(y)}</option>`).join("")}</select></label></div></div>
+  <p class="lede">${PI===3?`Percentile among ${PN} only`:"League percentile"} on ${META.dna_labels.length} measures, from box score, NBA tracking and play-type data${dn?`, ${sname(SEASON)} (${dn.gp} games, ${dn.min} minutes${dn.small?"; under the minutes floor, so read with care":""})`:""}. Bar colour runs cold to hot. The small line at right shows the same percentile across his seasons, so you can see a skill arrive or fade. Hover a row for the raw value. NBA.com re-processed 2024-25 tracking under new camera definitions (drives and touch time read higher from then on); percentiles are ranked within each season, which absorbs most of that shift.</p>
+  ${dn ? `<div class="dna">${body}</div>` : `<p class="empty">No tracking data for ${sname(SEASON)}.</p>`}</section>`;
+}
+
+/* ---------- shot chart ---------- */
+function court(){
+  const c = css("--line"), w = 1.6;
+  const arc = (r, a0, a1) => { const p = a => [r*Math.cos(a), r*Math.sin(a)]; const [x0,y0]=p(a0), [x1,y1]=p(a1); return `M${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}`; };
+  const a3 = Math.acos(220/237.5);
+  return `<g fill="none" stroke="${c}" stroke-width="${w}">
+    <rect x="-250" y="-47.5" width="500" height="470"/>
+    <rect x="-80" y="-47.5" width="160" height="190"/><rect x="-60" y="-47.5" width="120" height="190"/>
+    <path d="${arc(60, 0, Math.PI)}" transform="translate(0 142.5)"/>
+    <path d="${arc(40, 0, Math.PI)}"/>
+    <circle cx="0" cy="0" r="7.5"/><line x1="-30" x2="30" y1="-7.5" y2="-7.5"/>
+    <line x1="-220" x2="-220" y1="-47.5" y2="${237.5*Math.sin(a3)}"/><line x1="220" x2="220" y1="-47.5" y2="${237.5*Math.sin(a3)}"/>
+    <path d="M220 ${237.5*Math.sin(a3)} A237.5 237.5 0 0 1 -220 ${237.5*Math.sin(a3)}"/>
+    <path d="${arc(60, Math.PI, 2*Math.PI)}" transform="translate(0 422.5)"/></g>`;
+}
+function modShots(d){
+  const ys = Object.keys(d.shots);
+  if (!ys.length) return "";
+  const y = ys.includes(SEASON) ? SEASON : ys[ys.length-1];
+  const s = d.shots[y], R = 20, K = 6;
+  const maxf = Math.max(...s.hex.map(h=>h[2]));
+  const sorted = s.hex.map(h=>h[2]).sort((a,b)=>a-b); const ref = Math.max(4, sorted[Math.floor(sorted.length*0.9)]);
+  const py = String(+y - 1), ps = d.shots[py], change = SHOTMODE === "change" && ps;
+  const pmap = {}; if (ps) ps.hex.forEach(h => pmap[h[0]+","+h[1]] = h[2]/ps.fga);
+  const keys = new Set(s.hex.map(h=>h[0]+","+h[1])); if (change) Object.keys(pmap).forEach(k=>keys.add(k));
+  const cmap = {}; s.hex.forEach(h => cmap[h[0]+","+h[1]] = h);
+  const shs = [...keys].map(k => Math.max(cmap[k]?cmap[k][2]/s.fga:0, pmap[k]||0)).sort((a,b)=>a-b);
+  const sharesRef = Math.max(shs[Math.floor(shs.length*0.9)] || 0, 0.004);
+  const hexes = [...keys].map(k => {
+    const [q,r] = k.split(",").map(Number), h = cmap[k];
+    const cx = R*Math.sqrt(3)*(q + r/2), cy = R*1.5*r;
+    if (Math.abs(cx) > 250 || cy > 420) return "";
+    let sc, col, tip;
+    if (change) {
+      const now = h ? h[2]/s.fga : 0, was = pmap[k] || 0;
+      sc = Math.max(0.28, Math.min(1, Math.sqrt(Math.max(now, was)/sharesRef))) * 0.95;
+      col = dcol(now - was, 0.012);
+      tip = `${(100*now).toFixed(1)}% of shots here vs ${(100*was).toFixed(1)}% in ${sname(py)}`;
+    } else {
+      if (!h) return "";
+      const [,,fga,pts,lg] = h;
+      sc = Math.max(0.28, Math.min(1, Math.sqrt(fga/ref))) * 0.95;
+      col = dcol((pts + K*lg)/(fga + K) - lg, 0.35);
+      tip = `${fga} shots, ${(pts/fga).toFixed(2)} pts/shot (league ${lg.toFixed(2)} here)`;
+    }
+    const pt = Array.from({length:6}, (_,i) => { const a = Math.PI/180*(60*i-30); return `${(cx+R*sc*Math.cos(a)).toFixed(1)},${(cy+R*sc*Math.sin(a)).toFixed(1)}`; }).join(" ");
+    return `<polygon points="${pt}" fill="${col}"><title>${tip}</title></polygon>`;
+  }).join("");
+  const zorder = ["Restricted Area","Paint (non-RA)","Mid-Range","Left Corner 3","Right Corner 3","Above the Break 3","Deep 3 (30+ ft)"];
+  const tot = s.zones.reduce((a,z)=>a+z.fga,0);
+  const ptot = ps ? ps.zones.reduce((a,z)=>a+z.fga,0) : 0;
+  // 80% Wilson interval for a make rate
+  const wil = (m, n) => { const z = 1.2816, p = m/n, den = 1 + z*z/n, c = (p + z*z/(2*n))/den, h = z*Math.sqrt(p*(1-p)/n + z*z/(4*n*n))/den; return [c-h, c+h]; };
+  const zrows = zorder.map(n => s.zones.find(z=>z.zone===n)).filter(Boolean).map(z => {
+    const fg = z.fgm/z.fga, diff = (z.pts/z.fga) - z.lg_pps, [lo, hi] = wil(z.fgm, z.fga);
+    const pz = ps && ps.zones.find(x=>x.zone===z.zone), dsh = ps ? 100*(z.fga/tot - (pz?pz.fga/ptot:0)) : null;
+    return `<tr><td class="l">${E(z.zone)}</td><td>${z.fga}</td><td>${(100*z.fga/tot).toFixed(0)}%${dsh!=null?` <span style="color:${dcol(dsh,4)}">${dsh>0?"+":""}${dsh.toFixed(0)}</span>`:""}</td><td>${(100*fg).toFixed(1)}</td><td class="mute">${(100*lo).toFixed(0)}–${(100*hi).toFixed(0)}</td><td class="mute">${(100*z.lg_fg).toFixed(1)}</td><td style="color:${dcol(diff,0.3)}">${diff>0?"+":""}${diff.toFixed(2)}</td></tr>`; }).join("");
+  // distance curve
+  const W=460, H=190, L=34, Rr=10, T=10, B=26;
+  const dd = s.dist.filter(x=>x[0]<=30);
+  const maxF = Math.max(...dd.map(x=>x[1]/s.fga));
+  const X = v => L + v/30*(W-L-Rr), Yf = v => T + (1 - v/maxF)*(H-T-B);
+  const bars = dd.map(([b,fga,pts,lg]) => { const pps=(pts+K*lg)/(fga+K); return `<rect x="${X(b)-5}" y="${Yf(fga/s.fga)}" width="10" height="${H-B-Yf(fga/s.fga)}" fill="${dcol(pps-lg,0.35)}"><title>${b} ft: ${fga} shots, ${(pts/fga).toFixed(2)} pts/shot (league ${lg.toFixed(2)})</title></rect>`; }).join("");
+  const xt = [0,5,10,15,20,25,30].map(v=>`<text x="${X(v)}" y="${H-8}" text-anchor="middle">${v}${v===30?"+":""} ft</text>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>Where he shoots</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">${ps?`<div class="seg" id="shotmode"><button data-m="eff" aria-pressed="${!change}">Efficiency</button><button data-m="change" aria-pressed="${!!change}">Change from ${sname(py)}</button></div>`:""}
+    <label class="mute" style="font-size:14px">Season <select id="shotSeason">${ys.map(v=>`<option value="${v}" ${v===y?"selected":""}>${sname(v)}</option>`).join("")}</select></label></div></div>
+  <p class="lede">${s.fga} field-goal attempts in ${sname(y)}. ${change ? `Change view: hexagon colour shows where his shot diet moved since ${sname(py)} (hot = a bigger share of his shots now, cold = a smaller share); size shows the larger of the two seasons' shares.` : `Hexagon size shows how often he shoots from a spot; colour shows points per shot against the league average from the same spot (shrunk toward average where he has few shots). Hot = better than the league there.`}</p>
+  <div class="cols"><div><svg class="chart" viewBox="-252 -50 504 474" role="img" aria-label="Shot chart">${court()}${hexes}</svg>
+    <div class="legend"><span>${change?"Less often":"Below league"}</span><span class="ramp"></span><span>${change?"More often":"Above league"}</span></div></div>
+  <div><h3>By zone</h3><div class="tbl"><table><thead><tr><th class="l">Zone</th><th>FGA</th><th>Share${ps?" (vs last yr)":""}</th><th>FG%</th><th>80% range</th><th>League</th><th>Pts/shot vs lg</th></tr></thead><tbody>${zrows}</tbody></table></div>
+    <p class="note">"80% range" is the band his true FG% likely sits in given the number of attempts, so 40% on 30 shots and 40% on 300 shots no longer look the same.</p>
+    <h3 style="margin-top:18px">By distance</h3><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Shot distance profile">${bars}${xt}</svg>
+    <p class="note">Bar height = share of his shots from that distance; colour as on the chart.</p></div></div></section>`;
+}
+
+/* ---------- shot context ---------- */
+function modContext(d){
+  const fams = Object.keys(d.context);
+  if (!fams.length) return "";
+  const blocks = fams.map(f => {
+    const rows = d.context[f];
+    const W=300, rowH=26, H=rows.length*rowH+24, L=52;
+    const mx = Math.max(...rows.flatMap(r=>[r.freq||0, r.lg_freq||0]));
+    const sx = v => L + v/mx*(W-L-60);
+    const bars = rows.map((r,i) => { const y = 18 + i*rowH; const de = r.efg!=null ? r.efg - r.lg_efg : null;
+      return `<text class="lab" x="0" y="${y+11}">${E(r.b)}</text>
+      <rect x="${L}" y="${y}" width="${sx(r.freq||0)-L}" height="14" rx="2" fill="${de==null?css("--mid"):dcol(de,0.12)}"/>
+      <line x1="${sx(r.lg_freq)}" x2="${sx(r.lg_freq)}" y1="${y-3}" y2="${y+17}" stroke="${css("--ink")}" stroke-width="1.5"/>
+      <text x="${W-2}" y="${y+11}" text-anchor="end">${r.efg!=null?(100*r.efg).toFixed(0)+" eFG":"–"}</text>`; }).join("");
+    return `<div><h3>${E(f)}</h3><svg class="chart" viewBox="0 0 ${W} ${H}">${bars}</svg></div>`;
+  }).join("");
+  return `<section class="mod"><div class="mhead"><h2>How his shots happen<span class="new">rare view</span></h2></div>
+  <p class="lede">Shot diet in 2025-26 by how many dribbles he took, how close the nearest defender was, how long he held the ball, and how much time was left on the shot clock. Bar length = share of his shots; the black tick = the league share. Bar colour = his effective FG% against the league in that bucket (hot = better). The number at right is his eFG%.</p>
+  <div class="ctx">${blocks}</div></section>`;
+}
+
+/* ---------- play types ---------- */
+const PTN = {PRBallHandler:"P&R ball-handler", PRRollman:"P&R roll man", PRRollMan:"P&R roll man", Spotup:"Spot-up", Isolation:"Isolation", Transition:"Transition", Postup:"Post-up", Cut:"Cut", OffScreen:"Off screen", Handoff:"Handoff", OffRebound:"Putbacks", Misc:"Other"};
+function modPlaytypes(d){
+  const pt = d.playtypes; if (!pt.off.length && !pt.def.length) return "";
+  const blk = (rows, side) => { if (!rows.length) return `<p class="empty">Not enough plays.</p>`;
+    const tot = rows.reduce((a,r)=>a+r.poss,0), mx = Math.max(...rows.map(r=>r.poss/tot));
+    return rows.filter(r=>r.type!=="Misc").map(r => `<div class="ptrow" title="${r.poss} plays, ${r.ppp} points per play (league ${r.lg_ppp})">
+      <span>${E(PTN[r.type]||r.type)}</span><span class="pb"><i style="width:${(r.poss/tot/mx*100).toFixed(1)}%;background:${pcol(r.pct??50)}"></i></span>
+      <span class="num" style="text-align:right">${r.ppp.toFixed(2)}</span><span class="num mute" style="text-align:right">${r.pct??"–"}</span></div>`).join(""); };
+  return `<section class="mod"><div class="mhead"><h2>Play types, 2025-26</h2></div>
+  <p class="lede">How his possessions ended, by Synergy play type. Bar length = share of his plays; colour = NBA.com percentile (hot = good; on defence, hot = few points allowed). Columns: points per play, then that percentile.</p>
+  <div class="cols"><div><h3>Offense</h3>${blk(pt.off,"off")}</div><div><h3>Defense (as the defender)</h3>${blk(pt.def,"def")}</div></div></section>`;
+}
+
+/* ---------- rating parts ---------- */
+function modParts(d){
+  const p = d.summary && d.summary.r_parts; if (!p) return "";
+  const names = {scoring:"Scoring volume", efficiency:"Efficiency", playmaking:"Playmaking", rebounding:"Rebounding", defense:"Defensive box stats", turnovers:"Turnovers", other:"Other box", nonbox:"Not in the box score"};
+  const ks = Object.keys(names).filter(k=>p[k]!=null);
+  const W=640, rowH=26, H=ks.length*rowH+16, L=170, mid=L+(W-L-50)/2;
+  const mx = Math.max(2, ...ks.map(k=>Math.abs(p[k])));
+  const sx = v => v/mx*(W-L-50)/2;
+  const bars = ks.map((k,i) => { const v=p[k], y=8+i*rowH;
+    return `<text class="lab" x="0" y="${y+13}">${names[k]}</text><rect x="${v<0?mid+sx(v):mid}" y="${y+2}" width="${Math.abs(sx(v))}" height="15" rx="2" fill="${v<0?css("--cold"):css("--hot")}" opacity=".85"/>
+      <text x="${v<0?mid+sx(v)-4:mid+sx(v)+4}" y="${y+14}" text-anchor="${v<0?"end":"start"}">${v>0?"+":""}${v.toFixed(2)}</text>`; }).join("");
+  return `<section class="mod"><div class="mhead"><h2>Where the rating comes from</h2></div>
+  <p class="lede">His projected rating (${sgn(d.summary.r_proj)}) split into parts. Box-score parts come from the rating map; "Not in the box score" is what lineup data says he adds or costs beyond his stats.</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:${W}px"><line x1="${mid}" x2="${mid}" y1="0" y2="${H}" stroke="${css("--mute")}"/>${bars}</svg></section>`;
+}
+
+/* ---------- career table ---------- */
+function modCareer(d){
+  if (!d.box.length) return "";
+  const rat = Object.fromEntries((d.seasons||[]).map(s=>[s.season, s]));
+  const f1 = v => v==null?"–":v.toFixed(1), fp = v => v==null?"–":(100*v).toFixed(1);
+  const rows = d.box.map(b => { const r = rat[b.season] || {}; const rv = r.r ?? r.r_box;
+    return `<tr class="${b.season===2026?"cur":""}"><td>${sname(b.season)}</td><td class="l">${E(b.team)}</td><td>${b.gp}</td><td>${f1(b.mpg)}</td><td>${f1(b.ppg)}</td><td>${f1(b.rpg)}</td><td>${f1(b.apg)}</td><td>${f1(b.spg)}</td><td>${f1(b.bpg)}</td><td>${f1(b.tpg)}</td><td>${fp(b.fg)}</td><td>${fp(b.tp)}</td><td>${fp(b.ft)}</td><td>${fp(b.ts)}</td><td>${r.usg!=null?r.usg.toFixed(1):"–"}</td><td style="color:${rv==null?"":dcol(rv,6)};font-weight:500">${rv==null?"–":sgn(rv)}${r.r==null&&r.r_box!=null?"*":""}</td></tr>`; }).join("");
+  return `<section class="mod"><div class="mhead"><h2>Season by season</h2></div>
+  <div class="tbl"><table><thead><tr><th>Season</th><th class="l">Team</th><th>G</th><th>MPG</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TOV</th><th>FG%</th><th>3P%</th><th>FT%</th><th>TS%</th><th>USG</th><th>Rating</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">Regular season. Rating = Singular SiPM for the season; * = box-score rating only (current season or no lineup rating yet).</p></section>`;
+}
+
+/* ---------- on/off + with/without teammates ---------- */
+function modOnOff(d){
+  const L = d.lineup; if (!L || !L.onoff) return "";
+  const o = L.onoff, w = L.without;
+  const sg = v => v == null ? "–" : (v>0?"+":"") + v.toFixed(1);
+  if (o.net_on == null && o.swing == null) return "";
+  const tiles = `<div class="figs" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+    <div class="fig"><div class="k">Team with him on</div><div class="v" style="color:${dcol(o.net_on,12)}">${sg(o.net_on)}</div><div class="s">net points per 100, ${o.poss_on.toLocaleString()} possessions</div></div>
+    <div class="fig"><div class="k">With him off</div><div class="v" style="color:${dcol(o.net_off,12)}">${sg(o.net_off)}</div><div class="s">${o.poss_off.toLocaleString()} possessions</div></div>
+    <div class="fig"><div class="k">Swing</div><div class="v">${sg(o.swing)}</div><div class="s">80% range ${sg(o.swing_lo80)} to ${sg(o.swing_hi80)}${o.qualified&&o.swing_pct!=null?`; ${o.swing_pct}th percentile`:""}</div></div></div>`;
+  const tm = (w && w.teammates || []).map(t => { const dd = t.delta; const cell = (v, s, u="") => `<td style="color:${dcol(v,s)}">${v>0?"+":""}${v.toFixed(1)}${u}</td>`;
+    return `<tr><td class="l">${META.players.some(p=>p.id===t.id)?`<a href="#p-${t.id}" style="color:inherit">${E(t.name)}</a>`:E(t.name)}</td><td>${t.with.games} / ${t.without.games}${t.small?"*":""}</td>${cell(dd.pts36,5)}${cell(dd.ast36,3)}${cell(dd.reb36,3)}${cell(dd.ts,6)}${cell(dd.shots36,5)}</tr>`; }).join("");
+  return `<section class="mod"><div class="mhead"><h2>On the floor and off it, 2025-26</h2></div>
+  <p class="lede">${E(o.team)}'s scoring margin per 100 possessions with him on the court and off it, from every lineup stint of the season. The swing mixes his impact with who he shares the floor with, which is why the rating above adjusts for teammates; the range shows how much it moves from game to game. "Off" includes games he missed.</p>
+  ${tiles}
+  ${tm?`<h3 style="margin-top:14px">How his game changes when a key teammate sits</h3><div class="tbl"><table><thead><tr><th class="l">Teammate out</th><th>Games with / without</th><th>PTS/36</th><th>AST/36</th><th>REB/36</th><th>TS%</th><th>Shots/36</th></tr></thead><tbody>${tm}</tbody></table></div>
+  <p class="note">Change in his per-36 numbers in games the teammate missed versus games they played. * = fewer than 15 games without, so read as a hint.</p>`:""}</section>`;
+}
+
+
+/* ---------- on/off by season ---------- */
+function modOnOffHist(d){
+  const h = (d.onh||[]).filter(x=>x[4]!=null && x[1]>=300), M = META.onh_meta; if (h.length < 2) return "";
+  // rows: [season, poss_on, net_on, net_off, swing, lo80, hi80, pct]
+  const W=1000, H=230, L=40, R=12, T=14, B=30, n=h.length, bw=Math.min(60,(W-L-R)/n);
+  const vals = h.flatMap(x=>[x[5]??x[4], x[6]??x[4], x[4]]);
+  const step = Math.max(...vals) - Math.min(...vals) > 30 ? 10 : 5;
+  const top = Math.max(step, Math.ceil(Math.max(...vals)/step)*step), bot = Math.min(-step, Math.floor(Math.min(...vals)/step)*step);
+  const Y = v => T + (top-v)/(top-bot)*(H-T-B), x0 = L + ((W-L-R) - n*bw)/2;
+  const tks = []; for (let v = bot; v <= top; v += step) tks.push(v);
+  const grid = tks.map(v=>`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css(v===0?"--mute":"--grid")}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v>0?"+":""}${Math.round(v)}</text>`).join("");
+  const team = y => { const s = (d.seasons||[]).filter(z=>z.season===y); return s.length ? s.map(z=>z.team).join("/") : ""; };
+  const bars = h.map((x,i)=>{ const cx = x0 + i*bw + bw/2, y0 = Y(0), y1 = Y(x[4]), small = x[1] < 2000;
+    return `<g><rect x="${(cx-bw*0.32).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${(bw*0.64).toFixed(1)}" height="${Math.abs(y1-y0).toFixed(1)}" fill="${dcol(x[4],12)}" opacity="${small?0.45:0.9}"/>
+      ${x[5]!=null?`<line x1="${cx}" x2="${cx}" y1="${Y(x[5])}" y2="${Y(x[6])}" stroke="${css("--ink")}" stroke-width="1.2"/>`:""}
+      <text x="${cx}" y="${H-10}" text-anchor="middle">${n>14?`'${String(x[0]+1).slice(2)}`:sname(x[0])}</text>
+      <title>${sname(x[0])} ${team(x[0])}: swing ${x[4]>0?"+":""}${x[4].toFixed(1)} (80% range ${x[5]!=null?x[5].toFixed(1)+" to "+x[6].toFixed(1):"–"}); team ${x[2]>0?"+":""}${x[2].toFixed(1)} on, ${x[3]>0?"+":""}${x[3].toFixed(1)} off; ${x[1].toLocaleString()} possessions on${x[7]!=null?`; ${x[7]}th percentile`:""}</title></g>`; }).join("");
+  const ok = h.filter(x=>x[1]>=2000), pos = ok.filter(x=>x[5]!=null && x[5]>0).length, neg = ok.filter(x=>x[6]!=null && x[6]<0).length;
+  const p = M && M.persistence;
+  return `<section class="mod"><div class="mhead"><h2>On/off, every season<span class="new">rare view</span></h2></div>
+  <p class="lede">His team's net rating with him on the court minus with him off, each season since ${sname(h[0][0])}, from every lineup stint (whiskers = 80% range). ${ok.length?`In ${pos} of ${ok.length} full seasons the whole range sat above zero${neg?`, and in ${neg} below`:""}.`:""}${p?` Read single seasons lightly: across the league one season's swing predicts the next with r = ${p.r_swing_next} (players with ${p.qual_poss.toLocaleString()}+ possessions both years), so a multi-year pattern means far more than one bar.`:""}</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="On/off swing by season">${grid}${bars}</svg>
+  <p class="note">Faded bars = under 2,000 possessions on court. Traded seasons use the team he played most for. Hover a bar for the on and off numbers.</p></section>`;
+}
+
+
+
+
+
+/* ---------- redraft ---------- */
+function modDraft(d){
+  const r = d.draft; if (!r || r.year >= 2026 || !r.dots || r.dots.length < 10) return "";
+  const W=760, H=300, L=46, R=70, T=16, B=34, UD = 64;
+  const vmax = Math.max(...r.dots.map(x=>x[1]), 1);
+  const X = p => L + ((p==null ? UD : Math.min(p,60)) - 1) / (UD - 1) * (W-L-R), Y = v => T + (1 - v/vmax) * (H-T-B);
+  const names = Object.fromEntries((r.class||[]).map(c=>[c[0], c[1]]));
+  const top5 = new Set((r.class||[]).slice(0,5).map(c=>c[0]));
+  const dots = r.dots.slice().reverse().map(x => { const me = x[2]===d.id, cx = X(x[0]) + (x[0]==null ? ((x[2]%17)-8) : 0);
+    return `<circle cx="${cx.toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="${me?7:4}" fill="${me?css("--brown"):css("--mid")}" stroke="${me?css("--ink"):"none"}" opacity="${me?1:.85}"><title>${E(names[x[2]]||"")}${names[x[2]]?": ":""}pick ${x[0]??"undrafted"}, value ${x[1]}</title></circle>
+      ${(top5.has(x[2]) || me) ? `<text x="${(cx+9).toFixed(1)}" y="${(Y(x[1])+4).toFixed(1)}" style="${me?"font-weight:700;":""}fill:${css(me?"--brown":"--mute")}">${E((names[x[2]]||d.name).split(" ").slice(-1)[0])}</text>` : ""}`; }).join("");
+  const xt = [1,10,20,30,40,50,60].map(p=>`<text x="${X(p)}" y="${H-12}" text-anchor="middle">${p}</text>`).join("") + `<text x="${X(null)}" y="${H-12}" text-anchor="middle">undrafted</text>`;
+  const yt = [0, .5, 1].map(f=>`<line x1="${L}" x2="${W-R+20}" y1="${Y(f*vmax)}" y2="${Y(f*vmax)}" stroke="${css("--grid")}"/><text x="${L-6}" y="${Y(f*vmax)+4}" text-anchor="end">${Math.round(f*vmax)}</text>`).join("");
+  const rows = (r.class||[]).slice(0,10).concat(r.rank>10 ? (r.class||[]).filter(c=>c[0]===d.id) : []).map(c => `<tr${c[0]===d.id?' style="font-weight:700"':""}><td>${c[4]}</td><td class="l">${c[5]&&c[0]!==d.id?`<a href="#p-${c[0]}" style="color:inherit">${E(c[1])}</a>`:E(c[1])}</td><td>${c[2]??"UD"}</td><td>${c[3]}</td></tr>`).join("");
+  const moved = r.pick ? r.pick - r.rank : null;
+  return `<section class="mod"><div class="mhead"><h2>Redraft, ${r.year} class<span class="new">rare view</span></h2></div>
+  <p class="lede">Every player from his draft class by career value so far (seasons above replacement, weighted by minutes, from our rating) against where they were picked. ${r.pick ? `Taken ${r.pick}${r.pick===1?"st":""}${r.pick>1?" overall":""}, he ranks <b>${r.rank}</b> of ${r.n} today${moved>0?`, ${moved} spots better than his slot`:moved<0?`, ${-moved} spots below his slot`:", exactly his slot"}.` : `Undrafted, he ranks <b>${r.rank}</b> of ${r.n} in the class today.`}</p>
+  <div class="cols"><div style="min-width:0"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Draft pick vs career value">${yt}${xt}${dots}<text x="${(L+W-R)/2}" y="${H}" text-anchor="middle" style="font-size:11px">pick</text></svg></div>
+  <div><div class="tbl"><table><thead><tr><th>Redraft</th><th class="l">Player</th><th>Pick</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">Value to date, so young players and those with injuries trail; it says who has given most so far, not who will. Undrafted players join the class of their first season.</p></div></div></section>`;
+}
+
+
+/* ---------- current similar players ---------- */
+function modSimNow(d){
+  const s = d.sim_now; if (!s || !s.length) return "";
+  const chips = s.map(x => `<a href="#p-${x[0]}" class="chip" style="display:inline-flex;gap:8px;align-items:baseline;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);text-decoration:none"><b>${E(x[1]||"")}</b><span class="mute" style="font:12px var(--mono)">gap ${x[2]}</span></a>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>Plays most like, today</h2></div>
+  <p class="lede">The current players whose 2025-26 skill profile sits closest to his: the typical gap across the 35 measures, in league-percentile points (0 = identical). Style, not quality: a bench player can match a star's shape.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">${chips}</div></section>`;
+}
+
+/* ---------- milestone pace ---------- */
+function modMilestones(d){
+  const m = d.miles && d.miles.milestones, M = META.miles_meta; if (!m || !m.pts) return "";
+  const lab = {pts:"Points", reb:"Rebounds", ast:"Assists", fg3m:"Threes", stl:"Steals", blk:"Blocks", gp:"Games"};
+  const nf = v => Math.round(v).toLocaleString(), ord = n => n + (["th","st","nd","rd"][(n%100>10&&n%100<14)?0:Math.min(n%10,4)%4] || "th");
+  const pc = p => p >= .995 ? ">99%" : p < .01 ? "<1%" : Math.round(100*p)+"%";
+  const rows = Object.keys(lab).filter(k=>m[k] && m[k].total!=null).map(k => { const s = m[k], pr = s.proj || [];
+    const top = Math.max(pr[2] || s.total, s.total) * 1.04, Wd = 220, X = v => 4 + v/top*(Wd-8);
+    const bar = pr.length===3 ? `<svg viewBox="0 0 ${Wd} 22" style="width:100%;max-width:${Wd}px;height:22px" aria-hidden="true">
+      <rect x="4" y="7" width="${(X(s.total)-4).toFixed(1)}" height="8" fill="${css("--brown")}"/>
+      <rect x="${X(s.total).toFixed(1)}" y="7" width="${Math.max(0,X(pr[1])-X(s.total)).toFixed(1)}" height="8" fill="${css("--brown")}" opacity=".35"/>
+      <line x1="${X(pr[0])}" x2="${X(pr[2])}" y1="11" y2="11" stroke="${css("--ink")}"/><line x1="${X(pr[0])}" x2="${X(pr[0])}" y1="6" y2="16" stroke="${css("--ink")}"/><line x1="${X(pr[2])}" x2="${X(pr[2])}" y1="6" y2="16" stroke="${css("--ink")}"/></svg>` : "";
+    const nx = (s.next||[]).filter((x,i)=>i===0 || x.p >= .01).map(x=>`${nf(x.m)}: <b>${pc(x.p)}</b>`).join(" · ");
+    const pn = (s.pass_next||[]).slice(0,3).map(x=>`${x[3]?`<a href="#p-${x[0]}" style="color:inherit">${E(x[1])}</a>`:E(x[1])} <span class="mute">${nf(x[2])}</span>`).join(", ");
+    return `<tr><td class="l"><b>${lab[k]}</b></td><td>${nf(s.total)}<div class="mute" style="font-size:12px">${ord(s.rank)} all time</div></td>
+      <td style="min-width:140px">${bar}</td><td>${pr.length===3?`<b>${nf(pr[1])}</b><div class="mute" style="font-size:12px">${nf(pr[0])}–${nf(pr[2])}</div>`:"–"}</td>
+      <td>${s.proj_rank?ord(s.proj_rank):"–"}</td><td class="l" style="font-size:13px;white-space:normal;min-width:120px">${nx||"–"}</td><td class="l" style="font-size:13px;white-space:normal;min-width:200px;max-width:260px">${pn||"<span class='mute'>top of the list</span>"}</td></tr>`; }).join("");
+  const bt = M && M.backtest, cov = bt && (bt.coverage80 || bt.coverage || bt.cov80);
+  return `<section class="mod"><div class="mhead"><h2>Milestone pace<span class="new">rare view</span></h2></div>
+  <p class="lede">Career regular-season totals and where they rank among everyone in the database, then where the rest of his career likely takes them: 2,000 simulated careers built from how long players of his age and rating last and how their production ages. Dark bar = done; light bar = the median projection; whiskers = the 80% range.</p>
+  <div class="tbl"><table><thead><tr><th class="l">Stat</th><th>Now</th><th></th><th>Projected final</th><th>Rank then</th><th class="l">Chance of reaching</th><th class="l">Next to pass</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">Checked by freezing at the end of 2015-16 and projecting 340 players to 2025-26: the 80% ranges held about 80% of outcomes, and the typical points error was half a naive pace's. Milestone chances were too confident in the middle (61% predicted, 49% happened), so they are recalibrated on that test; on a second freeze (2008-09) the fix helped only partly (Brier 0.117 to 0.115; mid-range chances still run about 7 points high), so a shown 60% is closer to 53%. "Rank then" compares with today's totals of everyone else; active rivals keep adding too. Threes run above the range more often than they should, because the model cannot see the league still shooting more of them.</p></section>`;
+}
+
+/* ---------- splits with honesty ---------- */
+let SPLITSEASON = "main";
+function modSplits(d){
+  const S0 = d.splits, M = META.splits_meta; if (!S0 || !M) return "";
+  const S = SPLITSEASON === "cur" && S0.current ? S0.current : S0;
+  const T = (M.persistence_test && M.persistence_test.table) || [];
+  const rr = (sp, ms) => (T.find(x=>x.split===sp && x.measure===ms) || {}).r;
+  const lg = (M.league || {})[String(S.season)] || {};
+  const defs = [["home_away","Home minus away"],["rest","Back-to-back minus rested"],["opp","Vs winning teams minus losing"],["half","After All-Star break minus before"],["role","Starting minus off the bench"],["result","Wins minus losses*"]];
+  const span = 10, Wd = 260, X = v => Wd/2 + Math.max(-span, Math.min(span, v)) / span * (Wd/2 - 6);
+  const rows = defs.map(([k, lab]) => { const sp = S.splits && S.splits[k]; if (!sp || !sp.diff) return "";
+    const [raw, lo, hi, bel] = sp.diff.pts36, ts = sp.diff.ts, g = sp.groups, r = rr(k,"pts36"), L = lg[k] && lg[k].pts36;
+    const noise = lo <= 0 && hi >= 0;
+    const svg = `<svg viewBox="0 0 ${Wd} 26" style="width:100%;max-width:${Wd}px;height:26px" aria-hidden="true">
+      <line x1="${X(0)}" x2="${X(0)}" y1="2" y2="24" stroke="${css("--mute")}" stroke-dasharray="2 2"/>
+      ${L!=null?`<line x1="${X(L)}" x2="${X(L)}" y1="6" y2="20" stroke="${css("--olive")}" stroke-width="2"><title>League ${L>0?"+":""}${L}</title></line>`:""}
+      <line x1="${X(lo)}" x2="${X(hi)}" y1="13" y2="13" stroke="${css("--ink")}" stroke-width="1.5"/>
+      <circle cx="${X(raw)}" cy="13" r="5" fill="${noise?css("--bg"):dcol(raw,6)}" stroke="${css("--ink")}"/></svg>`;
+    const GL = {home:"home", away:"away", b2b:"back-to-back", rest1:"1 day rest", rest2p:"2+ days", vs_winning:"vs .500+", vs_losing:"vs sub-.500", pre_asb:"before", post_asb:"after", starter:"started", bench:"bench", win:"wins", loss:"losses"};
+    const gtxt = g.map(x=>`${E(GL[x.k]||x.k)} ${x.pts36} (${x.g} g)`).join(" · ");
+    return `<tr><td class="l"><b>${lab}</b><div class="mute" style="font-size:12px">${gtxt}</div></td>
+      <td><b>${raw>0?"+":""}${raw.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo.toFixed(1)} to ${hi.toFixed(1)}</div></td>
+      <td style="min-width:150px">${svg}</td>
+      <td>${k==="result"?"–":`${bel>0?"+":""}${bel.toFixed(1)}`}</td>
+      <td>${ts?`${ts[0]>0?"+":""}${(100*ts[0]).toFixed(1)}`:"–"}</td>
+      <td class="mute">${r!=null?r.toFixed(2):"–"}</td></tr>`; }).join("");
+  if (!rows) return "";
+  const ha = T.find(x=>x.split==="home_away" && x.measure==="pts36");
+  const maxr = Math.max(...T.map(x=>x.r));
+  return `<section class="mod"><div class="mhead"><h2>Splits, with honesty<span class="new">rare view</span></h2>${S0.current?`<div class="seg" id="splitmode"><button data-m="main" aria-pressed="${SPLITSEASON!=="cur"}">${sname(S0.season)}</button><button data-m="cur" aria-pressed="${SPLITSEASON==="cur"}">${sname(S0.current.season)} so far</button></div>`:""}</div>
+  <p class="lede">Points per 36 minutes in each kind of game, ${sname(S.season)} (${S.games} games). The dot is his gap, the black line its 80% range from resampling his games, the olive tick the league-wide gap. An open dot means the range crosses zero. Then the test: for each split we checked whether a player's gap one season repeats the next, 2012-13 to 2024-25. None did much (year-to-year r at most ${maxr.toFixed(2)}), so "believable" keeps only the share that repeats, given his minutes.</p>
+  <div class="tbl"><table><thead><tr><th class="l">Split</th><th>Gap, PTS/36</th><th>His gap vs league (−10 to +10)</th><th>Believable</th><th>TS gap (pts)</th><th>Repeats (r)</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">* Wins minus losses only describes: he plays well, so the team wins. ${ha?`Home/away is the split that repeats most (r ${ha.r}), and mostly for players who stay on one team (${ha.r_same_team} vs ${ha.r_moved} after a move), so part of it is the arena, not the player. `:""}Rest uses the team's schedule. True-shooting gaps repeat about zero.</p></section>`;
+}
+
+
+/* ---------- lineups ---------- */
+function modLineups(d){
+  const L = d.lineups; if (!L || !L.units || !L.units.length) return "";
+  const span = 40, Wd = 240, X = v => Wd/2 + Math.max(-span, Math.min(span, v))/span*(Wd/2-6);
+  const rows = L.units.map(u => { const [nm, ids, poss, net, lo, hi] = u;
+    const mates = nm.map((n,i)=>META.players.some(p=>p.id===ids[i])?`<a href="#p-${ids[i]}" style="color:inherit">${E(n)}</a>`:E(n)).join(", ");
+    const svg = `<svg viewBox="0 0 ${Wd} 22" style="width:100%;max-width:${Wd}px;height:22px" aria-hidden="true"><line x1="${X(0)}" x2="${X(0)}" y1="2" y2="20" stroke="${css("--mute")}" stroke-dasharray="2 2"/>${lo!=null?`<line x1="${X(lo)}" x2="${X(hi)}" y1="11" y2="11" stroke="${css("--ink")}" stroke-width="1.5"/>`:""}<circle cx="${X(net)}" cy="11" r="5" fill="${lo!=null&&lo<=0&&hi>=0?css("--bg"):dcol(net,15)}" stroke="${css("--ink")}"/></svg>`;
+    return `<tr><td class="l" style="white-space:normal;min-width:200px">${E(d.name.split(" ").slice(-1)[0])} + ${mates}</td><td>${poss.toLocaleString()}</td><td><b>${net>0?"+":""}${net.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo!=null?`${lo.toFixed(1)} to ${hi.toFixed(1)}`:""}</div></td><td style="min-width:150px">${svg}</td></tr>`; }).join("");
+  return `<section class="mod"><div class="mhead"><h2>His most-used lineups, 2025-26</h2></div>
+  <p class="lede">The five-man units he played in most (60+ possessions each)${L.share!=null?`, covering ${Math.round(100*L.share)}% of his ${L.poss.toLocaleString()} possessions`:""}. Net points per 100 with an 80% range from resampling the unit's games; an open dot means the range crosses zero. Unit samples are small, so the ranges are wide.</p>
+  <div class="tbl"><table><thead><tr><th class="l">Unit</th><th>Possessions</th><th>Net / 100</th><th>−40 to +40</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+}
+
+/* ---------- next games ---------- */
+function modUpcoming(d){
+  const u = d.upc, M = META.upc_meta; if (!u || !u.games || !u.games.length || !M) return "";
+  const t = M.test || {}, f = v => v.toFixed(1);
+  const rows = u.games.map(g => { const [pt, rb, as] = g[4], tilt = u.base[0] ? Math.round(100*(pt[0]/u.base[0]-1)) : 0;
+    const dt = new Date(g[0]+"T12:00:00"), day = dt.toLocaleDateString("en-US",{weekday:"short", month:"short", day:"numeric"});
+    return `<tr><td class="l">${day}</td><td class="l">${g[2]?"vs":"@"} ${E(g[1]||"")}${g[3]?` <span class="mute">(2nd night)</span>`:""}</td>
+      <td><b>${f(pt[0])}</b> <span class="mute">${f(pt[1])}–${f(pt[2])}</span></td><td>${f(rb[0])} <span class="mute">${f(rb[1])}–${f(rb[2])}</span></td><td>${f(as[0])} <span class="mute">${f(as[1])}–${f(as[2])}</span></td>
+      <td style="color:${tilt>0?css("--hot"):tilt<0?css("--cold"):css("--mute")}">${tilt>0?"+":""}${tilt}%</td></tr>`; }).join("");
+  const q = t.pts && t.pts.actual_over_base_by_opp_quintile;
+  return `<section class="mod"><div class="mhead"><h2>Next games</h2></div>
+  <p class="lede">A projected line for his team's next ${u.games.length} games: our rest-of-season projection (${f(u.base[0])} points, ${f(u.base[1])} rebounds, ${f(u.base[2])} assists a game), nudged for each opponent's defence and pace. Grey numbers are an 80% range for one game; single games swing far more than any matchup does.</p>
+  <div class="tbl"><table><thead><tr><th class="l">Date</th><th class="l">Opponent</th><th>PTS</th><th>REB</th><th>AST</th><th>Matchup</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">Tested on 2023-24 and 2024-25 games${t.pts?` (${t.pts.n_test.toLocaleString()} player-games)`:""}: ${q?`players scored ${Math.round(100*(q[0]-1))}% vs the stingiest fifth of defences and +${Math.round(100*(q[4]-1))}% vs the leakiest, but `:""}the matchup nudge cut the error by only ${t.pts?t.pts.rmse_gain_pct.toFixed(1):"?"}% for points${t.ast?` and ${t.ast.rmse_gain_pct.toFixed(1)}% for assists`:""}. The 80% ranges held ${t.pts?Math.round(100*t.pts.cover80):"?"}% of point totals. Home court and back-to-backs did not help and are left out. Schedule as of ${E((M.schedule_file||"").split("/")[3]||"")}; the list does not update.</p></section>`;
+}
+
+/* ---------- rotation pattern ---------- */
+function modRotation(d){
+  const r = d.lineup && d.lineup.rotation; if (!r || !r.on_by_minute) return "";
+  const W=1000, H=150, L=34, T=12, B=26, bw=(W-L)/48;
+  const Y = v => T + (1-v)*(H-T-B);
+  const bars = r.on_by_minute.map((v,i)=>`<rect x="${(L+i*bw+1).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${(H-B-Y(v)).toFixed(1)}" fill="${css("--brown")}" opacity="${0.35+0.65*v}"><title>Minute ${i+1}: on the floor in ${Math.round(100*v)}% of games</title></rect>`).join("");
+  const qs = [0,12,24,36,48].map(m=>`<line x1="${L+m*bw}" x2="${L+m*bw}" y1="${T}" y2="${H-B}" stroke="${css("--mute")}" stroke-dasharray="${m%48?"3 3":"0"}"/>`).join("") + ["Q1","Q2","Q3","Q4"].map((q,i)=>`<text x="${L+(i*12+6)*bw}" y="${H-8}" text-anchor="middle">${q}</text>`).join("");
+  const yt = [0,0.5,1].map(v=>`<text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${Math.round(100*v)}%</text>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>When he plays<span class="new">rare view</span></h2></div>
+  <p class="lede">Share of his ${r.games} games in which he was on the floor at each minute of regulation, 2025-26. He averaged ${r.spells_per_game} stints a game of ${r.avg_spell_min} minutes each.${r.close_late_on_share!=null?` In close games late (last five minutes, margin of 5 or less) he was on the floor ${Math.round(r.close_late_on_share)}% of the time; a low fourth-quarter bar with a high close-late share usually means blowouts, not benchings.`:""}</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="On-court share by game minute">${yt}${bars}${qs}</svg></section>`;
+}
+
+/* ---------- survival ---------- */
+function modSurvival(d){
+  const s = d.surv; if (!s) return "";
+  const W=560, H=200, L=40, R=12, T=14, B=28, n=s.p.length, bw=(W-L-R)/n;
+  const Y = v => T + (1-v)*(H-T-B);
+  const bars = s.p.map((v,i)=>`<rect x="${(L+i*bw+4).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${(bw-8).toFixed(1)}" height="${(H-B-Y(v)).toFixed(1)}" fill="${css("--olive")}"/><text x="${L+i*bw+bw/2}" y="${Y(v)-4}" text-anchor="middle">${Math.round(100*v)}%</text><text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle">${sname(s.base+i+1)}</text>`).join("");
+  const c = META.surv_meta && META.surv_meta.check;
+  return `<section class="mod"><div class="mhead"><h2>How long he lasts<span class="new">rare view</span></h2></div>
+  <p class="lede">Chance he plays 200+ minutes in each coming season, from what happened to players of his age (${s.age}) and rating (${sgn(s.r)} in ${sname(s.base)}) since 1996-97. It does not know his contract, health or style, so read it as a base rate.${c?` Checked on 2012-17: adding rating to age cut the five-seasons-ahead error from ${c[5].brier_age_only} to ${c[5].brier_age_rating} (Brier score).`:""}</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:${W}px" role="img" aria-label="Survival by season">${bars}</svg></section>`;
+}
+
+
+/* ---------- header: the short version ---------- */
+function shortVersion(d){
+  const f = [], ord = n => n + (["th","st","nd","rd"][(n%100>10&&n%100<14)?0:Math.min(n%10,4)%4] || "th");
+  const nf = v => Math.round(v).toLocaleString();
+  const m = d.miles && d.miles.milestones;
+  if (m) { const lab = {pts:"points", reb:"rebounds", ast:"assists", fg3m:"threes", stl:"steals", blk:"blocks", gp:"games"};
+    const top = Object.keys(lab).filter(k=>m[k] && m[k].rank && m[k].rank <= 10).map(k=>`${ord(m[k].rank)} in ${lab[k]}`);
+    if (top.length) f.push(`All time: ${top.slice(0,3).join(", ")}.`);
+    else { let big = null;
+      for (const k of ["pts","ast","reb","fg3m"]) { const c = (m[k] && m[k].next || []).filter(x=>x.p>=.5 && x.p<.995).sort((a,b)=>b.m-a.m)[0]; if (c) { big = {k, ...c}; break; } }
+      if (big) f.push(`On course for ${nf(big.m)} career ${lab[big.k]} (${Math.round(100*big.p)}% chance).`); } }
+  const h = d.hoft; if (h && h.length) { const now = h[h.length-1], pv = h.length>1 ? h[h.length-2][1] : null;
+    if (now[1] >= .15) f.push(`Hall of Fame chance ${now[1]>=.995?">99":Math.round(100*now[1])}%${pv!=null && Math.abs(now[1]-pv)>=.08 ? `, ${now[1]>pv?"up":"down"} ${Math.round(100*Math.abs(now[1]-pv))} points last season` : ""}.`); }
+  const r = d.draft; if (r && r.year < 2026 && r.n >= 20) {
+    if (r.pick && r.rank <= 3 && r.pick - r.rank >= 3) f.push(`Picked ${ord(r.pick)} in ${r.year}; ${r.rank===1?"the best":ord(r.rank)+"-best"} player from that class so far.`);
+    else if (!r.pick && r.rank <= 15) f.push(`Undrafted in ${r.year}; ${ord(r.rank)}-best from that class so far.`); }
+  const o = (d.onh||[]).filter(x=>x[1]>=2000 && x[5]!=null);
+  if (o.length >= 4) { const pos = o.filter(x=>x[5]>0).length; if (pos/o.length >= .7) f.push(`His teams were clearly better with him on the floor in ${pos} of ${o.length} full seasons.`); }
+  const u = d.upc; if (u && u.games && u.games.length) { const g = u.games[0]; f.push(`Next: ${g[2]?"vs":"@"} ${E(g[1]||"")} ${new Date(g[0]+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}, projected ${g[4][0][0].toFixed(0)} points.`); }
+  if (f.length < 2) return "";
+  return `<div class="fig" style="grid-column:1/-1"><div class="k">The short version</div><ul style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px;font-size:15px">${f.slice(0,5).map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+}
+
+/* ---------- skill-shape radar (header) ---------- */
+function radar(d){
+  const dn = d.dna[SEASON]; if (!dn) return "";
+  // Motion (miles run, speed) is style, not skill, so the shape uses Gravity (how much defences shade toward him) instead
+  const groups0 = ["Scoring","Creation","Shooting","Playmaking","Rebounding","Defense","Gravity"];
+  const val = g => { const ks = META.dna_labels.filter(x=>x[0]===g).map(x=>x[1]); const ps = dn.items.filter(x=>ks.includes(x[0]) && x[2]!=null).map(x=>shrunk(x[0], x[2])); return ps.length ? ps.reduce((a,b)=>a+b,0)/ps.length : null; };
+  const vs0 = groups0.map(val);
+  const dImp = SEASON === "2025" && d.imp_pct ? d.imp_pct[1] : null;
+  if (dImp != null) vs0[groups0.indexOf("Defense")] = dImp;
+  const groups = groups0.filter((_,i)=>vs0[i]!=null), vs = vs0.filter(v=>v!=null);  // axes with no data are left out, not drawn at zero
+  if (vs.length < 5) return "";
+  const W=300, H=250, cx=W/2, cy=H/2+4, R=88, n=groups.length;
+  const pt = (i, r) => { const a = -Math.PI/2 + i*2*Math.PI/n; return [cx + r*Math.cos(a), cy + r*Math.sin(a)]; };
+  const rings = [25,50,75,100].map(q => `<polygon points="${groups.map((_,i)=>pt(i,R*q/100).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="${css("--grid")}" ${q===50?'stroke-dasharray="3 3"':""}/>`).join("");
+  const spokes = groups.map((g,i)=>{ const [x,y]=pt(i,R), [lx,ly]=pt(i,R+18); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${css("--grid")}"/><text x="${lx}" y="${ly+4}" text-anchor="${Math.abs(lx-cx)<8?"middle":lx<cx?"end":"start"}">${g}${vs[i]!=null?" "+Math.round(vs[i]):""}</text>`; }).join("");
+  const shape = groups.map((_,i)=>pt(i,R*(vs[i]??0)/100).map(v=>v.toFixed(1)).join(",")).join(" ");
+  return `<div style="max-width:380px;margin-top:10px"><svg class="chart" viewBox="-50 0 ${W+100} ${H}" role="img" aria-label="Skill shape">${rings}${spokes}<polygon points="${shape}" fill="${css("--brown")}" fill-opacity=".22" stroke="${css("--brown")}" stroke-width="2"/></svg>
+  <p class="note" style="margin-top:0">Skill shape, ${sname(SEASON)}: average league percentile of each group in the skill profile below (dashed ring = 50th)${dImp!=null?`. Defense is the percentile of his defensive impact rating, because box and tracking counts miss the shots a defender stops people taking`:""}.</p></div>`;
+}
+
+/* ---------- other public models ---------- */
+function modPanel(d){
+  const p = d.panel; if (!p) return "";
+  const names = {SiPM:"Singular SiPM (ours, full 2025-26)", DARKO:"DARKO", EPM:"EPM (Dunks & Threes)", LEBRON:"LEBRON (BBall Index)", xRAPM:"xRAPM"};
+  const order = ["SiPM","DARKO","EPM","LEBRON","xRAPM"].filter(k=>p.m[k]);
+  const rows = order.map(k => { const [v, r] = p.m[k]; const pc = r ? Math.round(100*(1-(r-1)/p.n)) : null;
+    return `<div class="ptrow" style="grid-template-columns:minmax(0,230px) minmax(0,1fr) 64px"><span${k==="SiPM"?' style="font-weight:700"':""}>${names[k]}</span><span class="pb"><i style="width:${pc??0}%;background:${pcol(pc??50)}"></i></span><span class="num" style="text-align:right">#${r}</span></div>`; }).join("");
+  const rk = order.map(k=>p.m[k][1]).filter(Boolean), spread = Math.max(...rk) - Math.min(...rk);
+  return `<section class="mod"><div class="mhead"><h2>How other models rank him<span class="new">side by side</span></h2></div>
+  <p class="lede">Rank among the same ${p.n} players in each public impact model (a mid-season 2025-26 snapshot) and in ours (full 2025-26). ${spread <= Math.max(10, 0.05*p.n) ? "The models agree closely on him." : `The models disagree: his rank spans #${Math.min(...rk)} to #${Math.max(...rk)}, so treat any single number with care.`}</p>
+  <div style="max-width:680px">${rows}</div></section>`;
+}
+
+/* ---------- research findings ---------- */
+const X_ = d => d.extra || {};
+function modFindings(d){
+  // usage-absorbed cards are left out: few games per absence (median 5) and hard to read as a trait
+  const ord = n => n + (["th","st","nd","rd"][(n%100>10&&n%100<14)?0:Math.min(n%10,4)%4] || "th");
+  const peer = x => (d.fpeer || {})[x.key];
+  // keep only what is unusual about him: a league outlier, or an outlier among his peers in rating
+  const score = x => { if (x.key === "defense_reputation") { const m = x.measured_pct ?? 50; return (m >= 85 && !(x.value > 0)) || (x.value > 0.05 && m < 50) ? 60 : 0; }
+    if (x.key === "rim_deterrence" && d.posg === "G" && (x.pct ?? 0) < 85) return 0;  // low deterrence is expected of guards
+    const p = peer(x), lg = x.pct == null ? 0 : Math.abs(x.pct - 50), pr = p ? Math.abs(100 * (1 - (p[0] - 0.5) / p[1]) - 50) : 0;
+    return Math.max(lg >= 35 ? lg : 0, pr >= 30 ? pr + 5 : 0); };
+  const f = (X_(d).findings || []).filter(x => !/absorb/.test(x.key)).map(x => ({...x, _s: score(x)})).filter(x => x._s > 0).sort((a,b)=>b._s-a._s);
+  if (!f.length) return "";
+  const peerLine = x => { const p = peer(x); if (!p || x.key === "defense_reputation") return "";
+    const top = p[0] <= Math.ceil(p[1]/5), bot = p[0] > p[1] - Math.ceil(p[1]/5);
+    return `<div style="font-size:14px">Among ${E(p[2])}: <b style="color:${top?css("--hot"):bot?css("--cold"):css("--ink")}">${ord(p[0])} of ${p[1]}</b>${(top||bot) && Math.abs(x.pct-50) < 35 ? ` — ordinary league-wide, ${top?"unusual":"unusually low"} for his level` : ""}.</div>`; };
+  const vb = v => v.startsWith("supported") ? css("--forest") : css("--ochre");
+  const val = x => {
+    if (x.key === "defense_reputation") return `${x.value>0 ? (100*x.value).toFixed(1)+"% of All-Defense votes" : "No All-Defense votes"}<br><span style="font-size:15px">Measured defense: <span style="color:${pcol(x.measured_pct??50)}">${x.measured_pct??"–"}th pct</span> · box-score defense: ${x.box_pct??"–"}th</span>`;
+    if (x.lo != null) return `${x.value>0?"+":""}${x.value} <span class="mute" style="font-size:14px">(${x.lo} to ${x.hi})</span>`;
+    return x.value == null ? "–" : (typeof x.value === "number" ? (Math.abs(x.value) < 10 ? x.value.toFixed(2) : x.value.toFixed(1)) : E(x.value));
+  };
+  const cards = f.map(x => `<div style="border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--panel);display:grid;gap:6px;align-content:start">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><b style="font-size:15px">${E(x.question)}</b><span class="mono" style="font-size:11px;color:${vb(x.verdict)};white-space:nowrap">${E(x.verdict)} · ${E(x.id)}</span></div>
+    <div class="num" style="font-size:22px">${val(x)}${x.pct!=null && x.key!=="defense_reputation"?` <span style="font-size:14px;color:${pcol(x.pct)}">${x.pct}th pct</span>`:""}</div>
+    ${peerLine(x)}
+    <div class="note">${x.key==="defense_reputation"?`Measured = lineup-based defensive rating; box-score = DBPM. `:""}${E(x.unit)}${x.season?`, ${E(x.season)}`:""}. ${E(x.caveat)}</div></div>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>What our tests say about him<span class="new">nobody shows this</span></h2></div>
+  <p class="lede">Questions Singular has tested across the league, answered for him, but only where he stands out: far from the league, or far from players rated near him. The rest of the tests are left off this page, as are tests that failed (hot hand, free-throw pressure). Green = supported, ochre = mixed evidence.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">${cards}</div></section>`;
+}
+
+/* ---------- league context (player over league spread) ---------- */
+let LGMODE = "season";
+function modLeague(d){
+  const L = META.league; if (!L || !d.seasons.length) return "";
+  const born = d.bio && d.bio.birth_date ? Date.parse(d.bio.birth_date) : null;
+  const ageOf = s => born ? Math.round((Date.UTC(s+1,1,1) - born)/3.15576e10) : null;
+  const stats = [["r","Rating"],["pts","Points per game"],["reb","Rebounds per game"],["ast","Assists per game"],["usg","Usage %"],["ts","True shooting %"]];
+  const panels = stats.map(([k,label]) => {
+    const key = LGMODE === "age" && k === "ts" ? "ts_rel" : k;
+    const pts = d.seasons.filter(s => s.season <= 2025 && (s.min||0) >= 300 && s[k] != null).map(s => {
+      const xv = LGMODE === "age" ? ageOf(s.season) : s.season;
+      let v = s[k]; if (key === "ts_rel") v = v - (L.lg_ts[s.season] ?? v);
+      return [xv, v, s.season];
+    }).filter(p => p[0] != null && (LGMODE === "age" ? L.by_age[p[0]] : L.by_season[p[0]]));
+    if (pts.length < 2) return "";
+    const src = LGMODE === "age" ? L.by_age : L.by_season;
+    const xs = Object.keys(src).map(Number).filter(x => src[x][key] && (LGMODE === "age" ? (x >= Math.min(...pts.map(p=>p[0]))-2 && x <= Math.max(...pts.map(p=>p[0]))+2) : x >= Math.min(...pts.map(p=>p[0]))-1)).sort((a,b)=>a-b);
+    if (xs.length < 2) return "";
+    const W=320, H=150, Lm=34, R=8, T=16, B=20;
+    const vals = xs.flatMap(x => src[x][key] ? [src[x][key][0], src[x][key][4]] : []).concat(pts.map(p=>p[1]));
+    const y0 = Math.min(...vals), y1 = Math.max(...vals), pad = (y1-y0)*0.06;
+    const X = x => Lm + (x - xs[0])/((xs[xs.length-1]-xs[0])||1)*(W-Lm-R), Y = v => T + (y1+pad-v)/((y1-y0)+2*pad)*(H-T-B);
+    const band = (lo,hi,op) => `<path d="M${xs.map(x=>`${X(x).toFixed(1)} ${Y(src[x][key][hi]).toFixed(1)}`).join(" L")} L${xs.slice().reverse().map(x=>`${X(x).toFixed(1)} ${Y(src[x][key][lo]).toFixed(1)}`).join(" L")}Z" fill="${css("--mute")}" opacity="${op}"/>`;
+    const med = `<path d="M${xs.map(x=>`${X(x).toFixed(1)} ${Y(src[x][key][2]).toFixed(1)}`).join(" L")}" stroke="${css("--mute")}" stroke-width="1" fill="none" stroke-dasharray="3 3"/>`;
+    const line = `<path d="M${pts.map(p=>`${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join(" L")}" stroke="${css("--brown")}" stroke-width="2.2" fill="none"/>` + pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="2.6" fill="${css("--brown")}"><title>${sname(p[2])}: ${p[1].toFixed(1)}</title></circle>`).join("");
+    const fmtx = x => LGMODE === "age" ? String(x) : "'" + String(x+1).slice(2);
+    const ticks = [xs[0], xs[Math.floor(xs.length/2)], xs[xs.length-1]].map(x=>`<text x="${X(x)}" y="${H-5}" text-anchor="middle">${fmtx(x)}</text>`).join("");
+    const yt = [y0, y1].map(v=>`<text x="${Lm-4}" y="${Y(v)+4}" text-anchor="end">${v.toFixed(Math.abs(v)<10?1:0)}</text>`).join("");
+    return `<div><h3 style="font-size:14px">${label}${key==="ts_rel"?" vs league":""}</h3><svg class="chart" viewBox="0 0 ${W} ${H}">${band(0,4,.12)}${band(1,3,.18)}${med}${line}${ticks}${yt}</svg></div>`;
+  }).join("");
+  return `<section class="mod"><div class="mhead"><h2>Against the league<span class="new">by age too</span></h2>
+    <div class="seg" id="lgmode"><button data-m="season" aria-pressed="${LGMODE==="season"}">By season</button><button data-m="age" aria-pressed="${LGMODE==="age"}">By age</button></div></div>
+  <p class="lede">His line (brown) over the spread of all players with 800+ minutes: the light band covers the 10th to 90th percentile, the darker band the middle half, the dashed line the median. "By age" compares him with every player since 1996-97 at the same age; true shooting is then measured against each season's league average, since league shooting rose about five points.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px 22px">${panels}</div></section>`;
+}
+
+/* ---------- defense: matchups ---------- */
+function modDefense(d){
+  const m = X_(d).matchups; if (!m) return "";
+  const list = (rows, lab) => rows && rows.length ? `<h3>${lab}</h3><div class="tbl"><table><thead><tr><th class="l">Player</th><th>Possessions</th><th>Pts per 100</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="l">${META.players.some(p=>p.id===r.id)?`<a href="#p-${r.id}" style="color:inherit">${E(r.name)}</a>`:E(r.name)}</td><td>${Math.round(r.poss)}</td><td>${r.pts100!=null?r.pts100.toFixed(0):"–"}</td></tr>`).join("")}</tbody></table></div>` : "";
+  const h = m.hunted, sw = m.switch;
+  const tiles = `<div class="figs" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:16px">
+    ${h?`<div class="fig"><div class="k">How often offences attack him</div><div class="v">${h.target.toFixed(2)}×</div><div class="s">1.00 = what his assignments predict. More targeted than ${h.pct}% of defenders (${sname(h.y)}). Being targeted is a stable trait; it does not mean he gets scored on.</div></div>`:""}
+    ${sw?`<div class="fig"><div class="k">Who he guards (${sname(sw.y)})</div><div class="v" style="font-size:22px">${Math.round(100*sw.p_g)} / ${Math.round(100*sw.p_w)} / ${Math.round(100*sw.p_b)}</div><div class="s">% of matchups vs guards / wings / bigs. Switchability ${sw.pct}th percentile.</div></div>`:""}</div>`;
+  return `<section class="mod"><div class="mhead"><h2>Matchups, 2025-26<span class="new">rare view</span></h2></div>
+  <p class="lede">From NBA.com matchup tracking: the players he spent the most possessions guarding, and those who guarded him. "Pts per 100" is the scoring in those head-to-head possessions; samples are small, so read them as who, not how well.</p>
+  ${tiles}<div class="cols"><div>${list(m.guarded,"He guarded")}</div><div>${list(m.guarded_by,"Guarded him")}</div></div></section>`;
+}
+
+/* ---------- pass network ---------- */
+function modPasses(d){
+  const p = X_(d).passes; if (!p || (!p.to?.length && !p.from?.length)) return "";
+  const W=760, H=300, cx=W/2, cy=H/2;
+  const mx = Math.max(...[...(p.to||[]), ...(p.from||[])].map(r=>r.passes));
+  const side = (rows, left) => rows.map((r,i) => { const y = 30 + i*(H-60)/Math.max(1,rows.length-1); const x = left ? 120 : W-120;
+    const w = 1 + 9*r.passes/mx;
+    return `<path d="M${left?x+6:cx+44} ${left?y:cy} C ${(x+cx)/2} ${left?y:cy}, ${(x+cx)/2} ${left?cy:y}, ${left?cx-44:x-6} ${left?cy:y}" stroke="${left?css("--cold"):css("--hot")}" stroke-width="${w.toFixed(1)}" fill="none" opacity=".55"><title>${E(r.name)}: ${r.passes} passes, ${r.ast} assists</title></path>
+      <text class="lab" x="${left?x:x}" y="${y+4}" text-anchor="${left?"end":"start"}">${E(r.name)}</text>
+      <text x="${left?x:x}" y="${y+17}" text-anchor="${left?"end":"start"}">${r.passes} passes · ${r.ast} ast</text>`; }).join("");
+  const role = p.role || {};
+  return `<section class="mod"><div class="mhead"><h2>Who feeds him, whom he feeds, 2025-26<span class="new">rare view</span></h2></div>
+  <p class="lede">NBA.com pass tracking. Left: teammates who pass to him most (blue). Right: teammates he passes to most (red). Line width = passes; assists are the passes that led straight to a basket.${role.top_feeder_share!=null?` ${Math.round(100*role.top_feeder_share)}% of the passes he receives come from one teammate.`:""}</p>
+  <div style="overflow-x:auto"><svg class="chart" viewBox="0 0 ${W} ${H}" style="min-width:560px">${side(p.from||[], true)}${side(p.to||[], false)}
+  <circle cx="${cx}" cy="${cy}" r="42" fill="${css("--panel")}" stroke="${css("--ink")}"/><text class="lab" x="${cx}" y="${cy+4}" text-anchor="middle" style="font-weight:700">${E(d.name.split(" ").slice(-1)[0])}</text></svg></div></section>`;
+}
+
+/* ---------- consistency + signature games ---------- */
+function modConsistency(d){
+  const c = d.consistency, sg = d.signature;
+  if (!c && !sg) return "";
+  let strip = "";
+  if (c) {
+    const W=1000, H=110, L=10, R=10;
+    const lo = Math.min(-5, ...c.games), hi = Math.max(...c.games, 30);
+    const X = v => L + (v-lo)/(hi-lo)*(W-L-R);
+    const bins = {}; const dots = c.games.map(v => { const b = Math.round(X(v)/9); bins[b] = (bins[b]||0)+1; const y = H-28 - (bins[b]-1)*9; return `<circle cx="${X(v).toFixed(1)}" cy="${y}" r="4" fill="${v>=1.5*c.med?css("--hot"):v<=0.5*c.med?css("--cold"):css("--mute")}" opacity=".8"><title>game score ${v}</title></circle>`; }).join("");
+    const tk = [0,10,20,30,40,50].filter(v=>v>=lo&&v<=hi).map(v=>`<text x="${X(v)}" y="${H-6}" text-anchor="middle">${v}</text>`).join("");
+    const maxStack = Math.max(...Object.values(bins));
+    const top = Math.min(0, H-28-(maxStack-1)*9-10);
+    strip = `<svg class="chart" viewBox="0 ${top} ${W} ${H-top}">${dots}<line x1="${X(c.med)}" x2="${X(c.med)}" y1="${top}" y2="${H-18}" stroke="${css("--ink")}" stroke-dasharray="3 3"/>${tk}</svg>`;
+  }
+  const tiles = c ? `<div class="figs" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+    <div class="fig"><div class="k">Typical game</div><div class="v">${c.med}</div><div class="s">median game score, ${c.p_med}th pct</div></div>
+    <div class="fig"><div class="k">Steadiness</div><div class="v">${c.p_steady}</div><div class="s">percentile; spread relative to his own level</div></div>
+    <div class="fig"><div class="k">Big nights</div><div class="v">${c.boom!=null?Math.round(100*c.boom)+"%":"–"}</div><div class="s">games at 1.5× his median or more</div></div>
+    <div class="fig"><div class="k">Duds</div><div class="v">${c.bust!=null?Math.round(100*c.bust)+"%":"–"}</div><div class="s">games at half his median or less</div></div></div>` : "";
+  const sig = sg && sg.length ? `<h3 style="margin-top:18px">Signature games (career, by game score)</h3><div class="tbl"><table><thead><tr><th>Date</th><th class="l"></th><th class="l">Opponent</th><th>Game score</th><th class="l">Line</th></tr></thead><tbody>${sg.map(x=>`<tr><td>${x.d}</td><td class="l">${x.type==="Playoffs"?"Playoffs":""}</td><td class="l">${E(x.opp)} ${x.win?"(W)":"(L)"}</td><td>${x.gs}</td><td class="l">${E(x.line)}, ${x.min} min</td></tr>`).join("")}</tbody></table></div>` : "";
+  return `<section class="mod"><div class="mhead"><h2>Night to night<span class="new">nobody shows this</span></h2></div>
+  ${c?`<p class="lede">Every 2025-26 game as one dot, placed by game score (a one-number box-score summary; about 10 is an average starter's night). Red = big night, blue = dud, dashed line = his median. Percentiles compare him with the ${c.pool_n} players who played 40+ games at 20+ minutes${c.pooled?"":" (he is outside that pool, so treat them loosely)"}.</p>${tiles}${strip}`:""}
+  ${sig}</section>`;
+}
+
+/* ---------- availability ---------- */
+const RSN = {injury:"Injury", injury_mgmt:"Injury management", rest:"Rest", coach_decision:"Coach's decision", gleague:"G League", protocols:"Health protocols", suspension:"Suspension", personal:"Personal", not_with_team:"Away from team", holdout_unsigned:"Unsigned/holdout", trade_transit:"Trade transit", season_end:"Shut down", inactive_unknown:"Inactive, reason unknown", other:"Other"};
+const RCOL = {injury:"--hot", injury_mgmt:"--ochre", rest:"--olive", coach_decision:"--cold", gleague:"--purple", protocols:"--forest"};
+function modAvail(d){
+  const a = X_(d).availability; if (!a || !a.seasons || !a.seasons.length) return "";
+  const ss = a.seasons, W=1000, rowH=22, H=ss.length*rowH+10, L=70;
+  const mx = Math.max(...ss.map(s=>s.rg||82), 82);
+  const used = new Set();
+  const rows = ss.map((s,i) => { const y = 4 + i*rowH; let x = L; const sx = v => v/mx*(W-L-60);
+    let out = `<text class="lab" x="0" y="${y+13}">${sname(s.y)}</text><rect x="${x}" y="${y+2}" width="${sx(s.gp)}" height="14" fill="${css("--mid")}"><title>${s.gp} games played</title></rect>`; x += sx(s.gp);
+    for (const [k,v] of Object.entries(s.r||{})) { used.add(k); out += `<rect x="${x}" y="${y+2}" width="${sx(v)}" height="14" fill="${css(RCOL[k]||"--mute")}"><title>${v} missed: ${RSN[k]||k}</title></rect>`; x += sx(v); }
+    return out + `<text x="${x+6}" y="${y+13}">${s.gp}/${s.rg}</text>`; }).join("");
+  const ep = (a.episodes||[]).map(e=>`<tr><td>${e.start}</td><td>${e.games}</td><td class="l">${E(RSN[e.cause]||e.cause)}${e.type?` · ${E(e.type)}`:""}${e.region?` (${E(e.region)})`:""}${e.surgery?" · surgery":""}</td><td class="l">${E(e.sev||"")}</td></tr>`).join("");
+  const f = a.forecast;
+  return `<section class="mod"><div class="mhead"><h2>Availability<span class="new">rare view</span></h2></div>
+  <p class="lede">Games played (grey) and games missed by reason, each season, from box scores, injury reports and transactions.${f?` Forecast for 2026-27: about <b>${Math.round(f.miss_all)}</b> games missed (${Math.round(f.miss_inj)} for injury). That forecast is a weak signal (it explains 14% of the variation), so read it as a base rate.`:""}</p>
+  <div style="overflow-x:auto"><svg class="chart" viewBox="0 0 ${W} ${H}" style="min-width:560px">${rows}</svg></div>
+  <div class="legend" style="margin-top:6px"><span><span style="display:inline-block;width:10px;height:10px;background:${css("--mid")};margin-right:4px"></span>Played</span>${[...used].map(k=>`<span><span style="display:inline-block;width:10px;height:10px;background:${css(RCOL[k]||"--mute")};margin-right:4px"></span>${E(RSN[k]||k)}</span>`).join("")}</div>
+  ${ep?`<h3 style="margin-top:16px">Recent absences of 3+ games</h3><div class="tbl"><table><thead><tr><th>Start</th><th>Games</th><th class="l">Cause</th><th class="l">Size</th></tr></thead><tbody>${ep}</tbody></table></div>`:""}</section>`;
+}
+
+/* ---------- contract ---------- */
+function modContract(d){
+  const c = X_(d).contract; if (!c) return "";
+  const v = c.value || {}, ys = c.years || [];
+  const all = [...(c.sal25_m!=null?[{y:2025,sal_m:c.sal25_m,past:1}]:[]), ...ys];
+  const W=520, H=170, L=40, B=26, mx = Math.max(...all.map(x=>x.sal_m||0), 1);
+  const bw = (W-L)/Math.max(all.length,1);
+  const bars = all.map((x,i)=>`<rect x="${L+i*bw+6}" y="${H-B-(x.sal_m/mx)*(H-B-18)}" width="${bw-12}" height="${(x.sal_m/mx)*(H-B-18)}" fill="${x.past?css("--mid"):css("--ochre")}" opacity="${x.option?0.55:1}"><title>${sname(x.y)}: $${x.sal_m}M${x.option?` (${x.option} option)`:""}</title></rect>
+    <text x="${L+i*bw+bw/2}" y="${H-B-(x.sal_m/mx)*(H-B-18)-4}" text-anchor="middle">$${x.sal_m.toFixed(1)}M</text><text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle">${sname(x.y)}${x.option?"*":""}</text>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>Contract and value</h2></div>
+  <div class="cols"><div><svg class="chart" viewBox="0 0 ${W} ${H}">${bars}</svg><p class="note">Salary by season (grey = last season). * = ${[...new Set(ys.filter(x=>x.option).map(x=>x.option+" option"))].join(", ")||"option"} year, drawn lighter.</p></div>
+  <div class="figs" style="grid-template-columns:1fr 1fr">${v.surplus_m!=null?`<div class="fig"><div class="k">Surplus value, 2026-31</div><div class="v">${v.surplus_m>0?"+":""}$${Math.round(v.surplus_m)}M</div><div class="s">80% range $${Math.round(v.surplus_lo_m)}M to $${Math.round(v.surplus_hi_m)}M: projected on-court value minus salary, in 2026-27 dollars</div></div>`:""}
+  ${v.v26_vorp!=null?`<div class="fig"><div class="k">Projected 2026-27 value</div><div class="v">${v.v26_vorp.toFixed(1)}</div><div class="s">VORP; one VORP ≈ $14.4M on the market</div></div>`:""}
+  <p class="note" style="grid-column:1/-1">Players and draft picks priced in one currency (a supported test). It is not a forecast of what a team would pay in a trade; that test failed.</p></div></div></section>`;
+}
+
+/* ---------- combine ---------- */
+function modCombine(d){
+  const c = X_(d).combine; if (!c) return "";
+  const nm = {height_wo_shoes:"Height, no shoes (in)", wingspan:"Wingspan (in)", standing_reach:"Standing reach (in)", weight:"Weight (lb)", hand_length:"Hand length (in)", hand_width:"Hand width (in)", wingspan_minus_height:"Wingspan minus height (in)", body_fat_pct:"Body fat %", lane_agility:"Lane agility (s)", modified_lane_agility:"Modified lane agility (s)", three_quarter_sprint:"Three-quarter sprint (s)", standing_vertical:"Standing vertical (in)", max_vertical:"Max vertical (in)", bench_press:"Bench press reps"};
+  const rows = o => Object.entries(o||{}).filter(([k,v])=>v&&v[0]!=null).map(([k,[v,p]])=>`<div class="drow" style="grid-template-columns:minmax(0,1fr) 96px 30px 54px"><span>${E(nm[k]||k)}</span><span class="track">${p!=null?`<i style="width:${Math.max(3,p)}%;background:${pcol(p)}"></i>`:""}</span><span class="pc">${p??"–"}</span><span class="val">${v}</span></div>`).join("");
+  return `<section class="mod"><div class="mhead"><h2>Draft combine, ${c.year}</h2></div>
+  <p class="lede">Measurements and drills at the NBA draft combine, as percentiles among every combine attendee 2000-2025 (timed drills reversed, so 100 = fastest).</p>
+  <div class="dna"><div class="dgrp"><h3>Body</h3>${rows(c.anthro)}</div>${c.drills?`<div class="dgrp"><h3>Drills</h3>${rows(c.drills)}</div>`:""}</div></section>`;
+}
+
+/* ---------- comps ---------- */
+function modComps(d){
+  const c = d.comps; if (!c) return "";
+  const bt = META.comps_meta && META.comps_meta.backtest;
+  const cell = v => v==null ? `<td class="mute">out</td>` : `<td style="color:${dcol(v,6)}">${sgn(v)}</td>`;
+  const rows = c.comps.map(x => `<tr><td class="l"><a href="#p-${x.pid}" style="color:inherit">${E(x.name)}</a></td><td>${sname(x.season)}</td><td class="l">${E(x.team||"")}</td><td>${x.age.toFixed(1)}</td><td>${x.pts??"–"} / ${x.reb??"–"} / ${x.ast??"–"}</td><td style="color:${dcol(x.r,6)};font-weight:500">${sgn(x.r)}</td>${x.fut.map(cell).join("")}</tr>`).join("");
+  const W=520, H=220, L=40, R=60, T=14, B=28;
+  const pts = [0,1,2,3];
+  const bands = pts.map(k => k===0 ? [c.base_r,c.base_r,c.base_r,c.base_r,c.base_r] : (c.band[k]||null));
+  const proj = d.proj_path.slice(0,3).map(p=>p.mean);
+  const all = bands.filter(Boolean).map(b=>b.slice(0,5)).flat().concat(proj).filter(v=>v!=null);
+  let y0 = Math.floor(Math.min(...all)-0.5), y1 = Math.ceil(Math.max(...all)+0.5);
+  if (y1 - y0 < 4) { const m = (y0+y1)/2; y0 = Math.floor(m-2); y1 = Math.ceil(m+2); }
+  const X = k => L + k/3*(W-L-R), Y = v => T + (y1-v)/(y1-y0)*(H-T-B);
+  const okb = pts.filter(k=>bands[k]);
+  const area = (lo, hi) => `M${okb.map(k=>`${X(k)} ${Y(bands[k][hi])}`).join(" L")} L${okb.slice().reverse().map(k=>`${X(k)} ${Y(bands[k][lo])}`).join(" L")}Z`;
+  let g = "";
+  const stepv = (y1 - y0) > 10 ? 4 : (y1 - y0) > 5 ? 2 : 1;
+  for (let v = Math.ceil(y0); v <= y1; v++) if (v % stepv === 0) g += `<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css("--grid")}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v>0?"+":""}${v}</text>`;
+  g += pts.map(k=>`<text x="${X(k)}" y="${H-8}" text-anchor="middle">${sname(c.base_season+k)}</text>`).join("");
+  const lastk = okb[okb.length-1];
+  const fan = okb.length > 1 ? `<path d="${area(0,4)}" fill="${css("--purple")}" opacity=".12"/><path d="${area(1,3)}" fill="${css("--purple")}" opacity=".22"/>
+    <path d="M${okb.map(k=>`${X(k)} ${Y(bands[k][2])}`).join(" L")}" stroke="${css("--purple")}" stroke-width="2" fill="none"/>
+    <text x="${X(lastk)+6}" y="${Y(bands[lastk][2])+(proj.length && bands[lastk][2] < proj[proj.length-1] ? 14 : -4)}" style="fill:${css("--purple")}">comps</text>` : "";
+  const pj = proj.length ? `<path d="M${X(0)} ${Y(c.base_r)} ${proj.map((v,i)=>`L${X(i+1)} ${Y(v)}`).join(" ")}" stroke="${css("--olive")}" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+    ${proj.map((v,i)=>`<circle cx="${X(i+1)}" cy="${Y(v)}" r="3.5" fill="${css("--olive")}"/>`).join("")}<text x="${X(proj.length)+6}" y="${Y(proj[proj.length-1])+(okb.length>1 && bands[lastk][2] < proj[proj.length-1] ? -4 : 14)}" style="fill:${css("--olive")}">model</text>` : "";
+  return `<section class="mod"><div class="mhead"><h2>Players who looked like him</h2></div>
+  <p class="lede">The ${c.comps.length} closest player-seasons since 1996-97 to his ${sname(c.base_season)} at age ${c.age} (within a year of his age; matched on offensive and defensive rating, usage, efficiency against the league, per-game stats, minutes and height), and how their ratings moved over the next three seasons. "Out" = under 200 minutes or out of the league. Click a name to open that player.</p>
+  <div class="tbl"><table><thead><tr><th class="l">Player</th><th>Season</th><th class="l">Team</th><th>Age</th><th>PTS/REB/AST</th><th>Rating</th><th>Next season</th><th>+2</th><th>+3</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div style="max-width:620px;margin-top:16px"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Comp outcomes vs model">${g}${fan}${pj}<circle cx="${X(0)}" cy="${Y(c.base_r)}" r="4" fill="${css("--ink")}"/></svg>
+  <p class="note">Purple: his rating moved the way his comps' ratings moved (median, middle half, 80%). Olive: the Singular projection. ${bt?`Backtest on ${bt.n} seasons from 2019-20 to 2021-22: comps predicted next-season rating with error ${bt.rmse_comps} points vs ${bt.rmse_persistence} for "no change", so read comps as history, not a forecast.`:""}</p></div></section>`;
+}
+
+/* ---------- archetype ---------- */
+const ACOL = ["--brown","--olive","--purple","--forest","--cold","--hot","--ochre","--mute"];
+function modArch(d){
+  const a = d.arch; if (!a || !a.length) return "";
+  const names = META.arch_names;
+  const used = [...new Set(a.map(x=>x.a))];
+  const col = i => css(ACOL[used.indexOf(i) % ACOL.length]);
+  const cells = a.map(x => `<div title="${sname(x.season)}: ${E(names[x.a])} (${Math.round(100*x.p)}%)${x.p2>0.05?`; next: ${E(names[x.a2])} ${Math.round(100*x.p2)}%`:""}" style="flex:1 1 0;min-width:0;height:28px;background:${col(x.a)};opacity:${0.45+0.55*x.p};border-radius:3px"></div>`).join("");
+  const last = a[a.length-1];
+  return `<section class="mod"><div class="mhead"><h2>What kind of player, year by year</h2></div>
+  <p class="lede">Each block is one season, coloured by the statistical archetype it fits best (one of 14 types fitted on all qualified seasons since 1982). Faded blocks fit less cleanly; hover for the fit. Latest: <b>${E(names[last.a])}</b> in ${sname(last.season)}.</p>
+  <div style="display:flex;gap:3px">${cells}</div>
+  <div class="legend" style="justify-content:space-between;margin-top:4px"><span>${sname(a[0].season)}</span><span>${sname(last.season)}</span></div>
+  <div class="legend" style="margin-top:8px">${used.map(i=>`<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${col(i)};margin-right:4px"></span>${E(names[i])}</span>`).join("")}</div></section>`;
+}
+
+/* ---------- game log ---------- */
+const MCAT = {inj:["injury","--hot"], rest:["rest","--olive"], pers:["personal","--purple"], susp:["suspension","--ink"], gl:["G League","--cold"], coach:["coach's decision","--ochre"], nwt:["not with team","--purple"], unk:["unknown","--mute"], dnp:["did not play","--ochre"], inactive:["inactive","--mute"]};
+function modGames(d){
+  const g = d.games || [], ms = (d.miles && d.miles.missed) || {}, mg = ms.games || {};
+  const miss = [...(mg["2025"]||[]), ...(mg["2026"]||[])];
+  if (!g.length && !miss.length) return "";
+  const cur = g.filter(x => x[0] >= "2026-10-01");
+  const list = (cur.length ? cur : g.slice(-15)).slice().reverse();
+  const curMiss = (mg["2026"]||[]).map(m => ({d:m[0], m}));
+  const allRows = [...list.map(x=>({d:x[0], x})), ...(cur.length ? curMiss : [])].sort((a,b)=>a.d<b.d?1:-1);
+  const rows = allRows.map(o => { if (o.x) { const x = o.x; return `<tr><td>${x[0].slice(5)}</td><td class="l">${x[2]?"vs":"@"} ${E(x[1])}</td><td>${x[3]?"W":"L"}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]}</td><td>${x[9]}</td><td>${x[10]}</td><td>${x[11]}-${x[12]}</td><td>${x[13]}-${x[14]}</td><td>${x[15]}-${x[16]}</td><td>${x[17]>0?"+":""}${x[17]}</td></tr>`; }
+    const m = o.m, c = MCAT[m[3]] || [m[3],"--mute"]; return `<tr class="mute"><td>${m[0].slice(5)}</td><td class="l">${m[2].startsWith("@")?"@ "+E(m[2].slice(1)):"vs "+E(m[2])}</td><td colspan="12" class="l" style="color:${css(c[1])}">Out: ${E(m[4] || c[0])}</td></tr>`; }).join("");
+  // strip over every team game: played bars and missed ticks, in date order
+  const ev = [...g.map(x=>({d:x[0], x})), ...miss.map(m=>({d:m[0], m}))].sort((a,b)=>a.d<b.d?-1:1);
+  const W=1000, H=90, n=Math.max(ev.length,1), bw=W/n, mx=Math.max(...g.map(x=>x[5]),10);
+  const strip = ev.map((o,i)=> o.x ? `<rect x="${(i*bw).toFixed(1)}" y="${(H-14-o.x[5]/mx*(H-20)).toFixed(1)}" width="${Math.max(1,bw-1).toFixed(1)}" height="${(o.x[5]/mx*(H-20)).toFixed(1)}" fill="${o.x[0]>="2026-10-01"?css("--brown"):css("--mid")}"><title>${o.x[0]} ${o.x[2]?"vs":"@"} ${E(o.x[1])}: ${o.x[5]} pts</title></rect>`
+      : `<rect x="${(i*bw).toFixed(1)}" y="${H-18}" width="${Math.max(1,bw-1).toFixed(1)}" height="4" fill="${css((MCAT[o.m[3]]||["","--mute"])[1])}"><title>${o.m[0]}: out, ${E(o.m[4] || (MCAT[o.m[3]]||[o.m[3]])[0])}</title></rect>`).join("");
+  const split = ev.findIndex(o=>o.d>="2026-10-01");
+  // missed summary by season: episodes in order
+  const summ = ["2025","2026"].map(y => { const ss = (ms.seasons||{})[y]; if (!ss || !ss.missed) return "";
+    const runs = []; (mg[y]||[]).forEach(m => { const key = m[3]+"|"+(m[4]||""); const last = runs[runs.length-1];
+      if (last && last.key === key) { last.n++; last.end = m[0]; } else runs.push({key, cat:m[3], why:m[4], n:1, start:m[0], end:m[0]}); });
+    const md = s => new Date(s+"T12:00:00").toLocaleDateString("en-US",{month:"short", day:"numeric"});
+    let shown = runs, more = 0;
+    if (runs.length > 8) { const keep = new Set(runs.slice().sort((a,b)=>b.n-a.n).slice(0,8)); shown = runs.filter(r=>keep.has(r)); more = runs.length - 8; }
+    const items = shown.map(r => `<li><span style="color:${css((MCAT[r.cat]||["","--mute"])[1])}">■</span> ${E(r.why || (MCAT[r.cat]||[r.cat])[0])} <span class="mute">${r.n} game${r.n>1?"s":""}, ${md(r.start)}${r.n>1?"–"+md(r.end):""}</span></li>`).join("");
+    const cats = Object.entries(ss.by_cat||{}).map(([k,v])=>`${v} ${(MCAT[k]||[k])[0]}`).join(", ");
+    return `<div><h3>${sname(+y)}: missed ${ss.missed} of ${ss.team_games}${ss.inferred?" so far":""}</h3><p class="note" style="margin:2px 0 6px">${E(cats)}${ss.inferred?". Reasons for 2026-27 are not recorded yet.":""}</p><ul style="margin:0;padding-left:0;list-style:none;display:grid;gap:3px;font-size:14px">${items}${more?`<li class="mute">+ ${more} shorter spell${more>1?"s":""}</li>`:""}</ul></div>`; }).filter(Boolean).join("");
+  return `<section class="mod"><div class="mhead"><h2>Game log</h2></div>
+  <p class="lede">Points in every regular-season game since 2025-26 (grey = 2025-26, brown = 2026-27); the small coloured marks along the bottom are games he missed, coloured by reason. Then the ${cur.length ? "2026-27 games, newest first" : "last 15 games"}.</p>
+  <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Points by game, with missed games">${strip}${split>0?`<line x1="${split*bw}" x2="${split*bw}" y1="0" y2="${H-12}" stroke="${css("--mute")}" stroke-dasharray="3 3"/>`:""}<text x="0" y="${H-1}">2025-26</text>${split>0?`<text x="${split*bw+4}" y="${H-1}">2026-27</text>`:""}</svg>
+  ${rows?`<div class="tbl" style="max-height:360px;margin-top:10px"><table><thead><tr><th>Date</th><th class="l">Opponent</th><th></th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TOV</th><th>FG</th><th>3P</th><th>FT</th><th>+/-</th></tr></thead><tbody>${rows}</tbody></table></div>`:""}
+  ${summ?`<div class="cols" style="margin-top:14px">${summ}</div><p class="note">Reasons from NBA injury reports (last report before tip-off) via Singular's availability file. Consecutive games with the same listed reason are grouped.</p>`:""}</section>`;
+}
+
+/* ---------- playoffs ---------- */
+function modPlayoffs(d){
+  const p = d.playoffs; if (!p || !p.length) return "";
+  const rs = Object.fromEntries(d.box.map(b=>[b.season,b]));
+  const rows = p.map(x => { const r = rs[x.season] || {}; const dts = (x.ts!=null && r.ts!=null) ? x.ts - r.ts : null;
+    return `<tr><td>${sname(x.season)}</td><td class="l">${E(x.team)}</td><td>${x.gp}</td><td>${x.w}-${x.l}</td><td>${(x.mpg??0).toFixed(1)}</td><td>${(x.ppg??0).toFixed(1)}</td><td>${(x.rpg??0).toFixed(1)}</td><td>${(x.apg??0).toFixed(1)}</td><td>${x.ts!=null?(100*x.ts).toFixed(1):"–"}</td><td style="color:${dts==null?"inherit":dcol(dts,0.06)}">${dts==null?"–":(dts>0?"+":"")+(100*dts).toFixed(1)}</td><td>${r.ppg!=null&&x.ppg!=null?((x.ppg-r.ppg)>0?"+":"")+(x.ppg-r.ppg).toFixed(1):"–"}</td><td>${x.pm>0?"+":""}${x.pm}</td></tr>`; }).join("");
+  const tg = p.reduce((a,x)=>a+x.gp,0), tw = p.reduce((a,x)=>a+x.w,0);
+  return `<section class="mod"><div class="mhead"><h2>Playoffs</h2></div>
+  <p class="lede">${tg} playoff games, ${tw} wins. "TS vs RS" and "PTS vs RS" compare each run with the same season's regular season.</p>
+  <div class="tbl"><table><thead><tr><th>Season</th><th class="l">Team</th><th>G</th><th>W-L</th><th>MPG</th><th>PTS</th><th>REB</th><th>AST</th><th>TS%</th><th>TS vs RS</th><th>PTS vs RS</th><th>+/-</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+}
+
+
+/* ---------- Hall of Fame chance, season by season ---------- */
+function modHofTraj(d){
+  const t = d.hoft, M = META.hof_meta; if (!t || !t.length || !M) return "";
+  // t rows: [season, p, lo, hi, k, allstar, allnba_w, mvp, titles]
+  const W=720, H=260, L=44, R=110, T=14, B=30;
+  const kmax = Math.max(t[t.length-1][4], 12);
+  const X = k => L + (k-1)/(kmax-1)*(W-L-R), Y = v => T + (1-v)*(H-T-B);
+  const grid = [0,.25,.5,.75,1].map(v=>`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css("--grid")}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${Math.round(100*v)}%</text>`).join("");
+  const xt = Array.from({length:kmax},(_,i)=>i+1).filter(k=>k===1||k%2===0).map(k=>`<text x="${X(k)}" y="${H-10}" text-anchor="middle">${k}</text>`).join("");
+  const ref = (rows, col, lab, dash) => { const r = (rows||[]).filter(x=>x[0]<=kmax); if (r.length<2) return "";
+    const last = r[r.length-1];
+    return `<path d="M${r.map(x=>`${X(x[0]).toFixed(1)} ${Y(x[1]).toFixed(1)}`).join(" L")}" stroke="${css(col)}" stroke-width="1.5" fill="none" stroke-dasharray="${dash}"/><text x="${X(last[0])+6}" y="${Y(last[1])+4}" style="fill:${css(col)}">${lab}</text>`; };
+  const band = `<path d="M${t.map(x=>`${X(x[4]).toFixed(1)} ${Y(x[3]).toFixed(1)}`).join(" L")} L${t.slice().reverse().map(x=>`${X(x[4]).toFixed(1)} ${Y(x[2]).toFixed(1)}`).join(" L")} Z" fill="${css("--brown")}" opacity=".16"/>`;
+  const line = `<path d="M${t.map(x=>`${X(x[4]).toFixed(1)} ${Y(x[1]).toFixed(1)}`).join(" L")}" stroke="${css("--brown")}" stroke-width="2.5" fill="none"/>`;
+  // mark seasons that added an honour
+  const marks = t.map((x,i)=>{ const pv = i ? t[i-1] : [0,0,0,0,0,0,0,0,0]; const add = [];
+      if (x[7]>pv[7]) add.push("MVP"); if (x[6]>pv[6]) add.push("All-NBA"); if (x[5]>pv[5]) add.push("All-Star"); if (x[8]>pv[8]) add.push("title");
+      return `<circle cx="${X(x[4]).toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="${add.length?4.5:2.5}" fill="${add.length?css("--brown"):css("--bg")}" stroke="${css("--brown")}"><title>${sname(x[0])}: ${Math.round(100*x[1])}%${add.length?" · "+add.join(", "):""}</title></circle>`; }).join("");
+  const now = t[t.length-1], prev = t.length>1 ? t[t.length-2] : null;
+  const pct = v => v >= .995 ? ">99%" : v < .005 ? "<1%" : Math.round(100*v)+"%";
+  const ch = prev ? Math.round(100*(now[1]-prev[1])) : null;
+  const best = t.reduce((a,b)=>b[1]>a[1]?b:a);
+  const tv = M.tests && M.tests.temporal, cv = M.tests && M.tests.grouped_cv && M.tests.grouped_cv.all;
+  const story = now[1] >= .95 ? "His resume is already one that almost always ends in Springfield." :
+    best[1] - now[1] > .2 ? `It peaked at ${pct(best[1])} after ${sname(best[0])}; seasons since have not added enough honours for his age.` :
+    ch != null && ch >= 10 ? `Last season moved it ${ch} points.` : "";
+  return `<section class="mod"><div class="mhead"><h2>Hall of Fame chance, season by season<span class="new">rare view</span></h2></div>
+  <p class="lede">After each completed season, the share of past players with the same resume at the same age who were inducted. Resume = honours to date (All-Star, All-NBA, MVP, titles, All-Defense), points, best seasons and career value by our rating. It already prices in a typical rest of career. ${story}</p>
+  <div class="cols"><div style="min-width:0"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Hall of Fame chance by career season">${grid}${xt}
+    ${ref(M.reference && M.reference.inductees, "--forest", "median inductee", "5 4")}${ref(M.reference && M.reference.allstar_not_inducted, "--mute", "All-Star, not in", "2 3")}
+    ${band}${line}${marks}<text x="${(L+W-R)/2}" y="${H+0}" text-anchor="middle" style="font-size:11px"></text></svg>
+    <p class="note">x = his career season (1 = rookie year). Filled dots = a season that added an honour. Shaded band = 80% model range (refits on resampled players). Reference lines are out-of-sample.</p></div>
+  <div><div class="fig"><div class="k">After ${sname(now[0])}</div><div class="v">${pct(now[1])}</div><div class="s">80% range ${pct(now[2])}–${pct(now[3])}${ch!=null?` · ${ch>=0?"+":""}${ch} pts on the year`:""}</div></div>
+  <p class="note" style="margin-top:10px">Tested on players held out by era: trained on debuts before 1980, scored on 1980-2004 debuts. Brier ${tv?tv.model.brier:"?"} vs ${tv?tv.baseline.brier:"?"} for All-Star count alone (lower is better)${cv?`; by player, AUC ${cv.model.auc}`:""}. Trained on players retired by ${M.train_last_season_max}-${String(M.train_last_season_max+1).slice(2)}, so recent rule and voting changes are invisible. The range covers model wobble, not career luck. Players with long careers and modest honours (e.g. a veteran with five All-Star picks at 40) read lower than voters may treat them.</p></div></div></section>`;
+}
+
+/* ---------- honours ---------- */
+function modAwards(d){
+  const a = d.awards || [];
+  const minor = /Player of the Week|Rookie of the Month|Player of the Month|Olympic Appearance/;
+  const big = {}, small = {};
+  a.forEach(x => { const o = minor.test(x.t) ? small : big; (o[x.t] = o[x.t] || []).push(x.s); });
+  if (!Object.keys(big).length && !Object.keys(small).length && !d.hof) return "";
+  const li = o => Object.entries(o).sort((x,y)=>y[1].length-x[1].length).map(([t,ss])=>`<li><b>${E(t)}</b> <span class="num">×${ss.length}</span> <span class="mute">${E(ss.join(", "))}</span></li>`).join("");
+  const h = d.hof;
+  return `<section class="mod"><div class="mhead"><h2>Honours</h2></div>
+  <div class="cols"><div><ul style="margin:0;padding-left:18px;display:grid;gap:4px">${li(big) || "<li class='mute'>No major awards yet.</li>"}</ul></div>
+  <div>${h && !(d.hoft && d.hoft.length) ? `<div class="fig"><div class="k">Hall of Fame model, if he stopped today</div><div class="v">${Math.round(100*h.p)}%</div><div class="s">Phase 6 model C, trained on retired players' peak and career value. It inflates short careers and does not project the rest of his career.</div></div>` : ""}
+  ${Object.keys(small).length ? `<p class="note" style="margin-top:12px">${Object.entries(small).map(([t,ss])=>`${E(t)} ×${ss.length}`).join(" · ")}</p>` : ""}</div></div></section>`;
+}
+
+function wire(){
+  const secs = [...document.querySelectorAll("section.mod")];
+  const nav = $("#jump");
+  if (nav) {
+    nav.innerHTML = secs.map((s,i) => `<button data-i="${i}">${E((s.querySelector("h2")?.childNodes[0]?.textContent || "").trim())}</button>`).join("");
+    nav.onclick = e => { const b = e.target.closest("button"); if (b) secs[+b.dataset.i].scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); };
+  }
+  const ds = $("#dnaSeason"); if (ds) ds.onchange = () => { SEASON = ds.value; render(); };
+  const ss = $("#shotSeason"); if (ss) ss.onchange = () => { SEASON = ss.value; render(); };
+  const pm = $("#posmode"); if (pm) pm.onclick = e => { const b = e.target.closest("button"); if (b) { POSMODE = +b.dataset.m; render(); } };
+  const lm = $("#lgmode"); if (lm) lm.onclick = e => { const b = e.target.closest("button"); if (b) { LGMODE = b.dataset.m; render(); } };
+  const spm = $("#splitmode"); if (spm) spm.onclick = e => { const b = e.target.closest("button"); if (b) { SPLITSEASON = b.dataset.m; render(); } };
+  (window.WIRES || []).forEach(f => { try { f(); } catch (e) { console.error(e); } });
+  const sm = $("#shotmode"); if (sm) sm.onclick = e => { const b = e.target.closest("button"); if (b) { SHOTMODE = b.dataset.m; render(); } };
+}
+boot().catch(e => { $("#app").innerHTML = `<p class="empty">Could not load player data (${E(e.message)}).</p>`; });
+</script>
+
+</html>
