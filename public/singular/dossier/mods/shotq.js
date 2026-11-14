@@ -103,7 +103,7 @@ function modShotq(d){
   <div class="cols"><div><h3>Making per 100 shots, by season</h3>${chart}<div style="margin-top:12px">${stbl}</div></div>
     <div><h3>By zone, ${sname(y)}${part(y)}</h3>${ztbl}<h3 style="margin-top:18px">Shot diet</h3><div class="sqdiet">${dietRows}</div>${dietLeg}
     <p class="note">Share of his field-goal attempts from each zone, oldest season at top; number = FGA.</p></div></div>
-  <p class="note" style="margin-top:12px">${pq != null || pm != null ? `Percentiles ${popTxt}. ` : ""}${cur ? `${sname(y)} is in progress, so its range is wide and the believable value sits close to 0. ` : ""}What this cannot see: how open the shot was. Play-by-play has no defender distance, so shot-making mixes touch with the space he creates or is given. Regular season, 2018-19 on. Model: gradient-boosted trees fit on ${sname(T.train_seasons[0])} to ${sname(T.train_seasons[T.train_seasons.length-1])}, then refit on all seasons.</p></section>`;
+  <p class="note" style="margin-top:12px">${pq != null || pm != null ? `Percentiles ${popTxt}. ` : ""}${cur ? `${sname(y)} is in progress, so its range is wide and the believable value sits close to 0. ` : ""}The number is shot-making given the shot type: a big who takes tips and hooks is measured against other tips and hooks, so he can finish well overall and still read below zero (Gobert does). What this cannot see: how open the shot was. Play-by-play has no defender distance, so shot-making mixes touch with the space he creates or is given. Regular season, 2018-19 on. Model: gradient-boosted trees fit on ${sname(T.train_seasons[0])} to ${sname(T.train_seasons[T.train_seasons.length-1])}, then refit on all seasons.</p></section>`;
 }
 
 (window.WIRES = window.WIRES || []).push(function(){

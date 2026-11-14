@@ -64,7 +64,7 @@ function renderFront(){
   .ftbl .stk{position:sticky;background:var(--panel);z-index:1}
   .ftbl thead .stk{z-index:3}
   .ftbl .c0{left:0;width:34px;min-width:34px;color:var(--mute);text-align:right}
-  .ftbl .c1{text-align:left;left:34px;min-width:150px;max-width:178px;overflow:hidden;text-overflow:ellipsis;box-shadow:inset -1px 0 0 var(--line)}
+  .ftbl .c1{text-align:left;left:34px;min-width:144px;max-width:170px;overflow:hidden;text-overflow:ellipsis;box-shadow:inset -1px 0 0 var(--line)}
   .ftbl td.c1{font-family:var(--sans);font-size:13.5px;font-weight:600}
   .ftbl td.c1 a{color:inherit;text-decoration:none} .ftbl td.c1 a:hover{text-decoration:underline;color:var(--brown)}
   .ftbl td.tx{font-family:var(--sans);color:var(--mute);text-align:left}
@@ -74,7 +74,7 @@ function renderFront(){
   .ftbl td.mu{color:var(--mute)}
   .sip{display:flex;align-items:center;gap:6px;justify-content:flex-end}
   .sip b{font-weight:600;min-width:38px;text-align:right}
-  .sbar{position:relative;width:76px;height:12px}
+  .sbar{position:relative;width:64px;height:12px}
   .sbar u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--mute);opacity:.5}
   .sbar i{position:absolute;top:3px;height:6px;border-radius:2px;background:var(--brown);opacity:.85}
   .sbar s{position:absolute;top:5px;height:2px;background:var(--ink);opacity:.35;text-decoration:none}
@@ -229,7 +229,7 @@ function frUpdate(){
     switch (FS.sort) {
       case "rank": return o.rank ?? null; case "name": return o.r.name.split(" ").slice(1).join(" ") + " " + o.r.name;
       case "team": return (cur ? o.r.team : (o.b.t || o.r.team)) || null; case "pos": return o.r.pos || null; case "age": return o.r.age;
-      case "r": return o.b.r; case "o": return o.b.o; case "d": return o.b.d; case "g": return o.b.g ?? null; default: return null; }
+      case "r": return o.b.r; case "o": return o.b.o; case "d": return o.b.d; case "t5": return o.r.t5 ?? null; case "pk": return o.r.pk ?? null; case "g": return o.b.g ?? null; default: return null; }
   };
   rows.sort((a, b) => { const va = val(a), vb = val(b); if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
     return (typeof va === "string" ? va.localeCompare(vb) : va - vb) * FS.dir; });
@@ -238,7 +238,7 @@ function frUpdate(){
   const th = (k, label, cls = "", title = "") => `<th data-k="${k}" class="${cls}${FS.sort === k ? " on" : ""}" data-arrow="${arrow}" title="${E(title)}" ${FS.sort === k ? `aria-sort="${FS.dir > 0 ? "ascending" : "descending"}"` : ""}>${label}</th>`;
   const grpStart = new Set(["mpg", "fgp"]);
   let h = `<table><thead><tr>${th("rank", "#", "stk c0", "SiPM rank this season")}${th("name", "Player", "stk c1 l")}${th("team", "Tm", "l")}${th("pos", "Pos", "l")}${th("age", "Age", "", "Age on Feb 1, 2027")}
-    ${th("r", "SiPM", "grp", cur ? "Rest-of-season SiPM projection; whisker = 80% range" : "SiPM at the end of 2025-26")}${th("o", "Off", "", "SiPM offence")}${th("d", "Def", "", "SiPM defence")}${th("g", "G", "grp", "Games played")}
+    ${th("r", "SiPM", "grp", cur ? "Rest-of-season SiPM projection; whisker = 80% range" : "SiPM at the end of 2025-26")}${th("o", "Off", "", "SiPM offence")}${th("d", "Def", "", "SiPM defence")}${th("t5", "5-yr", "grp", "Five-season outlook: mean projected SiPM over 2026-27 to 2030-31, if he plays")}${th("pk", "Peak", "", "Projected SiPM in his best later season, 2027-28 to 2030-31")}${th("g", "G", "grp", "Games played")}
     ${keys.map(k => th(k, lab[k], grpStart.has(k) && k !== "mpg" ? "grp" : "", F_STAT_DESC[k])).join("")}</tr></thead><tbody>`;
   // SiPM bar scale
   const lo = -6, hi = 14, pos = v => Math.max(0, Math.min(100, 100 * (v - lo) / (hi - lo)));
@@ -254,7 +254,7 @@ function frUpdate(){
     }
     const tip = b.lo != null ? `SiPM ${sgn(b.r)} (80% range ${sgn(b.lo)} to ${sgn(b.hi)}); offence ${sgn(b.o)}, defence ${sgn(b.d)}` : b.r != null ? `SiPM ${sgn(b.r)}; offence ${sgn(b.o)}, defence ${sgn(b.d)}` : "No SiPM this season";
     h += `<tr><td class="stk c0">${o.rank ?? ""}</td><td class="stk c1"><a href="#p-${r.id}">${E(r.name)}</a></td><td class="tx">${E(team || "\u2013")}</td><td class="tx">${E(r.pos || "\u2013")}</td><td>${r.age != null ? r.age.toFixed(1) : "\u2013"}</td>
-      <td class="grp" title="${E(tip)}">${sip}</td><td class="mu">${sgn(b.o)}</td><td class="mu">${sgn(b.d)}</td><td class="grp">${b.g ?? "\u2013"}</td>`;
+      <td class="grp" title="${E(tip)}">${sip}</td><td class="mu">${sgn(b.o)}</td><td class="mu">${sgn(b.d)}</td><td class="grp" title="${E(r.t5 != null ? `5-year outlook ${sgn(r.t5)}${r.t5lo != null ? ` (80% range ${sgn(r.t5lo)} to ${sgn(r.t5hi)})` : ""}: mean projected SiPM 2026-27 to 2030-31, if he plays` : "No outlook")}">${sgn(r.t5)}</td><td class="mu" title="${E(r.pk != null ? `Best later season: ${sgn(r.pk)}${r.pka != null ? ` at age ${r.pka.toFixed(1)}` : ""}${r.pkn ? "; this season projects above it" : ""}` : "No peak projection")}">${sgn(r.pk)}</td><td class="grp">${b.g ?? "\u2013"}</td>`;
     keys.forEach((k, i) => {
       const v = b.v ? b.v[i] : null, cls = grpStart.has(k) && k !== "mpg" ? "grp" : "";
       let st = "", tt = "", strong = false;
