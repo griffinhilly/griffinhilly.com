@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NBA player ratings table 2026-27 | Singular</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="SiPM impact ratings, 2026-27 projections and five-season outlooks for every NBA player.">
+<script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/singular/assets/palette.css"><link rel="stylesheet" href="/singular/assets/hub.css">
+<script src="/singular/assets/players.js" defer></script><script src="/singular/assets/table.js" defer></script>
+</head><body>
+<header class="top"><div class="bar wide"><a class="brand" href="/singular/">Singular</a><nav><a href="/singular/" aria-current="page">Players</a><a href="/singular/all-time/">All-time</a><a href="/singular/tests/">Tests</a><a href="/singular/method/">Method</a><a href="/singular/report/"><span class="hs">Bulls report</span><span class="hm">Report</span></a></nav><button class="theme" type="button" aria-label="Switch light or dark" onclick="var r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=d==='light'?'dark':'light';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button></div></header>
+<main class="wide">
+<div class="head-row"><div><h1>NBA player ratings, 2026-27</h1>
+<p class="lede">Singular's plus-minus projection for every player, his rating so far, and where we expect him over the next five seasons. Ratings are points per 100 possessions above an average player.</p>
+<p class="asof">Data through <b>November 12, 2026</b> · <a href="/singular/method/">Method</a> · <a href="/singular/tests/">Tests</a> · <a href="/singular/report/">Bulls report</a> · <a href="/singular/dossier/">Player dossier</a></p></div></div>
+<div class="viewbar"><span class="seg big" role="group" aria-label="View"><button type="button" data-view="both">Both</button><button type="button" data-view="proj">Projections</button><button type="button" data-view="season">Season so far</button></span>
+<span class="seg" role="group" aria-label="Stat unit"><button type="button" data-unit="pg">Per game</button><button type="button" data-unit="p100">Per 100</button></span></div>
+<div class="controls" role="search">
+<input id="f-q" type="search" placeholder="Search players" aria-label="Search players" autocomplete="off">
+<details class="more" open><summary>Filters</summary><div class="fl">
+<select id="f-team" aria-label="Team"><option value="">All teams</option></select>
+<select id="f-pos" aria-label="Position"><option value="">All positions</option><option value="G">Guards</option><option value="F">Forwards</option><option value="C">Centers</option></select>
+<span class="age"><label>Age <input id="f-amin" type="number" inputmode="numeric" min="18" max="45" placeholder="min" aria-label="Minimum age"></label>
+<label>to <input id="f-amax" type="number" inputmode="numeric" min="18" max="45" placeholder="max" aria-label="Maximum age"></label></span>
+<label><input id="f-rook" type="checkbox"> Rookies</label>
+<label><input id="o-split" type="checkbox"> Off / Def</label><label><input id="o-parts" type="checkbox"> Rating sources</label>
+</div></details></div>
+<div class="subbar"><span><span id="count" aria-live="polite"></span> <span id="empty-note" class="muted" hidden></span></span><span class="legend"><i></i>shading: league percentile, low to high</span></div>
+<div class="tw"><table id="t" class="data"><thead></thead><tbody></tbody></table></div>
+<p class="note">Click a column to sort; click again to reverse. Projections and the outlook are Singular model outputs; projected stats account for expected role changes (minutes, usage) on the new roster. Season-so-far columns are box-score averages. Hover a column header for its definition.</p>
+</main>
+<footer class="foot"><div class="wide">Data through November 12, 2026. Ratings in points per 100 possessions; 0 is an average player.
+<a href="/singular/method/">How the model works</a>. By <a href="https://griffinhilly.com/">Griffin Hilly</a>.</div></footer>
+</body></html>
