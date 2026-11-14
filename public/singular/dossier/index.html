@@ -101,6 +101,7 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
   <datalist id="plist"></datalist>
   <div class="quick" id="quick"></div>
   <a href="/singular" style="margin-left:auto;font-size:13px;color:var(--mute)">Singular home</a>
+  <a href="#fantasy" style="font-size:13px;color:var(--mute);white-space:nowrap">Fantasy ranks</a>
 </div></div>
 
 <div class="wrap" id="app"><p class="empty">Loading players…</p></div>
@@ -109,6 +110,18 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
 <script src="mods/box.js"></script>
 <script src="mods/compare.js"></script>
 <script src="mods/front.js"></script>
+<script>
+(window.WIRES = window.WIRES || []).push(function(){
+  if (typeof CUR === "undefined" || !CUR || !CUR.slug) return;
+  const m = document.querySelector("#app header.hero .meta");
+  if (!m || m.querySelector(".hub-link")) return;
+  const s = document.createElement("span"); s.className = "hub-link";
+  const a = document.createElement("a"); a.href = "/singular/p/" + encodeURIComponent(CUR.slug) + "/"; a.textContent = "Singular page";
+  a.style.color = "inherit"; s.appendChild(a); m.appendChild(s);
+});
+</script>
+<script src="mods/shotq.js"></script>
+<script src="mods/fantasy.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -137,6 +150,7 @@ async function boot(){
   route();
 }
 function route(){ const m = location.hash.match(/^#p-(\d+)$/);
+  if (location.hash === "#fantasy" && typeof renderFantasy === "function") { CUR = null; renderFantasy(); window.scrollTo(0,0); return; }
   if (!m && typeof renderFront === "function") { CUR = null; renderFront(); window.scrollTo(0,0); return; }
   show(m ? +m[1] : META.players[0].id); }
 function go(id){ location.hash = "p-" + id; }
@@ -151,7 +165,16 @@ async function show(id){
 
 function lab(k){ return META.dna_labels.find(x => x[1] === k); }
 // reliability shrinkage: a percentile from a measure that barely repeats year to year is pulled toward 50 before use
-function shrunk(k, p){ const r = (META.dna_rel || {})[k]; return r == null ? p : 50 + Math.max(0, r) * (p - 50); }
+// Shrink on the SD scale, not the percentile scale (review 2026-11-13: linear shrink turned a 99th-percentile TS into 78).
+// Reliability = sqrt(year-to-year r): year-to-year r also counts real change, and sqrt tracks split-half reliability
+// (TS 0.75 vs split-half 0.71; 3P% 0.61 vs 0.55; FT% 0.87 vs 0.82; steals 0.84 vs 0.80).
+function qnorm(p){ const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924], b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857], c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878], d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];
+  p = Math.min(0.995, Math.max(0.005, p)); let q, r;
+  if (p < 0.02425) { q = Math.sqrt(-2*Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p > 1-0.02425) { q = Math.sqrt(-2*Math.log(1-p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q = p - 0.5; r = q*q; return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+function pnorm(z){ const t = 1/(1+0.2316419*Math.abs(z)), dd = 0.3989423*Math.exp(-z*z/2); const pr = dd*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274)))); return z > 0 ? 1-pr : pr; }
+function shrunk(k, p){ const r = (META.dna_rel || {})[k]; if (r == null) return p; return 100 * pnorm(Math.sqrt(Math.max(0, r)) * qnorm(p/100)); }
 // style / volume measures: low values describe role, not weakness
 const STYLE = new Set(["miles36","spd_off","spd_def","touch_sec","cs3a36","drives36","pu36","orebch36","drebch36","boxout36","potast36","astpts36","usg","pts36","ftr","cont36","defl36","blk36","stl36","orebpct","drebpct","astpct","grav","grav_off"]);
 
@@ -192,6 +215,7 @@ function render(){
   ${modDNA(d)}
   ${modLeague(d)}
   ${modShots(d)}
+  ${typeof modShotq === "function" ? modShotq(d) : ""}
   ${modContext(d)}
   ${modSplits(d)}
   ${modPlaytypes(d)}
@@ -536,7 +560,9 @@ function modSplits(d){
   const defs = [["home_away","Home minus away"],["rest","Back-to-back minus rested"],["opp","Vs winning teams minus losing"],["half","After All-Star break minus before"],["role","Starting minus off the bench"],["result","Wins minus losses*"]];
   const span = 10, Wd = 260, X = v => Wd/2 + Math.max(-span, Math.min(span, v)) / span * (Wd/2 - 6);
   const rows = defs.map(([k, lab]) => { const sp = S.splits && S.splits[k]; if (!sp || !sp.diff) return "";
-    const [raw, lo, hi, bel] = sp.diff.pts36, ts = sp.diff.ts, g = sp.groups, r = rr(k,"pts36"), L = lg[k] && lg[k].pts36;
+    const [raw, lo, hi] = sp.diff.pts36, ts = sp.diff.ts, g = sp.groups, r = rr(k,"pts36"), L = lg[k] && lg[k].pts36;
+    // believable = league gap + reliability x (his gap - league gap): with no evidence he is a league-average player (review 2026-11-13)
+    const rel = (sp.rel && sp.rel.pts36) || 0, bel = (L ?? 0) + rel * (raw - (L ?? 0));
     const noise = lo <= 0 && hi >= 0;
     const svg = `<svg viewBox="0 0 ${Wd} 26" style="width:100%;max-width:${Wd}px;height:26px" aria-hidden="true">
       <line x1="${X(0)}" x2="${X(0)}" y1="2" y2="24" stroke="${css("--mute")}" stroke-dasharray="2 2"/>
@@ -555,7 +581,7 @@ function modSplits(d){
   const ha = T.find(x=>x.split==="home_away" && x.measure==="pts36");
   const maxr = Math.max(...T.map(x=>x.r));
   return `<section class="mod"><div class="mhead"><h2>Splits, with honesty<span class="new">rare view</span></h2>${S0.current?`<div class="seg" id="splitmode"><button data-m="main" aria-pressed="${SPLITSEASON!=="cur"}">${sname(S0.season)}</button><button data-m="cur" aria-pressed="${SPLITSEASON==="cur"}">${sname(S0.current.season)} so far</button></div>`:""}</div>
-  <p class="lede">Points per 36 minutes in each kind of game, ${sname(S.season)} (${S.games} games). The dot is his gap, the black line its 80% range from resampling his games, the olive tick the league-wide gap. An open dot means the range crosses zero. Then the test: for each split we checked whether a player's gap one season repeats the next, 2012-13 to 2024-25. None did much (year-to-year r at most ${maxr.toFixed(2)}), so "believable" keeps only the share that repeats, given his minutes.</p>
+  <p class="lede">Points per 36 minutes in each kind of game, ${sname(S.season)} (${S.games} games). The dot is his gap, the black line its 80% range from resampling his games, the olive tick the league-wide gap. An open dot means the range crosses zero. Then the test: for each split we checked whether a player's gap one season repeats the next, 2012-13 to 2024-25. None did much (year-to-year r at most ${maxr.toFixed(2)}), so "believable" starts from the league-wide gap and moves toward his own only by the share that repeats, given his minutes.</p>
   <div class="tbl"><table><thead><tr><th class="l">Split</th><th>Gap, PTS/36</th><th>His gap vs league (−10 to +10)</th><th>Believable</th><th>TS gap (pts)</th><th>Repeats (r)</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p class="note">* Wins minus losses only describes: he plays well, so the team wins. ${ha?`Home/away is the split that repeats most (r ${ha.r}), and mostly for players who stay on one team (${ha.r_same_team} vs ${ha.r_moved} after a move), so part of it is the arena, not the player. `:""}Rest uses the team's schedule. True-shooting gaps repeat about zero.</p></section>`;
 }
@@ -848,7 +874,7 @@ function modComps(d){
   const c = d.comps; if (!c) return "";
   const bt = META.comps_meta && META.comps_meta.backtest;
   const cell = v => v==null ? `<td class="mute">out</td>` : `<td style="color:${dcol(v,6)}">${sgn(v)}</td>`;
-  const rows = c.comps.map(x => `<tr><td class="l"><a href="#p-${x.pid}" style="color:inherit">${E(x.name)}</a></td><td>${sname(x.season)}</td><td class="l">${E(x.team||"")}</td><td>${x.age.toFixed(1)}</td><td>${x.pts??"–"} / ${x.reb??"–"} / ${x.ast??"–"}</td><td style="color:${dcol(x.r,6)};font-weight:500">${sgn(x.r)}</td>${x.fut.map(cell).join("")}</tr>`).join("");
+  const rows = c.comps.map(x => `<tr><td class="l"><a href="#p-${x.pid}" style="color:inherit">${E(x.name)}</a></td><td>${sname(x.season)}</td><td class="l">${E(x.team||"")}</td><td>${x.age.toFixed(1)}</td><td>${x.pts??"–"} / ${x.reb??"–"} / ${x.ast??"–"}</td><td style="color:${dcol(x.r,6)};font-weight:500">${sgn(x.r)}</td>${x.fut.map((v,i)=> v==null && x.season+i+1 >= 2026 ? `<td class="mute" title="season not finished">not yet</td>` : cell(v)).join("")}</tr>`).join("");
   const W=520, H=220, L=40, R=60, T=14, B=28;
   const pts = [0,1,2,3];
   const bands = pts.map(k => k===0 ? [c.base_r,c.base_r,c.base_r,c.base_r,c.base_r] : (c.band[k]||null));
