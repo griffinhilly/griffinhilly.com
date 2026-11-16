@@ -3,6 +3,8 @@
 // built by scripts/pp_sipm_breakdown.py from scripts/ov_sipm_decomp.py (parts add up to the published rating, checked in the build).
 // The section is placed after the first section by a WIRES hook (the page's render list is not edited); it replaces the
 // older approximate "Where the rating comes from" section (modParts, hub box map), which is removed from the page when this one shows.
+// Stat chips (2026-11-16, H3): when mods/statdist.js is loaded, each stat step gets a chip line (his Basketball-Reference stat +
+// league percentile, linking to #s-<stat>-<year>-p<id>) and a control above the columns; players without stat steps get a strip.
 const BDCSS = `
 #m-sipmbd .bdcols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 32px;margin-top:6px}
 @media (max-width:760px){#m-sipmbd .bdcols{grid-template-columns:minmax(0,1fr)}}
@@ -46,8 +48,11 @@ function modBreakdown(d){
   const nm = String(d.name || "");
   const head = `<section class="mod" id="m-sipmbd"><style>${BDCSS}</style>
   <div class="mhead"><h2>Where his rating comes from<span class="new">new</span></h2></div>`;
+  const sdOn = typeof sdControl === "function" && typeof sdStrip === "function";
+  const sdRow = (key, side) => typeof sdRowChips === "function" ? sdRowChips(d, key, side) : "";
   if (B.v === "none" || s.r_proj == null) {
-    return head + `<p class="lede">SiPM has no rating for ${E(d.name)} yet: he has no recent NBA rating and no draft-based estimate, so there is nothing to break down.</p></section>`;
+    const strip = sdOn ? sdStrip(d) : "";
+    return head + `<p class="lede">SiPM has no rating for ${E(d.name)} yet: he has no recent NBA rating and no draft-based estimate, so there is nothing to break down.</p>${strip ? sdControl(d, true) + strip : ""}</section>`;
   }
   const rows = M.rows, groups = M.groups[B.v] || [];
   const side = {o: B.o || [], d: B.d || []}, pub = {o: s.r_proj_o, d: s.r_proj_d};
@@ -71,7 +76,7 @@ function modBreakdown(d){
       h += `<div class="bdg">${E(gt)}</div>`;
       for (const i of idx) {
         const [a, b] = cum[k][i], t = disp[k][i], r = rows[keys[i]] || [keys[i], ""];
-        h += `<div class="bdr"><span class="bdl" title="${E(r[1])}">${E(r[0])}</span><span class="bdt">${zero}${t ? bar(a, b, t > 0 ? "var(--hot)" : "var(--cold)") : ""}</span><span class="bdv">${bdFmt(t)}</span></div>`;
+        h += `<div class="bdr"><span class="bdl" title="${E(r[1])}">${E(r[0])}</span><span class="bdt">${zero}${t ? bar(a, b, t > 0 ? "var(--hot)" : "var(--cold)") : ""}</span><span class="bdv">${bdFmt(t)}</span></div>` + sdRow(keys[i], k);
       }
     }
     const T = Math.round(parseFloat(pub[k].toFixed(1)) * 10);
@@ -109,7 +114,8 @@ function modBreakdown(d){
   return head + `<p class="lede">${lede}</p>
   <div class="bdsum">${sum}</div>
   <p class="note"><b style="color:var(--ink)">How to read this:</b> start at 0, an average NBA player. Each bar adds (warm colour) or takes away (blue) points per 100 possessions, starting where the bar above it ended. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.</p>
-  <div class="bdcols">${chart("o", "Offence")}${chart("d", "Defence")}</div>
+  ${sdOn ? (B.v === "sipm" ? sdControl(d, false) : "") : ""}<div class="bdcols">${chart("o", "Offence")}${chart("d", "Defence")}</div>
+  ${sdOn && B.v !== "sipm" ? (s => s ? sdControl(d, true) + s : "")(sdStrip(d)) : ""}
   <details><summary>What each step means</summary><dl>${dl}</dl><p class="note">${how}</p></details></section>`;
 }
 
