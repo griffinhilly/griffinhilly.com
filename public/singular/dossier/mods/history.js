@@ -2,7 +2,8 @@
 // scripts/pp_history.py). Routes: #t-<CODE>-<season start year> (e.g. #t-CHI-1995 = 1995-96 Bulls); #teams, #teams-<year>;
 // #p-<id> for a player without a current page renders his retired page (show() is wrapped once the page script has loaded).
 // Nothing loads at start: teams.json + names.json on the first search focus or team route; t/<year>.json per season viewed;
-// p/pNN.json (id % 64) per retired player; careers/cNN.json (10-game dots, from pp_compare.py) for his trajectory chart.
+// p/pNN.json (id % 64) per retired player; his "Impact by age" chart comes from mods/compare.js (traj/tNN.json, pp_traj.py);
+// careers/cNN.json (10-game dots, from pp_compare.py) only feeds the fallback chart hxRetChart when compare.js is absent.
 const HX = { t: {}, p: {}, c: {}, cd: {}, idx: null, fr: "" };
 const HX_ERA = {"1951-72": "1951-52 to 1972-73", "1973-82": "1973-74 to 1982-83", "1983-95": "1983-84 to 1995-96", "1996-2006": "1996-97 to 2006-07", "2007-26": "2007-08 to 2025-26"};
 const HX_NSHARD = 64;   // = pp_history.py NPSHARD
@@ -209,15 +210,33 @@ function hxWireChooser(T){
 }
 
 /* ---------- retired player ---------- */
+// TRAJ 2026-11-16: with mods/compare.js loaded, a retired page draws the same "Impact by age" chart as current pages (smoothed
+// trajectory, ~10-game dots, playoff series, similar careers, "+ add any player"); hxRetChart stays as the fallback without it.
 function hxRetiredPage(id, doc){
-  CUR = null;
-  const k = id % 64, have = HX.cd[k] ? HX.cd[k][id] || [] : null;
+  CUR = null; HX.ret = {id, doc};
+  const cmp = typeof modCompare === "function";
+  const k = id % 64, have = cmp ? null : HX.cd[k] ? HX.cd[k][id] || [] : null;
   $("#app").innerHTML = hxRetiredHTML(id, doc, have);
+  if (cmp && typeof cmpWire === "function") cmpWire();
   window.scrollTo(0, 0);
-  if (!have) hxDots(id).then(ds => {
+  if (!cmp && !have) hxDots(id).then(ds => {
     const el = document.querySelector("#hx-chart");
     if (el && hxHere(`#p-${id}`)) el.innerHTML = hxRetChart(doc, ds);
   }).catch(() => {});
+}
+// compare.js calls this when his trajectory shard or careers.json arrives, or a chart control changes
+function hxRetRerender(id){
+  if (!HX.ret || HX.ret.id !== id || !hxHere(`#p-${id}`)) return;
+  $("#app").innerHTML = hxRetiredHTML(id, HX.ret.doc);
+  if (typeof cmpWire === "function") cmpWire();
+}
+// a retired player in the shape modCompare reads (season rows, bio, similar careers from his traj shard)
+function hxPseudo(id, doc){
+  const t = cmpTraj(id), by = CMPCAR ? CMPCAR.by : {}, wait = String.fromCharCode(8230);
+  const sug = t && t.sug ? t.sug.filter(x => !CMPCAR || by[x[0]]).map(x => [x[0], (by[x[0]] || [0, wait])[1], x[1], x[2]]) : [];
+  return {id, name: doc.n, retired: true, cmpReady: !!t, bio: {birth_date: (doc.b || [])[0] || null}, proj_path: [],
+          seasons: doc.s.filter(r => r[5] != null).map(r => ({season: r[0], r: r[5], min: r[4] || 0})),
+          cmp: {sug, tier: t ? t.tier || "" : "", posg: (by[id] || [])[2] || "", ghost: []}};
 }
 function hxRetChart(doc, dots){
   const app = typeof document !== "undefined" && document.querySelector ? document.querySelector("#app") : null;
@@ -288,14 +307,14 @@ function hxRetiredHTML(id, doc, dots){
     </div>
     <div class="figs">${figs}</div>
   </header>
-  <section class="mod" id="hx-traj"><div class="mhead"><h2>Trajectory</h2><span class="note">rating by age</span></div>
-    <div id="hx-chart">${hxRetChart(doc, dots)}</div></section>
+  ${typeof modCompare === "function" ? modCompare(hxPseudo(id, doc)) : `<section class="mod" id="hx-traj"><div class="mhead"><h2>Trajectory</h2><span class="note">rating by age</span></div>
+    <div id="hx-chart">${hxRetChart(doc, dots)}</div></section>`}
   ${shape}
   <section class="mod" id="hx-seasons"><div class="mhead"><h2>Season by season</h2><span class="note">click a team for that team season</span></div>
     <div class="tbl"><table class="hx-tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th class="l">${ap ? "As played" : "Rating"}${st}</th><th>Off</th><th>Def</th>${ap ? `<th title="His Singular SiPM at the end of that season: its projection for the following season">Forecast<br><small>next season</small></th>` : ""}<th title="Season mean of his box-score game rating, the one measure that exists in every era">Box</th><th>Age</th><th>G</th><th>Min</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offence + defence." : "Rating = Singular SiPM (offence + defence)."} ${hxEraNote(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
   </section>
-  <footer>Ratings: Singular SiPM (all-time data from 1951-52). Latent path and career shape: experimental, item D (2026-11-16).</footer>`;
+  <footer>Ratings: Singular SiPM (all-time data from 1951-52). Smoothed trajectory: item D's career-path model (November 2026).</footer>`;
 }
 
 /* ---------- search box, Teams link, team links on current players' tables ---------- */
