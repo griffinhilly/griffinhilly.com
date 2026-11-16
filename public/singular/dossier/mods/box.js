@@ -70,7 +70,7 @@ function bxCols(tab){
     cnt("ft","FT","Free throws made"), cnt("fta","FTA","Free throw attempts"), ["ftp","FT%","p3","Free throw %"],
     ["ts","TS%","p3","True shooting %: PTS / (2 × (FGA + 0.44 × FTA))"], ["usg","USG%","p1","Usage %: share of team plays (FGA + 0.44 FTA + TOV) he used while on court"],
     cnt("orb","ORB","Offensive rebounds"), cnt("drb","DRB","Defensive rebounds"), cnt("pf","PF","Personal fouls","lo"), cnt("pm","+/-","Plus-minus: team point margin while he played")] };
-  if (tab === "adv") return { groups: [["",5],["Shooting efficiency",4],["Role",3],["Rebounding",3],["Defense",2],["SiPM rating, pts/100",3]], cols: [...B,
+  if (tab === "adv") return { groups: [["",5],["Shooting efficiency",4],["Role",3],["Rebounding",3],["Defense",2],[(META.bx_meta || {}).ap ? "As played, pts/100" : "SiPM rating, pts/100",3]], cols: [...B,
     ["ts","TS%","p3","True shooting %: PTS / (2 × (FGA + 0.44 × FTA))"], ["efg","eFG%","p3","Effective FG %: (FG + 0.5 × 3P) / FGA"],
     ["tpar","3PAr","p3","Three-point attempt rate: 3PA / FGA"], ["ftr","FTr","p3","Free throw rate: FTA / FGA"],
     ["usg","USG%","p1","Usage %: share of team plays (FGA + 0.44 FTA + TOV) he used while on court"],
@@ -78,7 +78,9 @@ function bxCols(tab){
     ["tovp","TOV%","p1","Turnover %: turnovers per 100 plays (FGA + 0.44 FTA + TOV)","lo"],
     ["orbp","ORB%","p1","Offensive rebound %: share of available offensive rebounds he grabbed"], ["drbp","DRB%","p1","Defensive rebound %"], ["trbp","TRB%","p1","Total rebound %"],
     ["stlp","STL%","p1","Steal %: steals per 100 opponent possessions while on court"], ["blkp","BLK%","p1","Block %: share of opponent two-point attempts he blocked"],
-    ["r","SiPM","sg","Our Singular rating: points per 100 possessions vs an average player"], ["ro","Off","sg","Offensive part of SiPM"], ["rd","Def","sg","Defensive part of SiPM"]] };
+    ...((META.bx_meta || {}).ap  // 2026-11-16 (pp_boxtables.py AS_PLAYED): the season's own rating, not SiPM's next-season projection
+      ? [["r","Rating","sg","As played: his Singular rating for that season itself (that season's lineup results, shrunk toward his box-score rating), points per 100 possessions vs an average player"], ["ro","Off","sg","Offensive part"], ["rd","Def","sg","Defensive part"]]
+      : [["r","SiPM","sg","Our Singular rating: points per 100 possessions vs an average player"], ["ro","Off","sg","Offensive part of SiPM"], ["rd","Def","sg","Defensive part of SiPM"]])] };
   return { groups: [["",5],["Percentages",6],["Shot diet",2],["Share of FGA by zone",5],["FG% by zone",5],["",1]], cols: [B[0],B[1],B[2],B[3],
     ["fgapg","FGA","1","Field goal attempts per game","nb"],
     ["fgp","FG%","p3","Field goal %"], ["twp","2P%","p3","Two-point %"], ["tpp","3P%","p3","Three-point %"], ["ftp","FT%","p3","Free throw %"],
@@ -212,7 +214,7 @@ function modBox(d){
   const leg = `<div class="bxleg">
     <span><i class="sw" style="background:${mix(panel, cold, 0.3)}"></i>bottom of the league</span>
     <span><i class="sw" style="background:${mix(panel, hot, 0.3)}"></i>top of the league</span>
-    <span>Shading = his percentile that season among players with ${po ? "100+ playoff" : "500+"} minutes${po ? "" : " (scaled for short seasons)"}; ${tab === "shoot" ? "" : "turnovers and fouls are flipped so red is always good."}${tab === "adv" ? " SiPM is shaded by its value (±6 = full colour)." : ""}</span>
+    <span>Shading = his percentile that season among players with ${po ? "100+ playoff" : "500+"} minutes${po ? "" : " (scaled for short seasons)"}; ${tab === "shoot" ? "" : "turnovers and fouls are flipped so red is always good."}${tab === "adv" ? ((M.ap ? " The as-played rating" : " SiPM") + " is shaded by its value (±6 = full colour).") : ""}</span>
     <span><b style="color:var(--ink)">Bold</b> = his best season in that column.</span>
     <span>Hover a cell for the exact percentile.</span></div>`;
   const foot = `<p class="note" style="margin-top:6px">${po ? "Playoffs" : "Regular season"}${(tab === "basic" || po) ? `, ${ml}` : ""}. Possessions: each game, the average of his team's and the opponent's FGA + 0.44 × FTA − OREB + TOV, times his share of the minutes. Per-75 points match the Singular hub within 1%. Games from 2003-04 on; ${sname(Math.max(...Object.keys(M.thr).map(Number)))} in progress. TOT = all teams in a traded season, with each team's line below it.</p>`;

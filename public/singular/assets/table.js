@@ -65,7 +65,7 @@ function render(){
  for(var i=0;i<list.length;i++){var r=list[i];out.push('<tr>');
   for(var j=0;j<cs.length;j++){var c=cs[j],cl=c.cls||'';
    if(c.k==='rk'){out.push('<td class="rk '+cl+'">'+(i+1)+'</td>');continue}
-   if(c.k==='name'){out.push('<td class="nm '+cl+'"><a href="/singular/p/'+r.slug+'/">'+r.name.replace(/</g,'&lt;')+'</a></td>');continue}
+   if(c.k==='name'){out.push('<td class="nm '+cl+'"><a href="'+(window.DOSS&&DOSS[r.id]?'/singular/dossier/#p-'+r.id:'/singular/p/'+r.slug+'/')+'">'+r.name.replace(/</g,'&lt;')+'</a></td>');continue}
    if(c.k==='bar'){out.push('<td class="'+cl+'">'+bar(r)+'</td>');continue}
    var v=val(r,c);out.push('<td class="'+cl+'"'+shade(c,v)+'>'+(c.k==='peak_age'&&r.peak_now?'now':fmt(v,c))+'</td>')}
   out.push('</tr>')}

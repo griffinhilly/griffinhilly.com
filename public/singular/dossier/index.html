@@ -126,6 +126,8 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
 <script src="mods/fantasy9.js"></script>
 <script src="mods/history.js"></script>
 <script src="mods/statdist.js"></script>
+<script src="mods/asplayed.js"></script>
+<script src="mods/dossierfirst.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -242,7 +244,7 @@ function render(){
   ${modContract(d)}
   ${modCombine(d)}
   ${modDraft(d)}
-  ${modCareer(d)}
+  ${typeof modCareerAP === "function" ? modCareerAP(d) : modCareer(d)}
   ${modPlayoffs(d)}
   ${modHofTraj(d)}
   ${modAwards(d)}
