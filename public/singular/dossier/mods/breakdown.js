@@ -6,6 +6,10 @@
 // 1. "Box score: his offensive / defensive stats" (own-side stats only; rim deterrence as a labelled play-by-play sub-row on
 // defence), 2. "Patterns beyond the box" (cross-side stat terms, size and experience, minutes, the model's constant; each with
 // one pattern line), 3. lineup results, 4. projection, 5. this season. Each layer heading shows its subtotal.
+// Credit order (R1b, 2026-11-16, Griffin: "Size should be the residual after offensive rebounds"): when META.sipmbd_meta.attribution
+// is present (pp_sipm_breakdown.py SEQUENTIAL_ATTRIBUTION = True), layers 1-2 hold an ordered split of the same box rating
+// (own-side stats, then cross-side stats, then minutes / height / age; method "nested" is exact, "stagewise" adds a "Model
+// remainder" row) and the lede, the layer-2 note and "What each step means" say so. Without it the page reads as R1.
 // The section is placed after the first section by a WIRES hook (the page's render list is not edited); it replaces the
 // older approximate "Where the rating comes from" section (modParts, hub box map), which is removed from the page when this one shows.
 // Stat chips (H3; R1 layout): when mods/statdist.js is loaded, each own-side stat step shows its chips (his Basketball-Reference
@@ -83,6 +87,13 @@ function modBreakdown(d){
   const groups = M.groups[B.v] || [];
   const side = {o: B.o || [], d: B.d || []}, pub = {o: s.r_proj_o, d: s.r_proj_d};
   const SW = {o: "offence", d: "defence"};
+  const AT = M.attribution || null, ADJ = {o: "offensive", d: "defensive"};
+  const remRow = !!(AT && AT.remainder && AT.remainder.row);
+  // layer-2 note: R1 (joint terms) or ordered credit
+  const beyondNote = k => !AT ? `What lineup data shows beyond his own ${ADJ[k]} stats. Each part is measured from the average player, so having less of a trait than average flips its sign.`
+    : `Credit given after his ${ADJ[k]} stats, in this order: his ${ADJ[k === "o" ? "d" : "o"]} stats first, then his minutes, height and age. `
+      + (AT.method === "nested" ? "Each gets credit only for what it adds beyond the stats before it, so a part is negative when he has less of something than his stats suggest, or when the pattern runs against him."
+         : "Each part is measured from the average player. The last row is what the ordered steps leave over.");
   const disp = {}, cum = {};
   let lo = 0, hi = 0;
   for (const k of ["o", "d"]) {
@@ -102,7 +113,7 @@ function modBreakdown(d){
       if (!idx.length) continue;
       const gsum = idx.reduce((a, i) => a + disp[k][i], 0);
       h += `<div class="bdg" data-g="${E(g[0])}"><span>${E(bdGTitle(g, k))}</span><span class="bdgt">${bdFmt(gsum)}</span></div>`;
-      if (g[0] === "beyond") h += `<p class="bdgn">What lineup data shows beyond his own ${SW[k] === "offence" ? "offensive" : "defensive"} stats. Each part is measured from the average player, so having less of a trait than average flips its sign.</p>`;
+      if (g[0] === "beyond") h += `<p class="bdgn">${beyondNote(k)}</p>`;
       for (const i of idx) {
         const key = keys[i], t = disp[k][i], r = R[key] || [key, ""];
         const [a, b] = cum[k][i];
@@ -135,7 +146,8 @@ function modBreakdown(d){
   const games = B.gp ? `his ${B.gp} game${B.gp === 1 ? "" : "s"} this season <b>${stv.season}</b>` : "no games yet this season";
   let lede, sum;
   if (B.v === "sipm") {
-    lede = `SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. It builds that number in layers. First his box-score stats: offensive stats count toward his offence, defensive stats toward his defence. Then patterns that lineup data shows beyond the box score, such as height and age. Then how his lineups actually did, and a projection step for age and role. This season's games update it from there.`;
+    lede = AT ? `SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. It builds that number in layers, giving credit in order. First his box-score stats for each end of the floor: offensive stats toward his offence, defensive stats toward his defence. Then, only for what those leave unexplained, his stats from the other end of the floor, and then his minutes, height and age. Then how his lineups actually did, and a projection step for age and role. This season's games update it from there.`
+      : `SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. It builds that number in layers. First his box-score stats: offensive stats count toward his offence, defensive stats toward his defence. Then patterns that lineup data shows beyond the box score, such as height and age. Then how his lineups actually did, and a projection step for age and role. This season's games update it from there.`;
     sum = `<span>Box-score stats <b>${stv.box}</b></span><span>Patterns beyond the box <b>${stv.beyond}</b></span><span>Lineup results <b>${stv.lineups}</b></span><span>Age and role <b>${stv.proj}</b></span><span>${B.gp ? `${B.gp} game${B.gp === 1 ? "" : "s"} this season` : "This season (no games yet)"} <b>${stv.season}</b></span>`;
   } else if (B.v === "sipm_gap") {
     lede = `SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. He has no 2025-26 rating (he played little or not at all last season), so SiPM starts from his rating after ${sname(B.last)} and rolls it forward to this season; ${games}.`;
@@ -162,7 +174,12 @@ function modBreakdown(d){
     const pick = gk => { const g = groups.find(x => x[0] === gk); return g ? ["o", "d"].flatMap(k => bdGKeys(g, k).map(key => [key, k])) : []; };
     const seen = new Set();
     const boxDl = dlOf(pick("box"), seen), restDl = dlOf(["lineups", "proj", "season"].flatMap(pick), new Set());
-    how = `<h4>Box score</h4>${boxDl}<p class="note">SiPM's box-score model reads his stats per 36 minutes, adjusted for opponents, from last season (2025-26). Here each stat counts only on its own end of the floor: scoring, shooting, assists, offensive rebounds and turnovers on offence; defensive rebounds, steals, blocks and fouls on defence. Rim deterrence is a defensive measure from play-by-play (how many fewer shots opponents take at the rim with him on the floor), so it is listed on defence but marked as not from the box score.</p>
+    const restNote = `<p class="note">A lineup model starts from the box-score rating and moves it by how his lineups actually scored and defended, carrying earlier seasons forward at three-quarters weight a year. A projection step then weighs the two by how well each predicted the next season and adds age and role. His box-score games this season move it from there. Parts are measured from the average player-season the model learned from.</p>`;
+    const nfmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (AT) how = `<h4>Box score</h4>${boxDl}<p class="note">SiPM's box-score model reads his stats per 36 minutes, adjusted for opponents, from last season (2025-26), together with his minutes, height and age, and predicts how his lineups did at each end of the floor. This page splits that box-score rating by giving credit in order. Step 1: the stats for that end of the floor take all the credit they can explain on their own: scoring, shooting, assists, offensive rebounds and turnovers on offence; defensive rebounds, steals, blocks and fouls on defence. Rim deterrence is a defensive measure from play-by-play (how many fewer shots opponents take at the rim with him on the floor), so it is listed on defence but marked as not from the box score.</p>
+    <h4>Patterns beyond the box</h4><p class="note">Step 2: his stats from the other end of the floor get credit only for what step 1 left unexplained${AT.method === "nested" ? ", and only for the part of each stat that his own-end stats do not already predict" : ""}. Step 3: his minutes, height and age get credit for what is still left${AT.method === "nested" ? ", again only beyond what his stats already say about them" : ""}. So a center's rebounds and blocks are credited before his height${AT.method === "nested" ? ": a tall player whose stats already look like a tall player's gets little extra for size, and a minus when his stats look like those of an even taller player" : ""}. ${remRow ? `Because his stats and traits overlap, the steps do not add up exactly: the "Model remainder" row holds the difference (about ${(+AT.remainder.sd.o).toFixed(1)} either way on offence and ${(+AT.remainder.sd.d).toFixed(1)} on defence for a typical player).` : "Nothing is left over: the steps and the starting value add up exactly to his box-score rating."} The order changes only how credit is split between these rows; his box-score rating, and so his overall rating, would be the same in any order. The split is fitted on the ${nfmt(AT.n_player_seasons)} player-seasons since ${E(AT.since)} that the model learned from, weighted by possessions. Each line under a bar says which way the pattern runs. These are patterns the fit found; the model does not say why they happen.</p>
+    <h4>Lineups, projection and this season</h4>${restDl}${restNote}`;
+    else how = `<h4>Box score</h4>${boxDl}<p class="note">SiPM's box-score model reads his stats per 36 minutes, adjusted for opponents, from last season (2025-26). Here each stat counts only on its own end of the floor: scoring, shooting, assists, offensive rebounds and turnovers on offence; defensive rebounds, steals, blocks and fouls on defence. Rim deterrence is a defensive measure from play-by-play (how many fewer shots opponents take at the rim with him on the floor), so it is listed on defence but marked as not from the box score.</p>
     <h4>Patterns beyond the box</h4><p class="note">The box-score model reads his whole stat line, height, age and minutes at once to predict how his lineups did at each end of the floor, with weights fitted on every season since 1996-97. Some weights cross over: once his offensive stats are counted, his blocks or defensive rebounds still say something about how his offence went in lineup data. Those cross-over parts, his size and age, his minutes, and the model's fixed starting value are not offensive or defensive stats, so they sit in this middle layer. Each line under a bar says which way the pattern runs. These are patterns the fit found; the model does not say why they happen.</p>
     <h4>Lineups, projection and this season</h4>${restDl}<p class="note">A lineup model starts from the box-score rating and moves it by how his lineups actually scored and defended, carrying earlier seasons forward at three-quarters weight a year. A projection step then weighs the two by how well each predicted the next season and adds age and role. His box-score games this season move it from there. Parts are measured from the average player-season the model learned from.</p>`;
   } else {
