@@ -291,7 +291,7 @@ function hxRetiredHTML(id, doc, dots){
       + `<td>${age != null ? Math.floor(age) : "\u2013"}</td><td>${g ?? "\u2013"}</td><td>${hxInt(mn)}</td><td>${hxF1(pts)}</td><td>${hxF1(reb)}</td><td>${hxF1(ast)}</td></tr>`;
   }).join("");
   const shape = dk ? `<section class="mod" id="hx-shape"><div class="mhead"><h2>Career shape <span class="new">experimental</span></h2></div>
-    <p class="lede">A new measure (November 2026), still under review. It treats each season's rating as a noisy reading of his true level, with short seasons counting less, and smooths the readings into one path: the purple line above. "Sustained peak" is the level he reached and held, the average of that path over his best five straight seasons.</p>
+    <p class="lede">A new measure (November 2026), still under review. It treats each season's rating as a noisy reading of his true level, with short seasons counting less, and smooths the readings into one path${typeof LINE_MODE !== "undefined" && LINE_MODE === "dots" ? " (not the line on the chart above, which averages his ten-game ratings)" : ": the purple line above"}. "Sustained peak" is the level he reached and held, the average of that path over his best five straight seasons.</p>
     <div class="figs" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
       ${fig("Sustained peak", hxS(dk[0]), `${sname(dk[3])} to ${sname(dk[4])} \u00b7 80% range ${hxS(dk[1])} to ${hxS(dk[2])}`)}
       ${fig("Seasons at +4 or better", dk[5] ?? "\u2013", dk[5] ? `ages ${dk[6]} to ${dk[7]} (his path above +4)` : "his path never reached +4")}
@@ -314,7 +314,7 @@ function hxRetiredHTML(id, doc, dots){
     <div class="tbl"><table class="hx-tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th class="l">${ap ? "As played" : "Rating"}${st}</th><th>Off</th><th>Def</th>${ap ? `<th title="His Singular SiPM at the end of that season: its projection for the following season">Forecast<br><small>next season</small></th>` : ""}<th title="Season mean of his box-score game rating, the one measure that exists in every era">Box</th><th>Age</th><th>G</th><th>Min</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offence + defence." : "Rating = Singular SiPM (offence + defence)."} ${hxEraNote(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
   </section>
-  <footer>Ratings: Singular SiPM (all-time data from 1951-52). Smoothed trajectory: item D's career-path model (November 2026).</footer>`;
+  <footer>Ratings: Singular SiPM (all-time data from 1951-52). ${typeof LINE_MODE !== "undefined" && LINE_MODE === "dots" ? "Smoothed line: a minutes-weighted average of his ten-game ratings." : "Smoothed trajectory: item D's career-path model (November 2026)."}</footer>`;
 }
 
 /* ---------- search box, Teams link, team links on current players' tables ---------- */

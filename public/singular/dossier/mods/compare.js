@@ -6,6 +6,11 @@
 // [age, rating, minutes, games], po = playoff series [age, rating, minutes, games, season, opponent, round, W, L, minutes estimated],
 // sug / tier = similar careers for retired players. TRAJ 2026-11-16: also drawn on retired pages (mods/history.js calls
 // modCompare with a retired player, d.retired = true; CMPD = the player being drawn, CUR stays null there).
+// TRAJ2 2026-11-16 (Griffin: "one dot per season" is not the line he wants): LINE_MODE "dots" = every player's bold line is the
+// minutes-weighted smoother through his ~10-game dots (cmpTrend, the line drawn before TRAJ: bandwidth 0.45 years, no per-season
+// markers, no band); a rated season with no game dots joins the smoother as one point at that season's age, weighted by its
+// minutes (cmpFill). "d_season" = TRAJ's season-level line from item D's model with its 80% band (traj l / ls; kept, off).
+const LINE_MODE = "dots";
 let CMPX = "age", CMPGHOST = false, CMPCAR = null, CMPLOAD = null, CMPW = 0, CMPD = null;
 const CMPST = {};  // player id -> {on: [ids shown], extra: [ids added by search]}
 const CMPTJ = {};  // traj shard number -> object, or "loading"
@@ -68,7 +73,7 @@ function cmpLine(t){
 // players with dots but no trajectory line (2026-27 rookies): minutes-weighted Gaussian smoother through the dots
 // (bandwidth half a season); breaks across gaps of a year or more
 function cmpTrend(id, dots){
-  if (CMPTR[id] && CMPTR[id].n === dots.length) return CMPTR[id].t;
+  if (CMPTR[id] && CMPTR[id].n === dots.length && CMPTR[id].src === dots) return CMPTR[id].t;   // same array (cmpFill makes a new one)
   const bw = 0.45, out = [];
   if (dots.length) {
     const a0 = dots[0][0], a1 = dots[dots.length-1][0];
@@ -82,8 +87,14 @@ function cmpTrend(id, dots){
     }
     if (seg.length) out.push(seg);
   }
-  CMPTR[id] = {n: dots.length, t: out};
+  CMPTR[id] = {n: dots.length, src: dots, t: out};
   return out;
+}
+// LINE_MODE "dots": his ~10-game dots plus, for each rated season [age, r, min, season] with no dot within 0.6 years of that
+// season's age (Feb 1), one point [age, r, min, 0]; sorted by age. Pseudo-points feed the smoother only, never the cloud.
+function cmpFill(dots, rows){
+  const add = (rows || []).filter(r => r[0] != null && r[1] != null && r[2] > 0 && !dots.some(p => Math.abs(p[0] - r[0]) <= 0.6)).map(r => [r[0], r[1], r[2], 0]);
+  return add.length ? dots.concat(add).sort((a, b) => a[0] - b[0]) : dots;
 }
 
 function cmpState(d){
@@ -131,9 +142,10 @@ function modCompare(d){
   const dashOf = id => ids.indexOf(id) >= CMPPAL.length ? "6 3" : "";
 
   // series: {name, col, me, dots | null, line [segments], ls, po, trend, rows [age, r, min, season], xs}
-  const mkS = (id, name, col, dash, xs, rows, isMe) => { const tj = cmpTraj(id), dt = tj ? tj.f || [] : null, ln = tj ? cmpLine(tj) : [];
+  const mkS = (id, name, col, dash, xs, rows, isMe) => { const tj = cmpTraj(id), dt = tj ? tj.f || [] : null, ln = tj && LINE_MODE !== "dots" ? cmpLine(tj) : [];
+    const fr = LINE_MODE === "dots" && CMPCAR && CMPCAR.by[id] ? CMPCAR.by[id][4] : rows;   // season rows on the dots' scale (as played)
     return {id, name, col, dash, me: isMe, xs, rows, dots: dt, line: ln, ls: tj ? tj.ls || "" : "", po: isMe && tj ? tj.po || [] : [],
-            trend: !ln.length && dt && dt.length ? cmpTrend(id, dt) : []}; };
+            trend: !ln.length && dt && dt.length ? cmpTrend(id, LINE_MODE === "dots" ? cmpFill(dt, fr) : dt) : []}; };
   const series = comps.map(c => mkS(c[0], c[1], colOf(c[0]), dashOf(c[0]), xsOf(c[3]), c[4], false));
   const meS = mkS(d.id, d.name, css("--brown"), "", xsMe, me.map(s => [s.age, s.r, s.min, s.season]), true);
   series.push(meS);
@@ -204,8 +216,9 @@ function modCompare(d){
         if (s.me) trends += seg.map((p, i) => `<circle cx="${f1(pts[i][0])}" cy="${f1(pts[i][1])}" r="${small ? 2.4 : 2.8}" fill="${s.col}"><title>${E(sname(p[0]))} (age ${fmtA(p[1])}): smoothed ${sgn(p[2])}${p[3] != null ? `, 80% range ${sgn(p[2] - 1.2816 * p[3])} to ${sgn(p[2] + 1.2816 * p[3])}` : ""}</title></circle>`).join("");
       });
       const ls = s.line[s.line.length-1], lp = ls[ls.length-1]; last = [Xp(s.xs(lp[1], lp[0])), Yp(lp[2]), lp[2]];
-    } else if (s.trend.length) {  // no completed season (2026-27 rookie): a simple smoother through his dots
-      s.trend.forEach(seg => { trends += `<path class="${s.me ? "trd me" : "trd"}" d="${path(seg.map(p => [Xp(s.xs(p[0], null)), Yp(p[1])]))}" fill="none" stroke="${s.col}" stroke-width="${s.me ? 3 : 2.2}" stroke-dasharray="${s.dash || ""}" stroke-linejoin="round" stroke-linecap="round"/>`; });
+    } else if (s.trend.length) {  // LINE_MODE "dots": every player; "d_season": no completed season (2026-27 rookie)
+      const dl = LINE_MODE === "dots";   // the pre-TRAJ look: same weights as the season line it replaces
+      s.trend.forEach(seg => { trends += `<path class="${dl ? (s.me ? "trj me" : "trj c") : s.me ? "trd me" : "trd"}" d="${path(seg.map(p => [Xp(s.xs(p[0], null)), Yp(p[1])]))}" fill="none" stroke="${s.col}" stroke-width="${dl ? (s.me ? 3.4 : 2.4) : s.me ? 3 : 2.2}" stroke-dasharray="${s.dash || ""}" stroke-linejoin="round" stroke-linecap="round"/>`; });
       const ls = s.trend[s.trend.length-1], lp = ls[ls.length-1]; last = [Xp(s.xs(lp[0], null)), Yp(lp[1]), lp[1]];
     } else if (s.rows.length) {  // no trajectory or game dots (yet): his season ratings as a line
       const pts = s.rows.map(r => [Xp(s.xs(r[0], r[3])), Yp(r[1])]);
@@ -237,8 +250,11 @@ function modCompare(d){
   const chip = (x, extra) => { const on = ids.includes(x[0]); const tip = extra ? "added by you" : `career-arc gap ${x[2]} points over ${x[3]} shared ages`;
     return `<button data-id="${x[0]}" aria-pressed="${on}" title="${E(x[1])}: ${E(tip)}"><i style="background:${on ? colOf(x[0]) : css("--line")}"></i>${E(x[1])}${extra ? " \u00d7" : ""}</button>`; };
   const extras = st.extra.map(id => { const c = CMPCAR && CMPCAR.by[id]; return c ? [id, c[1]] : null; }).filter(Boolean);
-  const tierTxt = {top: "He is one of the all-time top tier, so these are the other all-time greats, whatever their position, closest in peak and standing.",
-    great: "He is in the all-time top 75 or so, so these are players of similar impact from his era (close in age, overlapping careers), with the same position a bonus."}[cm.tier]
+  const sim2 = (META.cmp_meta || {}).sim === 2;   // pp_compare.py SIM_V2 (TRAJ2): peak first, position and shares break ties
+  const tierTxt = (sim2 ? {top: "He is one of the all-time top tier, so these are the other all-time greats closest to his peak (best three seasons within about 1.5 points), then closest in career shape and length; position and assist and rebound shares only break ties.",
+    great: "He is in the all-time top 75 or so, so these are other greats closest to his peak (within about 1.5 points), then in career shape and length, preferring his era; position and assist and rebound shares only break ties."}
+    : {top: "He is one of the all-time top tier, so these are the other all-time greats, whatever their position, closest in peak and standing.",
+    great: "He is in the all-time top 75 or so, so these are players of similar impact from his era (close in age, overlapping careers), with the same position a bonus."})[cm.tier]
     || (d.retired ? "Players whose whole careers looked like his, from any era: rating at the same ages, peak, career value and length, position, assist and rebound shares, and height."
       : "Players who, at his age, were his type (position, height, assist and rebound shares, rating curve so far) and then played at least three more seasons, so you can see where those careers went. Recent players are preferred; one is always active or retired within five seasons.");
   const addBox = `<input id="cmpAdd" list="cmpList" placeholder="+ add any player" aria-label="Add any player to the chart" autocomplete="off">`;
@@ -252,7 +268,7 @@ function modCompare(d){
   const lnSw = `<svg width="22" height="12" aria-hidden="true">${meS.ls === "d" ? `<rect x="0" y="1" width="22" height="10" fill="${br}" opacity=".16"/>` : ""}<line x1="1" x2="21" y1="6" y2="6" stroke="${br}" stroke-width="3"/></svg>`;
   const dia = `<svg width="12" height="12" aria-hidden="true"><path d="M6 1.2L10.8 6L6 10.8L1.2 6Z" style="fill:var(--po)"/></svg>`;
   const loading = !CMPCAR || series.some(s => s.dots === null);
-  const legend = `<div class="cmpleg"><span>${dot(br)}about ten games, regular season</span>${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>` : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
+  const legend = `<div class="cmpleg"><span>${dot(br)}about ten games, regular season</span>${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? (LINE_MODE === "dots" ? `<span>${sw(br, "", 3.4)}smoothed line through his dots</span>` : `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>`) : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
 
   const nowA = me.length ? me[me.length-1].age : null, ak = nowA != null ? Math.floor(nowA) : null;
   const atAge = rows => { if (ak == null) return null; const r = rows.find(x => Math.floor(x[0]) === ak); return r ? r[1] : null; };
@@ -268,7 +284,7 @@ function modCompare(d){
   const lineTxt = meS.line.length ? (meS.ls === "d"
       ? " The smoothed trajectory treats each season's rating as a noisy reading of his true level (short seasons count less, and a player's level usually changes gradually with age) and smooths the readings across his whole career; the band is the 80% range of that level. It breaks where he missed a whole season. Method: item D's career-path model (November 2026), checked on held-out seasons."
       : " He has no season of 100+ minutes, so his line is a simple minutes-weighted average of his season ratings (no band).")
-    : meS.trend.length ? " He has no completed season yet, so his line is a simple minutes-weighted average of his dots." : "";
+    : meS.trend.length ? (LINE_MODE === "dots" ? " The bold line averages nearby dots, weighted by minutes, over about half a season either side." : " He has no completed season yet, so his line is a simple minutes-weighted average of his dots.") : "";
   const notes = `<p class="note" style="margin-top:8px">${E(tierTxt)} How the dots are made: Singular's box-score rating of every game, shifted so each season averages ${(META.cmp_meta || {}).ap ? "his as-played rating for that season (1996-97 on: that season's own rating, not SiPM's next-season projection; 2026-27: his current forecast)" : "his season SiPM rating (2026-27: his current projection)"}. Each season's games are then split, in order, into groups of about ten (a 78-game season makes eight dots: six of 10 games and two of 9); a group never crosses seasons. Playoff games get the same game rating and the same season shift, one dot per series; before 1969-70 many playoff box scores lack minutes, and those are estimated from his regular-season minutes per game. Games before 1996-97 come from the era-bridge game ratings, which are rougher (before 1973-74 no steals or blocks, and minutes are sometimes estimated), so those clouds look tighter than they really are.${lineTxt}${CMPGHOST && h1 ? ` Past forecasts: a simple model (his last three seasons weighted by minutes, his age and minutes) fitted on seasons before 2016-17, then run from each summer using only what was known then. It lags breakouts on purpose. Tested on 2016-17 to 2025-26: typical miss ${h1.rmse_model} points one season out (same-as-last-season: ${h1.rmse_same_as_last}), ${h5.rmse_model} five seasons out (same-as-last-season: ${h5.rmse_same_as_last}); its 80% bands held ${Math.round(100*h1.cover80)}\u2013${Math.round(100*h5.cover80)}% of outcomes.` : ""}</p>`;
 
   return `<section class="mod" id="m-cmp"><style>${CMPCSS}</style>${head}${lede}${chips}${legend}${svg}${tbl}${notes}</section>`;
