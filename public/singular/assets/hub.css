@@ -211,3 +211,6 @@ table.data .sep{border-left:1px solid var(--rule)}
  table.data .xw{display:none}
  .kpi .v{font-size:1.35rem}
 }
+.chart .dots.d10 circle{fill-opacity:.7}
+:root[data-theme='light'] .chart .dots.d10 circle{fill-opacity:.45}
+@media (prefers-color-scheme:light){:root:not([data-theme='dark']) .chart .dots.d10 circle{fill-opacity:.45}}
