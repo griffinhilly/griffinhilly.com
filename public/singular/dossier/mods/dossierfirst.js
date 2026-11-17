@@ -14,7 +14,7 @@ const DF_ON = true;
 const DF_SELF = true;
 // DF_HUB_LINK (with DF_SELF): the second header link, "Season-by-season page" -> /singular/p/<slug>/. Set false when Singular's
 // build_singular_hub.py HUB_PLAYER_REDIRECT goes on (those pages then redirect straight back here). False = only "Impact by age".
-const DF_HUB_LINK = true;
+const DF_HUB_LINK = false;  // off 2026-11-17 with HUB_PLAYER_REDIRECT (hub pages retired)
 // DF_PLAYERS (HUBTRAJ scope change; Griffin: "rename the dossier so that it is just the player page"): the top bar's brand and the
 // tab title read "Players" instead of "Player Dossier" (set when this file runs; the static HTML keeps the old words until
 // pp_site_stage / index.html are changed). The URL stays /singular/dossier/. False = no change.
