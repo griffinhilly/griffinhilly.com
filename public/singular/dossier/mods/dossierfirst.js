@@ -98,7 +98,7 @@ function dfAfter(){
   if (row) {
     const n = Number(DFF.n || 0).toLocaleString("en-US");
     const rk = row[2] ? `#${row[2]} of ${n} all-time (${DFF.q}+ seasons of 1,000+ minutes)` : `not ranked all-time (fewer than ${DFF.q} seasons of 1,000+ minutes)`;
-    h += `<div class="fig df-fig"><div class="k">Career, age-weighted</div><div class="v">${row[0]}</div><div class="s">${rk}${row[1] ? "<br>" + row[1] : ""}${String(row[0]).endsWith("*") ? "<br>* includes an estimated lineup part (the all-time table's opening view)" : ""}</div></div>`;
+    h += `<div class="fig df-fig"><div class="k">Career, prime-based</div><div class="v">${row[0]}</div><div class="s">${rk}${row[1] ? "<br>" + row[1] : ""}${String(row[0]).endsWith("*") ? "<br>* includes an estimated lineup part (the all-time table's opening view)" : ""}</div></div>`;
   }
   if (!h) return;
   const all = figs.querySelectorAll(":scope > .fig"), last = all[all.length - 1];
