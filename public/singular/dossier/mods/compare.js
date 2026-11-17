@@ -11,6 +11,11 @@
 // markers, no band); a rated season with no game dots joins the smoother as one point at that season's age, weighted by its
 // minutes (cmpFill). "d_season" = TRAJ's season-level line from item D's model with its 80% band (traj l / ls; kept, off).
 const LINE_MODE = "dots";
+// CHARTVIEW 2026-11-17 (Griffin: Robinson's all-time best five +9.4, yet his line "never even hits +8"): pp_traj.py TRAJ_VIEW anchors a
+// season before 1996-97 on the all-time table's opening-view value (box + estimated lineup part) and flags its dots (f[4] = 1) and
+// playoff series (po[10] = 1). CMP_VIEW_MARK draws those hollow, adds a legend entry and one note line. False, or data without
+// flags = the chart as before.
+const CMP_VIEW_MARK = true;
 let CMPX = "age", CMPGHOST = false, CMPCAR = null, CMPLOAD = null, CMPW = 0, CMPD = null;
 const CMPST = {};  // player id -> {on: [ids shown], extra: [ids added by search]}
 const CMPTJ = {};  // traj shard number -> object, or "loading"
@@ -201,9 +206,12 @@ function modCompare(d){
   // band first, then every player's cloud, then lines on top (his last), then his playoff series
   let bands = "", clouds = "", trends = "", marks = "", labs = [];
   const ord = [...series.filter(s => !s.me), ...series.filter(s => s.me)];
+  let ivN = 0;   // CMP_VIEW_MARK: hollow dots / series drawn (seasons before 1996-97 on the all-time table's opening view)
   ord.forEach(s => {
     const op = s.me ? 0.42 : 0.3, rr = s.me ? 2.1 : 1.8, cls = s.me ? "fd me" : "fd";
-    if (s.dots && s.dots.length) clouds += s.dots.filter(p => p[1] >= y0 && p[1] <= y1).map(p => `<circle class="${cls}" cx="${f1(Xp(s.xs(p[0], null)))}" cy="${f1(Yp(p[1]))}" r="${rr}" fill="${s.col}" opacity="${op}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])}</title></circle>`).join("");
+    if (s.dots && s.dots.length) clouds += s.dots.filter(p => p[1] >= y0 && p[1] <= y1).map(p => CMP_VIEW_MARK && p[4] === 1
+      ? (ivN++, `<circle class="${cls}" cx="${f1(Xp(s.xs(p[0], null)))}" cy="${f1(Yp(p[1]))}" r="${rr}" fill="none" stroke="${s.col}" stroke-width="${s.me ? 1.2 : 1}" opacity="${s.me ? 0.6 : 0.45}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])} (box score + estimated lineup part)</title></circle>`)
+      : `<circle class="${cls}" cx="${f1(Xp(s.xs(p[0], null)))}" cy="${f1(Yp(p[1]))}" r="${rr}" fill="${s.col}" opacity="${op}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])}</title></circle>`).join("");
     let last = null;
     if (s.line.length) {
       const lc = s.me ? "trj me" : "trj c", sw = s.me ? 3.4 : 2.4;
@@ -233,7 +241,8 @@ function modCompare(d){
   const poIn = meS.po.filter(p => p[1] >= y0 && p[1] <= y1);
   marks = poIn.map(p => { const x = Xp(meS.xs(p[0], null)), y = Yp(p[1]), k = small ? 3.8 : 4.4;
     const res = p[7] != null ? `, ${p[7] > p[8] ? "won" : p[7] < p[8] ? "lost" : "tied"} ${p[7]}-${p[8]}` : "";
-    return `<path class="po" d="M${f1(x)} ${f1(y - k)}L${f1(x + k)} ${f1(y)}L${f1(x)} ${f1(y + k)}L${f1(x - k)} ${f1(y)}Z" style="fill:var(--po);stroke:var(--panel)" stroke-width="1"><title>${E(sname(p[4]))} playoffs, ${cmpRound(p[6], p[4])} vs ${E(p[5])}${res}: ${p[3]} game${p[3] === 1 ? "" : "s"}, ${p[2]} minutes, rating ${sgn(p[1])}${p[9] ? " (minutes partly estimated)" : ""}</title></path>`; }).join("");
+    const hol = CMP_VIEW_MARK && p[10] === 1; if (hol) ivN++;   // hollow: a season on the table's opening view (estimated lineup part)
+    return `<path class="po" d="M${f1(x)} ${f1(y - k)}L${f1(x + k)} ${f1(y)}L${f1(x)} ${f1(y + k)}L${f1(x - k)} ${f1(y)}Z" style="${hol ? "fill:var(--panel);stroke:var(--po)" : "fill:var(--po);stroke:var(--panel)"}" stroke-width="${hol ? 1.6 : 1}"><title>${E(sname(p[4]))} playoffs, ${cmpRound(p[6], p[4])} vs ${E(p[5])}${res}: ${p[3]} game${p[3] === 1 ? "" : "s"}, ${p[2]} minutes, rating ${sgn(p[1])}${p[9] ? " (minutes partly estimated)" : ""}${hol ? " (box score + estimated lineup part)" : ""}</title></path>`; }).join("");
 
   let fan = "";
   if (pj.length) {
@@ -273,7 +282,8 @@ function modCompare(d){
   const lnSw = `<svg width="22" height="12" aria-hidden="true">${meS.ls === "d" ? `<rect x="0" y="1" width="22" height="10" fill="${br}" opacity=".16"/>` : ""}<line x1="1" x2="21" y1="6" y2="6" stroke="${br}" stroke-width="3"/></svg>`;
   const dia = `<svg width="12" height="12" aria-hidden="true"><path d="M6 1.2L10.8 6L6 10.8L1.2 6Z" style="fill:var(--po)"/></svg>`;
   const loading = !CMPCAR || series.some(s => s.dots === null);
-  const legend = `<div class="cmpleg"><span>${dot(br)}about ten games, regular season</span>${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? (LINE_MODE === "dots" ? `<span>${sw(br, "", 3.4)}smoothed line through his dots</span>` : `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>`) : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
+  const hol = `<svg width="12" height="10" aria-hidden="true"><circle cx="6" cy="5" r="2.6" fill="none" stroke="${br}" stroke-width="1.2" opacity=".7"/></svg>`;
+  const legend = `<div class="cmpleg"><span>${dot(br)}about ten games, regular season</span>${ivN ? `<span>${hol}before 1996-97: box score + estimated lineup part</span>` : ""}${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? (LINE_MODE === "dots" ? `<span>${sw(br, "", 3.4)}smoothed line through his dots</span>` : `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>`) : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
 
   const nowA = me.length ? me[me.length-1].age : null, ak = nowA != null ? Math.floor(nowA) : null;
   const atAge = rows => { if (ak == null) return null; const r = rows.find(x => Math.floor(x[0]) === ak); return r ? r[1] : null; };
@@ -283,16 +293,18 @@ function modCompare(d){
   const trow = (name, id, col, rows, pos) => { const pk = cmpPeak(rows), best = rows.length ? rows.reduce((a, b) => b[1] > a[1] && b[2] >= 500 ? b : a, rows[0]) : null;
     return `<tr><td class="l"><i style="background:${col}"></i>${linkable(id) ? `<a href="#p-${id}">${E(name)}</a>` : E(name)}</td><td class="l">${E(pos || "")}</td><td>${rows.length ? `${sname(rows[0][3]).slice(0,4)}\u2013${String(rows[rows.length-1][3]+1).slice(2)}` : "\u2013"}</td><td>${rows.length}</td><td>${anyAt ? sgn(atAge(rows)) : rows.length ? `${sgn(rows[rows.length-1][1])} <span class="mute">(${fmtA(rows[rows.length-1][0])})</span>` : "\u2013"}</td><td>${sgn(pk)}</td><td>${best ? `${sgn(best[1])} <span class="mute">(${fmtA(best[0])})</span>` : "\u2013"}</td></tr>`; };
   const tbl = (me.length && comps.length) ? `<div class="tbl cmptbl"><table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th>Seasons</th><th>N</th><th>${anyAt ? `At age ${ak}` : "Last season (age)"}</th><th>Best 3 avg</th><th>Best season (age)</th></tr></thead><tbody>
-    ${trow(d.name, d.id, css("--brown"), me.map(s => [s.age, s.r, s.min, s.season]), cm.posg || d.pos)}${comps.map(c => trow(c[1], c[0], colOf(c[0]), c[4], c[2])).join("")}</tbody></table><p class="note" style="margin:6px 8px">Season columns use ${(META.cmp_meta || {}).ap ? "the season ratings (as played from 1996-97 on)" : "the season SiPM ratings"}.</p></div>` : "";
+    ${trow(d.name, d.id, css("--brown"), me.map(s => [s.age, s.r, s.min, s.season]), cm.posg || d.pos)}${comps.map(c => trow(c[1], c[0], colOf(c[0]), c[4], c[2])).join("")}</tbody></table><p class="note" style="margin:6px 8px">Season columns use ${(META.cmp_meta || {}).ap ? "the season ratings (as played from 1996-97 on)" : "the season SiPM ratings"}${ivN ? "; before 1996-97, box score + estimated lineup part, as the chart" : ""}.</p></div>` : "";
 
   const gt = META.cmp_meta && META.cmp_meta.ghost_test, h1 = gt && gt.by_h[0], h5 = gt && gt.by_h[gt.by_h.length-1];
   const lineTxt = meS.line.length ? (meS.ls === "d"
       ? " The smoothed trajectory treats each season's rating as a noisy reading of his true level (short seasons count less, and a player's level usually changes gradually with age) and smooths the readings across his whole career; the band is the 80% range of that level. It breaks where he missed a whole season. Method: item D's career-path model (November 2026), checked on held-out seasons."
       : " He has no season of 100+ minutes, so his line is a simple minutes-weighted average of his season ratings (no band).")
     : meS.trend.length ? (LINE_MODE === "dots" ? " The bold line averages nearby dots, weighted by minutes, over about half a season either side." : " He has no completed season yet, so his line is a simple minutes-weighted average of his dots.") : "";
-  const notes = `<p class="note" style="margin-top:8px">${E(tierTxt)} How the dots are made: Singular's box-score rating of every game, shifted so each season averages ${(META.cmp_meta || {}).ap ? "his as-played rating for that season (1996-97 on: that season's own rating, not SiPM's next-season projection; 2026-27: his current forecast)" : "his season SiPM rating (2026-27: his current projection)"}. Each season's games are then split, in order, into groups of about ten (a 78-game season makes eight dots: six of 10 games and two of 9); a group never crosses seasons. Playoff games get the same game rating and the same season shift, one dot per series; before 1969-70 many playoff box scores lack minutes, and those are estimated from his regular-season minutes per game. Games before 1996-97 come from the era-bridge game ratings, which are rougher (before 1973-74 no steals or blocks, and minutes are sometimes estimated), so those clouds look tighter than they really are.${lineTxt}${CMPGHOST && h1 ? ` Past forecasts: a simple model (his last three seasons weighted by minutes, his age and minutes) fitted on seasons before 2016-17, then run from each summer using only what was known then. It lags breakouts on purpose. Tested on 2016-17 to 2025-26: typical miss ${h1.rmse_model} points one season out (same-as-last-season: ${h1.rmse_same_as_last}), ${h5.rmse_model} five seasons out (same-as-last-season: ${h5.rmse_same_as_last}); its 80% bands held ${Math.round(100*h1.cover80)}\u2013${Math.round(100*h5.cover80)}% of outcomes.` : ""}</p>`;
+  const notes = `<p class="note" style="margin-top:8px">${E(tierTxt)} How the dots are made: Singular's box-score rating of every game, shifted so each season averages ${(META.cmp_meta || {}).ap ? "his as-played rating for that season (1996-97 on: that season's own rating, not SiPM's next-season projection; 2026-27: his current forecast)" : "his season SiPM rating (2026-27: his current projection)"}${ivN ? "; before 1996-97, the all-time table's opening-view value (hollow dots)" : ""}. Each season's games are then split, in order, into groups of about ten (a 78-game season makes eight dots: six of 10 games and two of 9); a group never crosses seasons. Playoff games get the same game rating and the same season shift, one dot per series; before 1969-70 many playoff box scores lack minutes, and those are estimated from his regular-season minutes per game. Games before 1996-97 come from the era-bridge game ratings, which are rougher (before 1973-74 no steals or blocks, and minutes are sometimes estimated), so those clouds look tighter than they really are.${lineTxt}${CMPGHOST && h1 ? ` Past forecasts: a simple model (his last three seasons weighted by minutes, his age and minutes) fitted on seasons before 2016-17, then run from each summer using only what was known then. It lags breakouts on purpose. Tested on 2016-17 to 2025-26: typical miss ${h1.rmse_model} points one season out (same-as-last-season: ${h1.rmse_same_as_last}), ${h5.rmse_model} five seasons out (same-as-last-season: ${h5.rmse_same_as_last}); its 80% bands held ${Math.round(100*h1.cover80)}\u2013${Math.round(100*h5.cover80)}% of outcomes.` : ""}</p>`;
 
-  return `<section class="mod" id="m-cmp"><style>${CMPCSS}</style>${head}${lede}${chips}${legend}${svg}${tbl}${notes}</section>`;
+  // CMP_VIEW_MARK: one note line under the chart when hollow dots are drawn
+  const ivNote = ivN ? `<p class="note" style="margin:6px 0 0">Hollow dots: seasons before 1996-97, when there is no lineup data. Each such season averages the box-score rating plus an estimated lineup part (what the box score misses, mostly defence), as in the all-time table’s opening view; its “Box score, every era” button shows box score only.</p>` : "";
+  return `<section class="mod" id="m-cmp"><style>${CMPCSS}</style>${head}${lede}${chips}${legend}${svg}${ivNote}${tbl}${notes}</section>`;
 }
 
 // wiring for the chart's controls; history.js also calls it after drawing a retired page (CMPD = the player drawn)

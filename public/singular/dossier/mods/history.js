@@ -12,6 +12,13 @@ const HX_NSHARD = 64;   // = pp_history.py NPSHARD
 // HX_ASC false and docs without ap = the page before this change.
 const HX_ASC = true;
 const HX_DF = true;  // DOSSIER_FIRST (2026-11-16): the header link to the hub page reads "Impact by age"; false = "Singular page"
+// CHARTVIEW 2026-11-17 (Griffin: Robinson's all-time best five +9.4 vs his chart under +8): docs with iv = 1 (pp_history.py HX_VIEW)
+// follow the all-time table's opening view. Header Best season / Best five / Career = the table's figures, "*" only where a figure
+// includes the estimated lineup part (star letters b / 5 / c), with its 80% range and "best available" when that differs by 0.1+;
+// season rows before 1996-97 flagged r[14] = 1 show the table's value with the best-available value r[13] beneath when it differs
+// by 0.1+. HX_VIEW_MARK false, or docs without iv = the page as before.
+const HX_VIEW_MARK = true;
+const HX_IV_READ = "Seasons before 1996-97 (marked *) add an estimated lineup part to his box-score rating: what the box score misses, mostly defence, as the all-time table's opening view does. There is no lineup data before then.";
 const HX_AP_NOTE = "As played = his rating for that season itself: that season's lineup results, shrunk toward his box-score rating (from 1996-97). Forecast for next season = his Singular SiPM at the end of that season, which projects the following season and so includes the expected change with age.";
 const HXCSS = `
 .hx-nav{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--mute)}
@@ -271,6 +278,12 @@ function hxRetChart(doc, dots){
   ${lp.length ? `<span><svg width="22" height="12"><rect x="0" y="2" width="22" height="8" fill="var(--purple)" fill-opacity=".18"/><line x1="0" x2="22" y1="6" y2="6" stroke="var(--purple)" stroke-width="2.4"/></svg>latent career path, 80% band (experimental)</span>` : ""}
   ${hi >= 4 ? `<span><svg width="22" height="12"><line x1="0" x2="22" y1="6" y2="6" stroke="var(--ochre)" stroke-dasharray="4 4"/></svg>+4</span>` : ""}</div>`;
 }
+// HX_VIEW_MARK: the season table's note for a doc on the all-time table's opening view (replaces hxEraNote there)
+function hxIvNote(y){
+  if (y >= 1996) return hxEraNote(y);
+  return "* Before 1996-97 there is no lineup data. These ratings add an estimated lineup part (what the box score misses, mostly defence) to his box-score rating, as the all-time table's opening view does; \u201cbest available\u201d beneath, where it differs by 0.1 or more, is the box-score rating adjusted for how his teams did with and without him. Off and Def split the best-available rating."
+    + (y <= 1972 ? " Before 1973-74 steals, blocks and turnovers were not recorded, so defence is mostly invisible in the box score: great defenders, big men above all, are understated." : "");
+}
 function hxRetiredHTML(id, doc, dots){
   const c = doc.c || {}, cb = doc.cb || {}, b = doc.b || [], dk = doc.dk;
   const first = c.first ?? (doc.s[0] || [])[0], last = c.last ?? (doc.s[doc.s.length - 1] || [])[0];
@@ -278,17 +291,27 @@ function hxRetiredHTML(id, doc, dots){
   const ht = hxHt(b[1]);
   const draft = b[2] ? (b[3] ? `${b[2]} \u00b7 pick ${b[3]}` : `${b[2]} \u00b7 undrafted`) : null;
   const st = pre ? "*" : "";
+  // HX_VIEW_MARK: figures as the all-time table's opening view prints them (star per figure, 80% range, best available)
+  const iv = HX_VIEW_MARK && !!doc.iv, cst = c.star || "", cf = doc.cf || {};
+  const stF = fl => iv ? (cst.includes(fl) ? "*" : "") : st;
+  const ivB = (k, fl, season) => { if (!iv) return ""; const bb = [];
+    if (cst.includes(fl) && c[k + "_lo"] != null) bb.push(`80%: ${hxS(c[k + "_lo"])} to ${hxS(c[k + "_hi"])}`);
+    if (c[k] != null && cf[k] != null && Math.abs(Math.round((c[k] - cf[k]) * 100) / 100) >= 0.1)
+      bb.push(`best available ${hxS(cf[k])}${season && cf.best_season != null && cf.best_season !== c.best_season ? ` (${sname(cf.best_season)})` : ""}`);
+    return bb.length ? "<br>" + bb.join(" \u00b7 ") : ""; };
   const fig = (k, v, s, cls = "") => `<div class="fig ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
   const figs = [
-    fig(`Best season${st}`, hxS(c.best), c.best_season != null ? `${sname(c.best_season)}${c.best_age != null ? `, age ${Math.round(c.best_age)}` : ""}${cb.best != null ? `<br>box score only: ${hxS(cb.best)}` : ""}` : "", "big"),
-    fig(`Best five seasons${st}`, hxS(c.best5), "consecutive, 1,000+ minutes each"),
-    fig(`Career${st}`, hxS(c.career), `minutes-weighted, ${c.q_seasons ?? 0} season${c.q_seasons === 1 ? "" : "s"} of 1,000+ minutes`),
+    fig(`Best season${stF("b")}`, hxS(c.best), c.best_season != null ? `${sname(c.best_season)}${c.best_age != null ? `, age ${Math.round(c.best_age)}` : ""}${ivB("best", "b", true)}${cb.best != null ? `<br>box score only: ${hxS(cb.best)}` : ""}` : "", "big"),
+    fig(`Best five seasons${stF("5")}`, hxS(c.best5), "consecutive, 1,000+ minutes each" + ivB("best5", "5")),
+    fig(`Career${stF("c")}`, hxS(c.career), `minutes-weighted, ${c.q_seasons ?? 0} season${c.q_seasons === 1 ? "" : "s"} of 1,000+ minutes${ivB("career", "c")}`),
     dk ? fig(`Sustained peak <span class="new">experimental</span>`, hxS(dk[0]), `${sname(dk[3])} to ${sname(dk[4])}; 80% range ${hxS(dk[1])} to ${hxS(dk[2])}`)
        : fig("Games", hxInt(c.gp), `${hxInt(c.min)} minutes \u00b7 ${c.seasons ?? doc.s.length} seasons`)].join("");
   const ap = !!doc.ap;
   const rows = (HX_ASC ? doc.s.slice() : doc.s.slice().reverse()).map(r => {
     const [y, tm, age, g, mn, rr, ro, rd, rb, pts, reb, ast, fc] = r;
-    return `<tr><td class="l">${sname(y)}</td><td class="l">${hxTeamLinks(tm, y)}</td><td class="l">${hxBar(rr, 6)}<b>${hxS(rr)}${rr != null && y < 1996 ? "*" : ""}</b></td><td>${hxS(ro)}</td><td>${hxS(rd)}</td>${ap ? `<td>${y >= 1996 ? hxS(fc) : "–"}</td>` : ""}<td>${hxS(rb)}</td>`
+    const ba = iv && r[14] === 1 && r[13] != null && rr != null && Math.abs(Math.round((rr - r[13]) * 100) / 100) >= 0.1   // HX_VIEW_MARK
+      ? `<br><span class="mute" style="font-size:12px;margin-left:91px">best available ${hxS(r[13])}</span>` : "";
+    return `<tr><td class="l">${sname(y)}</td><td class="l">${hxTeamLinks(tm, y)}</td><td class="l">${hxBar(rr, 6)}<b>${hxS(rr)}${rr != null && y < 1996 ? "*" : ""}</b>${ba}</td><td>${hxS(ro)}</td><td>${hxS(rd)}</td>${ap ? `<td>${y >= 1996 ? hxS(fc) : "–"}</td>` : ""}<td>${hxS(rb)}</td>`
       + `<td>${age != null ? Math.floor(age) : "\u2013"}</td><td>${g ?? "\u2013"}</td><td>${hxInt(mn)}</td><td>${hxF1(pts)}</td><td>${hxF1(reb)}</td><td>${hxF1(ast)}</td></tr>`;
   }).join("");
   const shape = dk ? `<section class="mod" id="hx-shape"><div class="mhead"><h2>Career shape <span class="new">experimental</span></h2></div>
@@ -304,7 +327,7 @@ function hxRetiredHTML(id, doc, dots){
       <div class="brand" style="color:var(--mute)">Retired \u00b7 ${first != null ? `${sname(first)} to ${sname(last)}` : ""}</div>
       <h1>${E(doc.n)}</h1>
       <div class="meta">${ht ? `<span>Height <b>${ht}</b></span>` : ""}${draft ? `<span>Draft <b>${draft}</b></span>` : ""}<span>Games <b>${hxInt(c.gp)}</b></span><span>Minutes <b>${hxInt(c.min)}</b></span>${doc.slug ? `<span><a class="hx-lk" href="/singular/p/${encodeURIComponent(doc.slug)}/"${HX_DF ? ` title="His rating by age with the season-by-season trajectory (Singular page)"` : ""}>${HX_DF ? "Impact by age" : "Singular page"}</a></span>` : ""}</div>
-      <p class="read">Ratings are points per 100 possessions above an average player of his own season. ${pre ? "Seasons before 1996-97 (marked *) are estimates from the box score and from how his teams did with and without him; there is no lineup data before then." : ""}</p>
+      <p class="read">Ratings are points per 100 possessions above an average player of his own season. ${pre ? (iv ? HX_IV_READ : "Seasons before 1996-97 (marked *) are estimates from the box score and from how his teams did with and without him; there is no lineup data before then.") : ""}</p>
     </div>
     <div class="figs">${figs}</div>
   </header>
@@ -313,7 +336,7 @@ function hxRetiredHTML(id, doc, dots){
   ${shape}
   <section class="mod" id="hx-seasons"><div class="mhead"><h2>Season by season</h2><span class="note">click a team for that team season</span></div>
     <div class="tbl"><table class="hx-tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th class="l">${ap ? "As played" : "Rating"}${st}</th><th>Off</th><th>Def</th>${ap ? `<th title="His Singular SiPM at the end of that season: its projection for the following season">Forecast<br><small>next season</small></th>` : ""}<th title="Season mean of his box-score game rating, the one measure that exists in every era">Box</th><th>Age</th><th>G</th><th>Min</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offence + defence." : "Rating = Singular SiPM (offence + defence)."} ${hxEraNote(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
+    <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offence + defence." : "Rating = Singular SiPM (offence + defence)."} ${(iv ? hxIvNote : hxEraNote)(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
   </section>
   <footer>Ratings: Singular SiPM (all-time data from 1951-52). ${typeof LINE_MODE !== "undefined" && LINE_MODE === "dots" ? "Smoothed line: a minutes-weighted average of his ten-game ratings." : "Smoothed trajectory: item D's career-path model (November 2026)."}</footer>`;
 }
