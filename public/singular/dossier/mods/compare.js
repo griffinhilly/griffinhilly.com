@@ -123,8 +123,11 @@ function modCompare(d){
   const W0 = (window.innerWidth || 1400), W = W0 < 520 ? 430 : W0 < 900 ? 720 : 1000; CMPW = W;
   const small = W < 600, H = small ? 380 : 440, L = small ? 30 : 40, R = small ? 74 : 118, T = 16, B = 30;
   const ag = cmpAgeFn(d), st = cmpState(d), cm = d.cmp || {}, sug = cm.sug || [];
+  // COMPS 2026-11-16: cm.cn = how many of sug, at the front, are hand-picked (pp_compare.py CURATED_COMPS: his peers in all-time
+  // debates plus a rival of his era); they fill "Compare with" and the rest "More like him". No cn: as before (5 + the rest).
+  const cn = cm.cn || 0, simC = d.retired && !cn;
   const fmtA = a => a == null ? "\u2013" : a.toFixed(1);
-  const head = `<div class="mhead"><h2>Impact by age<span class="new">${d.retired ? "similar careers" : "comparisons"}</span></h2>
+  const head = `<div class="mhead"><h2>Impact by age<span class="new">${simC ? "similar careers" : "comparisons"}</span></h2>
     <div class="cmpctl"><div class="seg" id="cmpX" role="group" aria-label="Horizontal axis"><button data-m="age" aria-pressed="${CMPX==="age"}">by age</button><button data-m="season" aria-pressed="${CMPX==="season"}">by season</button></div>
     ${(cm.ghost || []).length ? `<div class="seg" id="cmpG"><button data-m="1" aria-pressed="${CMPGHOST}" title="Faint lines: what a simple model would have forecast each past summer">show past forecasts</button></div>` : ""}</div></div>`;
   const me = (d.seasons || []).filter(s => s.r != null).map(s => ({season: s.season, age: ag(s.season), r: s.r, min: s.min || 0})).filter(s => s.age != null);
@@ -151,7 +154,7 @@ function modCompare(d){
   series.push(meS);
 
   const sc = META.cmp_meta && META.cmp_meta.scale;
-  const lede = `<p class="lede">Each faint dot is about ten games of his rating, inside one regular season${meS.line.length ? "; the bold line is his smoothed trajectory" + (meS.ls === "d" ? ", with its 80% band shaded" : "") : meS.trend.length ? "; the bold line smooths the dots" : ""}.${meS.po.length ? " Teal diamonds are his playoff series, one per series." : ""} ${d.retired ? "Similar careers" : "Comparison players"} are drawn the same way in their own colours. The rating is points per 100 possessions better than an average player, so 0 is average${sc ? `; in ${sname(sc.season)} the middle player with 1,500+ minutes rated ${sgn(sc.median)}, the 10th best ${sgn(sc.tenth)} and the best ${sgn(sc.best)}` : ""}.${pj.length ? " The dashed olive line is his forecast for the next five seasons, with its 80% range." : ""}</p>`;
+  const lede = `<p class="lede">Each faint dot is about ten games of his rating, inside one regular season${meS.line.length ? "; the bold line is his smoothed trajectory" + (meS.ls === "d" ? ", with its 80% band shaded" : "") : meS.trend.length ? "; the bold line smooths the dots" : ""}.${meS.po.length ? " Teal diamonds are his playoff series, one per series." : ""} ${simC ? "Similar careers" : "Comparison players"} are drawn the same way in their own colours. The rating is points per 100 possessions better than an average player, so 0 is average${sc ? `; in ${sname(sc.season)} the middle player with 1,500+ minutes rated ${sgn(sc.median)}, the 10th best ${sgn(sc.tenth)} and the best ${sgn(sc.best)}` : ""}.${pj.length ? " The dashed olive line is his forecast for the next five seasons, with its 80% range." : ""}</p>`;
 
   const ghosts = CMPGHOST ? (cm.ghost || []).map(g => {
     const o = me.find(s => s.season === g[0]); if (!o) return null;
@@ -245,21 +248,23 @@ function modCompare(d){
   labs.sort((a, b) => a.y - b.y);
   for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i-1].y < 15 && Math.abs(labs[i].x - labs[i-1].x) < 90) labs[i].y = labs[i-1].y + 15;
   const lb = labs.map(l => `<text x="${f1(Math.min(l.x + 7, W - 4))}" y="${f1(l.y + 4)}" text-anchor="${l.x + 7 > W - R + 60 ? "end" : "start"}" style="fill:${l.col};font:${l.me ? 700 : 600} ${small ? 11 : 12}px var(--sans);paint-order:stroke;stroke:${css("--bg")};stroke-width:3px">${E(l.t)}</text>`).join("");
-  const svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${E(d.name)}: rating by ${CMPX}, with ${d.retired ? "similar careers" : "comparison players"}">${g}${gh}${bands}${clouds}${fan}${trends}${marks}${lb}</svg>`;
+  const svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${E(d.name)}: rating by ${CMPX}, with ${simC ? "similar careers" : "comparison players"}">${g}${gh}${bands}${clouds}${fan}${trends}${marks}${lb}</svg>`;
 
-  const chip = (x, extra) => { const on = ids.includes(x[0]); const tip = extra ? "added by you" : `career-arc gap ${x[2]} points over ${x[3]} shared ages`;
+  const hand = new Set(sug.slice(0, cn).map(x => x[0]));
+  const chip = (x, extra) => { const on = ids.includes(x[0]); const tip = extra ? "added by you" : hand.has(x[0]) ? "picked by hand: a player he is measured against in all-time debates" : `career-arc gap ${x[2]} points over ${x[3]} shared ages`;
     return `<button data-id="${x[0]}" aria-pressed="${on}" title="${E(x[1])}: ${E(tip)}"><i style="background:${on ? colOf(x[0]) : css("--line")}"></i>${E(x[1])}${extra ? " \u00d7" : ""}</button>`; };
   const extras = st.extra.map(id => { const c = CMPCAR && CMPCAR.by[id]; return c ? [id, c[1]] : null; }).filter(Boolean);
   const sim2 = (META.cmp_meta || {}).sim === 2;   // pp_compare.py SIM_V2 (TRAJ2): peak first, position and shares break ties
-  const tierTxt = (sim2 ? {top: "He is one of the all-time top tier, so these are the other all-time greats closest to his peak (best three seasons within about 1.5 points), then closest in career shape and length; position and assist and rebound shares only break ties.",
+  const tierTxt = (cn ? "Compare with: the players he is measured against in all-time debates, plus a rival from his own era, picked by hand; position does not matter here. More like him: the closest careers by the numbers (peak first, then career shape and length)." : "")
+    || (sim2 ? {top: "He is one of the all-time top tier, so these are the other all-time greats closest to his peak (best three seasons within about 1.5 points), then closest in career shape and length; position and assist and rebound shares only break ties.",
     great: "He is in the all-time top 75 or so, so these are other greats closest to his peak (within about 1.5 points), then in career shape and length, preferring his era; position and assist and rebound shares only break ties."}
     : {top: "He is one of the all-time top tier, so these are the other all-time greats, whatever their position, closest in peak and standing.",
     great: "He is in the all-time top 75 or so, so these are players of similar impact from his era (close in age, overlapping careers), with the same position a bonus."})[cm.tier]
     || (d.retired ? "Players whose whole careers looked like his, from any era: rating at the same ages, peak, career value and length, position, assist and rebound shares, and height."
       : "Players who, at his age, were his type (position, height, assist and rebound shares, rating curve so far) and then played at least three more seasons, so you can see where those careers went. Recent players are preferred; one is always active or retired within five seasons.");
   const addBox = `<input id="cmpAdd" list="cmpList" placeholder="+ add any player" aria-label="Add any player to the chart" autocomplete="off">`;
-  const chips = sug.length ? `<div class="cmpchips" id="cmpChips"><span class="lbl">${d.retired ? "Similar careers" : "Compare with"}</span>${sug.slice(0, 5).map(x => chip(x)).join("")}</div>
-    <div class="cmpchips more" id="cmpMore" style="margin-top:6px"><span class="lbl">More like him</span>${sug.slice(5).map(x => chip(x)).join("")}${extras.map(x => chip(x, true)).join("")}${addBox}</div>`
+  const chips = sug.length ? `<div class="cmpchips" id="cmpChips"><span class="lbl">${simC ? "Similar careers" : "Compare with"}</span>${sug.slice(0, cn || 5).map(x => chip(x)).join("")}</div>
+    <div class="cmpchips more" id="cmpMore" style="margin-top:6px"><span class="lbl">More like him</span>${sug.slice(cn || 5).map(x => chip(x)).join("")}${extras.map(x => chip(x, true)).join("")}${addBox}</div>`
     : `<div class="cmpchips" id="cmpMore"><span class="lbl">Compare with</span>${extras.map(x => chip(x, true)).join("")}${addBox}</div>`;
 
   const sw = (col, dash, w) => `<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="${col}" stroke-width="${w}" ${dash ? `stroke-dasharray="${dash}"` : ""}/></svg>`;

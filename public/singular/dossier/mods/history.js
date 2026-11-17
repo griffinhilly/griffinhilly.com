@@ -236,7 +236,8 @@ function hxPseudo(id, doc){
   const sug = t && t.sug ? t.sug.filter(x => !CMPCAR || by[x[0]]).map(x => [x[0], (by[x[0]] || [0, wait])[1], x[1], x[2]]) : [];
   return {id, name: doc.n, retired: true, cmpReady: !!t, bio: {birth_date: (doc.b || [])[0] || null}, proj_path: [],
           seasons: doc.s.filter(r => r[5] != null).map(r => ({season: r[0], r: r[5], min: r[4] || 0})),
-          cmp: {sug, tier: t ? t.tier || "" : "", posg: (by[id] || [])[2] || "", ghost: []}};
+          cmp: {sug, tier: t ? t.tier || "" : "", posg: (by[id] || [])[2] || "", ghost: [],
+                 cn: t && t.cn ? t.sug.slice(0, t.cn).filter(x => !CMPCAR || by[x[0]]).length : 0}};   // COMPS 2026-11-16: hand-picked count (pp_traj "cn")
 }
 function hxRetChart(doc, dots){
   const app = typeof document !== "undefined" && document.querySelector ? document.querySelector("#app") : null;
