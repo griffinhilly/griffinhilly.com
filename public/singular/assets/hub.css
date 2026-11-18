@@ -278,6 +278,32 @@ details.fold .tw{max-height:70vh}
 .viewbar:has(>.qm)>.seg{flex:0 1 auto}
 .cat summary h2::before{content:"\25B8"}
 @media (min-width:641px){.controls details.more>.fl{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}}
+table.data thead th[aria-sort] button.qm::after{content:none}
 .chart .dots.d10 circle{fill-opacity:.7}
 :root[data-theme='light'] .chart .dots.d10 circle{fill-opacity:.45}
 @media (prefers-color-scheme:light){:root:not([data-theme='dark']) .chart .dots.d10 circle{fill-opacity:.45}}
+
+/* 2026-11-18 FACTCHECK EXPLAINER_PAGE: /how-it-works/ (scripts/hub_explainer.py); every rule scoped to .xpl */
+.xpl p{max-width:66ch}
+.xpl figure{margin:1.1rem 0 1.3rem}
+.xpl figcaption{font-size:.85rem;color:var(--ink2);margin-top:.35rem;max-width:72ch}
+.xpl svg.chart{width:100%;height:auto;display:block;overflow:visible}
+.xpl svg.chart text{fill:var(--ink2);font:12px var(--f-ui)}
+.xpl svg.chart text.b{fill:var(--ink);font-weight:600}
+.xpl svg.chart text.note{fill:var(--ink3);font-size:11px}
+.xpl svg.chart text.w{fill:#fff;font-weight:600}
+.xpl svg.chart .grid{stroke:var(--rule);stroke-width:1}
+.xpl svg.chart .zero{stroke:var(--ink3);stroke-width:1}
+.xpl svg.chart .vline{stroke:var(--ink3);stroke-width:1;stroke-dasharray:3 3}
+.xpl svg.chart .nd{fill:var(--raise);stroke:var(--rule);stroke-width:1.5}
+.xpl svg.chart .nd2{fill:var(--raise2);stroke:var(--ink3);stroke-width:1.5}
+.xpl svg.chart .arr{stroke:var(--ink3);stroke-width:1.6;fill:none}
+.xpl svg.chart .ahd{fill:var(--ink3)}
+.xpl svg.chart.dg{max-width:600px}
+.xpl svg.chart.dg text:not(.w){paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.xpl .lg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--ink2);margin:.2rem 0 .3rem}
+.xpl .lg span{display:inline-flex;align-items:center;gap:6px}
+.xpl .lg i{display:inline-block;width:14px;height:10px;border-radius:2px}
+.xpl .xn{display:none}
+@media (max-width:640px){.xpl .xw{display:none}.xpl .xn{display:block}.xpl .xn svg.chart text{font-size:13px}
+ .xpl svg.chart.dg text{font-size:15px}.xpl svg.chart.dg text.note{font-size:13px}}

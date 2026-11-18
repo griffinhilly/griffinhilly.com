@@ -31,6 +31,11 @@ if (DF_PLAYERS && typeof document !== "undefined" && typeof document.querySelect
 // season cells in "Season by season" link to the season pages /singular/season/<yyyy>/. False = none of this.
 const DF_FIGS = true;
 const DF_FIGS_URL = "/singular/assets/player_figs.json";
+// DF_LEGACY (2026-11-18, LEGACY lane; Griffin: "I agree with legacy version 2. We can make it go live"): beside "Career,
+// prime-based", a "Legacy, with playoffs" figure with its all-time rank (same 3+ seasons rule) and its parts (career · title odds ·
+// results vs odds), from player_figs.json row fields 3-5 (Singular build_singular_hub.py LEGACY_COL). Rows without them, or false =
+// the header as before.
+const DF_LEGACY = true;
 let DFF = null, DFL = false;
 const DF_T_SELF = "Jump to his Impact by age chart on this page (about ten games per dot, smoothed line, forecast)";
 const DF_T_HUB = "His Singular page: ratings season by season, with the same trajectory chart and the five-season forecast";
@@ -99,6 +104,10 @@ function dfAfter(){
     const n = Number(DFF.n || 0).toLocaleString("en-US");
     const rk = row[2] ? `#${row[2]} of ${n} all-time (${DFF.q}+ seasons of 1,000+ minutes)` : `not ranked all-time (fewer than ${DFF.q} seasons of 1,000+ minutes)`;
     h += `<div class="fig df-fig"><div class="k">Career, prime-based</div><div class="v">${row[0]}</div><div class="s">${rk}${row[1] ? "<br>" + row[1] : ""}${String(row[0]).endsWith("*") ? "<br>* includes an estimated lineup part (the all-time table's opening view)" : ""}</div></div>`;
+    if (DF_LEGACY && row.length >= 6 && row[3] != null) {   // DF_LEGACY: Legacy, with playoffs
+      const lrk = row[5] ? `#${row[5]} of ${n} all-time` : "not ranked all-time";
+      h += `<div class="fig df-fig df-lg"><div class="k">Legacy, with playoffs</div><div class="v">${row[3]}</div><div class="s">${lrk}${row[4] ? "<br>" + row[4] : ""}<br>Career plus credit for playoff success, in championship odds</div></div>`;
+    }
   }
   if (!h) return;
   const all = figs.querySelectorAll(":scope > .fig"), last = all[all.length - 1];

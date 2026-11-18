@@ -12,8 +12,12 @@
 // in the address (the hub pages' search form sends /singular/dossier/?q=...) is resolved the same way on load.
 // HDR_V2 false = the header exactly as before (nothing in this file runs).
 const HDR_V2 = true;
+// EXPLAINER_PAGE (2026-11-18, FACTCHECK; Singular build_singular_hub.py switch of the same name): "How it works" ->
+// /singular/how-it-works/, the public explainer, just before Method. false = the menu exactly as before.
+const EXPLAINER_PAGE = true;
 const HDR_LINKS = [["Players", "/singular/"], ["All-time", "/singular/all-time/"], ["Seasons", "/singular/season/"],
-  ["Teams", "/singular/dossier/#teams"], ["Fantasy", "/singular/dossier/#fantasy"], ["Method", "/singular/method/"], null,
+  ["Teams", "/singular/dossier/#teams"], ["Fantasy", "/singular/dossier/#fantasy"],
+  ...(EXPLAINER_PAGE ? [["How it works", "/singular/how-it-works/"]] : []), ["Method", "/singular/method/"], null,
   ["Tests", "/singular/tests/"], ["Ratings table", "/singular/ratings/"], ["Bulls report", "/singular/report/"]];
 const HDR_CSS = `
 .bar.sg2-bar{padding-block:8px}
