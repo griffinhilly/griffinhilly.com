@@ -39,6 +39,15 @@ const BDCSS2 = `
 #m-sipmbd .bdg .ppq{margin-left:6px}
 #m-sipmbd .lede .ppq{vertical-align:1px}
 `;
+// RECENTER_MW (2026-11-18 ZERO lane, data-driven): the muted Scale line's CSS, added only when the data carry meta.scale
+// (pp_sipm_breakdown on a re-centred hub), so the page is unchanged otherwise.
+const BDCSS_Z = `
+#m-sipmbd .bdg[data-g="scale"]{display:none}
+#m-sipmbd .bdr[data-k="scale"]{color:var(--mute);font-size:12.5px;margin-top:6px}
+#m-sipmbd .bdr[data-k="scale"] .bdl{white-space:normal;overflow:visible;line-height:1.25;grid-column:1 / 3}
+#m-sipmbd .bdr[data-k="scale"] .bdt i{opacity:.4}
+@media (max-width:560px){#m-sipmbd .bdr[data-k="scale"] .bdl{grid-column:1 / 2}}
+`;
 const BDCSS = `
 #m-sipmbd .bdcols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 36px;margin-top:6px}
 @media (max-width:1080px){#m-sipmbd .bdcols{grid-template-columns:minmax(0,1fr)}}
@@ -100,7 +109,7 @@ function modBreakdown(d){
   const B = d.sipmbd, M = META.sipmbd_meta, s = d.summary || {};
   if (!B || !M) return "";
   const nm = String(d.name || "");
-  const head = `<section class="mod" id="m-sipmbd"><style>${BDCSS}</style>
+  const head = `<section class="mod" id="m-sipmbd"><style>${BDCSS}${M && M.scale ? BDCSS_Z : ""}</style>
   <div class="mhead"><h2>Where his rating comes from<span class="new">new</span></h2></div>`;
   const sdOn = typeof sdControl === "function" && typeof sdStrip === "function";
   const sdRow = (key, side) => typeof sdRowChips === "function" ? sdRowChips(d, key, side) : "";
@@ -183,6 +192,11 @@ function modBreakdown(d){
         const key = keys[i], t = disp[k][i], r = R[key] || [key, ""];
         const [a, b] = cum[k][i];
         if (sub[key]) h += `<div class="bdsub">${E(sub[key])}</div>`;
+        if (key === "scale") {   // RECENTER_MW (pp_sipm_breakdown, data-driven): one muted line, (?) with the meta's help text
+          const qid = `bdq-${k}-scale`, hasQ = typeof ppQ === "function" && typeof ppQBody === "function";
+          h += `<div class="bdr nc" data-k="scale"><span class="bdl">${E(r[0])}${hasQ ? ppQ(qid, "What the Scale line is") : ""}</span><span class="bdt">${zero}${t ? bar(a, b, "var(--mute)") : ""}</span><span class="bdv">${bdFmt(t)}</span></div>${hasQ ? ppQBody(qid, `<p>${E(r[1])}</p>`) : `<p class="bdp">${E(r[1])}</p>`}`;
+          continue;
+        }
         const chips = cross.has(key) ? "" : sdRow(key, k);
         h += `<div class="bdr${chips ? "" : " nc"}" data-k="${E(key)}"><span class="bdl" title="${E(r[1])}">${E(r[0])}</span>${chips || '<span class="bdst0"></span>'}<span class="bdt">${zero}${t ? bar(a, b, t > 0 ? "var(--hot)" : "var(--cold)") : ""}</span><span class="bdv">${bdFmt(t)}</span></div>`;
         if (g[0] === "beyond" && r[1]) h += `<p class="bdp">${E(r[1])}</p>`;
@@ -222,6 +236,8 @@ function modBreakdown(d){
     lede = `SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. He has no NBA lineup history yet, so his rating starts from a rookie estimate based on ${E(basis)}; ${games}.`;
     sum = `<span>Rookie estimate <b>${stv.rookie}</b></span><span>This season <b>${stv.season}</b></span>`;
   }
+  if (M.scale && "scale" in stv) sum += `<span>Scale <b>${stv.scale}</b></span>`;   // RECENTER_MW (data-driven)
+  const ZS = !!(M.scale && "scale" in stv);
   // "What each step means": rows in layer order, each once (a row's text is the same wherever it shows, except layer 2)
   const used = {o: new Set(side.o.map(x => x[0])), d: new Set(side.d.map(x => x[0]))};
   const dlOf = (gkeys, seen) => {
@@ -252,8 +268,9 @@ function modBreakdown(d){
     how = dl + `<p class="note">${B.v === "sipm_gap" ? `When a player misses a season, SiPM keeps his last rating and moves it forward with a model fitted on past players who returned after time away (it accounts for his age and the seasons missed). His box-score games this season then move it.`
       : `Rookies have no NBA lineup data, so SiPM starts them from a rookie-season estimate: past rookies' first-season level, predicted from pre-NBA stats (when on file), draft slot and age. His box-score games this season then move it.`}</p>`;
   }
-  const howRead = `<b style="color:var(--ink)">How to read this:</b> start at 0, an average NBA player. Each bar adds (warm colour) or takes away (blue) points per 100 possessions, starting where the bar above it ended. Each layer's heading shows what that layer adds up to. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.`;
-  if (SHORT) return head + `<style>${BDCSS2}</style><p class="lede">SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. The bars build that number step by step from 0, an average player.${ppQ("bdq-how", "How SiPM builds the rating and how to read the bars")}</p>
+  const howRead = ZS ? `<b style="color:var(--ink)">How to read this:</b> start at 0, the model's own zero (about the average of every player who appeared, each counted once). Each bar adds (warm color) or takes away (blue) points per 100 possessions, starting where the bar above it ended. Each layer's heading shows what that layer adds up to. The muted Scale line then moves the result onto the published scale, where 0 is the league's average player weighted by minutes played. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.`
+    : `<b style="color:var(--ink)">How to read this:</b> start at 0, an average NBA player. Each bar adds (warm colour) or takes away (blue) points per 100 possessions, starting where the bar above it ended. Each layer's heading shows what that layer adds up to. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.`;
+  if (SHORT) return head + `<style>${BDCSS2}</style><p class="lede">SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. ${ZS ? "The bars build that number step by step from the model's own 0; the muted last line puts it on the published scale (0 = the league's average player, weighted by minutes)." : "The bars build that number step by step from 0, an average player."}${ppQ("bdq-how", "How SiPM builds the rating and how to read the bars")}</p>
   ${ppQBody("bdq-how", `<p>${lede}</p><p>${howRead}</p>`)}<div class="bdsum">${sum}</div>
   ${sdOn ? sdControl(d, false) : ""}<div class="bdcols">${chart("o", "Offense")}${chart("d", "Defense")}</div>
   <details><summary>What each step means</summary>${how}</details></section>`;

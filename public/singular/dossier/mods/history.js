@@ -169,7 +169,7 @@ function hxTeamHTML(c, y, d, T){
     </div>
     <div class="figs">
       <div class="fig big"><div class="k">Player ratings added up</div><div class="v">${hxS(d.est)}</div><div class="s">each player's rating \u00d7 his share of the team's minutes (five on the floor)</div></div>
-      <div class="fig"><div class="k">Average team, same sum</div><div class="v">${hxS(d.lg)}</div><div class="s">${sname(y)}: the scale's zero is an average player, and the players who get minutes rate above it</div></div>
+      <div class="fig"><div class="k">Average team, same sum</div><div class="v">${hxS(d.lg)}</div><div class="s">${sname(y)}: ${d.z ? "zero is the league's average player, weighted by minutes, so an average team adds up to about 0" : "the scale's zero is an average player, and the players who get minutes rate above it"}</div></div>
       <div class="fig"><div class="k">This roster vs average</div><div class="v">${hxS(d.rel)}</div><div class="s">what the ratings say, per 100 possessions</div></div>
       <div class="fig"><div class="k">What really happened</div><div class="v">${hxS(d.nrtg)}</div><div class="s">net rating: points scored minus allowed per 100 possessions${cur ? ", so far" : ""}</div></div>
     </div>

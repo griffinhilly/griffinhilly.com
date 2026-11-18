@@ -247,7 +247,7 @@ function frUpdate(){
     ${th("r", "SiPM", "grp", cur ? "Rest-of-season SiPM projection; whisker = 80% range" : "SiPM at the end of 2025-26")}${th("o", "Off", "", "SiPM offense")}${th("d", "Def", "", "SiPM defense")}${th("t5", "5-yr", "grp", "Five-season outlook: mean projected SiPM over 2026-27 to 2030-31, if he plays")}${th("pk", "Peak", "", "Projected SiPM in his best later season, 2027-28 to 2030-31")}${th("g", "G", "grp", "Games played")}
     ${keys.map(k => th(k, lab[k], grpStart.has(k) && k !== "mpg" ? "grp" : "", F_STAT_DESC[k])).join("")}</tr></thead><tbody>`;
   // SiPM bar scale
-  const lo = -6, hi = 14, pos = v => Math.max(0, Math.min(100, 100 * (v - lo) / (hi - lo)));
+  const lo = FR.zero ? -7 : -6, hi = FR.zero ? 13 : 14, pos = v => Math.max(0, Math.min(100, 100 * (v - lo) / (hi - lo)));   // RECENTER_MW (pp_front "zero", data-driven)
   const z0 = pos(0);
   const n = rows.length, LIMIT = 700;
   for (const o of rows.slice(0, LIMIT)) {
