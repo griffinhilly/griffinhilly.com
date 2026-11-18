@@ -22,7 +22,7 @@ const HX_VIEW_MARK = true;
 // an "Rk" column first and sorts by any column header (click again to flip); it opens sorted by minutes as before. False = as before.
 const HX_SORT = true;
 const HXS = {k: "mn", dir: -1};
-const HX_IV_READ = "Seasons before 1996-97 (marked *) add an estimated lineup part to his box-score rating: what the box score misses, mostly defence, as the all-time table's opening view does. There is no lineup data before then.";
+const HX_IV_READ = "Seasons before 1996-97 (marked *) add an estimated lineup part to his box-score rating: what the box score misses, mostly defense, as the all-time table's opening view does. There is no lineup data before then.";
 const HX_AP_NOTE = "As played = his rating for that season itself: that season's lineup results, shrunk toward his box-score rating (from 1996-97). Forecast for next season = his Singular SiPM at the end of that season, which projects the following season and so includes the expected change with age.";
 const HXCSS = `
 .hx-nav{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--mute)}
@@ -70,7 +70,7 @@ function hxEraNote(y){
   if (y >= 2007) return "";
   if (y >= 1996) return "1996-97 to 2006-07: full SiPM, fitted with the model's final weights (approximate).";
   return "* Before 1996-97 there is no lineup data, so these ratings (SiPM*) are an estimate: each player's box-score rating, adjusted for how his teams did in games with and without him. They are rougher than the modern number."
-    + (y <= 1972 ? " Before 1973-74 steals, blocks and turnovers were not recorded, so defence is mostly invisible here: great defenders, big men above all, are understated." : "");
+    + (y <= 1972 ? " Before 1973-74 steals, blocks and turnovers were not recorded, so defense is mostly invisible here: great defenders, big men above all, are understated." : "");
 }
 
 /* ---------- routing ---------- */
@@ -133,7 +133,7 @@ function hxTeamHTML(c, y, d, T){
   const codeIn = s => (T.seasons[s].find(r => r[4] === d.fr) || [c])[0];
   const pct = d.w != null && d.w + d.l ? (d.w / (d.w + d.l)).toFixed(3).replace(/^0/, "") : null;
   // rating columns first after the name, so a phone shows them without sideways scrolling
-  let ths = `<tr><th class="l">Player</th><th title="Minutes for this team">Min</th><th class="l" title="${d.ap && !pre && !cur ? "As played: his rating for that season itself, points per 100 possessions above an average player" : "Singular SiPM for his season: points per 100 possessions above an average player"}">${d.ap && !cur && !pre ? "As played" : "Rating"}${pre ? "*" : ""}</th><th title="Offence part of the rating">Off</th><th title="Defence part of the rating">Def</th><th title="Rating x his share of the team's minutes (five players at a time)">Adds</th><th title="Age on Feb 1 of the season">Age</th><th title="Games played for this team">G</th><th title="Minutes per game">MPG</th><th>PTS</th><th>REB</th><th>AST</th></tr>`;
+  let ths = `<tr><th class="l">Player</th><th title="Minutes for this team">Min</th><th class="l" title="${d.ap && !pre && !cur ? "As played: his rating for that season itself, points per 100 possessions above an average player" : "Singular SiPM for his season: points per 100 possessions above an average player"}">${d.ap && !cur && !pre ? "As played" : "Rating"}${pre ? "*" : ""}</th><th title="Offense part of the rating">Off</th><th title="Defense part of the rating">Def</th><th title="Rating x his share of the team's minutes (five players at a time)">Adds</th><th title="Age on Feb 1 of the season">Age</th><th title="Games played for this team">G</th><th title="Minutes per game">MPG</th><th>PTS</th><th>REB</th><th>AST</th></tr>`;
   let rows = d.rows;
   if (HX_SORT) {   // Rk first; every column header sorts (click again to flip); default = minutes, most first (the order above)
     const ks = ["nm", "mn", "rr", "ro", "rd", "con", "age", "g", "mpg", "pts", "reb", "ast"];
@@ -177,7 +177,7 @@ function hxTeamHTML(c, y, d, T){
   ${why ? `<p class="hx-why">${why}</p>` : ""}
   <section class="mod" id="hx-roster"><div class="mhead"><h2>Roster and ratings</h2><span class="note">${HX_SORT ? "click a column to sort; click a name for his page" : "sorted by minutes; click a name for his page"}</span></div>
     <div class="tbl"><table class="hx-tbl"><thead>${ths}</thead><tbody>${body}${tot}</tbody></table></div>
-    <p class="note" style="margin-top:8px">${d.ap && !pre && !cur ? `As played = the player's own rating for his whole season (all his teams): that season's lineup results, shrunk toward his box-score rating; not SiPM's end-of-season number, which projects the next season. Points per 100 possessions above an average player of that season; offence + defence = rating.` : "Rating = Singular SiPM for the player's whole season (all his teams), points per 100 possessions above an average player of that season; offence + defence = rating."}${cur ? ` 2026-27 is in progress: ratings are each player's current rating (Singular's rest-of-season projection); games and minutes are to date${M.data_through ? ` (through ${E(M.data_through)})` : ""}.` : ""} PTS, REB, AST per game for this team.${unr} ${hxEraNote(y)}</p>
+    <p class="note" style="margin-top:8px">${d.ap && !pre && !cur ? `As played = the player's own rating for his whole season (all his teams): that season's lineup results, shrunk toward his box-score rating; not SiPM's end-of-season number, which projects the next season. Points per 100 possessions above an average player of that season; offense + defense = rating.` : "Rating = Singular SiPM for the player's whole season (all his teams), points per 100 possessions above an average player of that season; offense + defense = rating."}${cur ? ` 2026-27 is in progress: ratings are each player's current rating (Singular's rest-of-season projection); games and minutes are to date${M.data_through ? ` (through ${E(M.data_through)})` : ""}.` : ""} PTS, REB, AST per game for this team.${unr} ${hxEraNote(y)}</p>
     <p class="note">Rosters, minutes and box lines: Basketball-Reference season totals${y >= M.cur ? "; 2026-27 from NBA box scores" : ""}. Record, margin and net rating: ${d.src === "db" ? "NBA box scores (net rating = margin per 100 possessions)" : "Basketball-Reference"}.</p>
   </section>
   <footer>Ratings: Singular SiPM. History pages built ${E(M.built || "")}.</footer>`;
@@ -302,8 +302,8 @@ function hxRetChart(doc, dots){
 // HX_VIEW_MARK: the season table's note for a doc on the all-time table's opening view (replaces hxEraNote there)
 function hxIvNote(y){
   if (y >= 1996) return hxEraNote(y);
-  return "* Before 1996-97 there is no lineup data. These ratings add an estimated lineup part (what the box score misses, mostly defence) to his box-score rating, as the all-time table's opening view does; \u201cbest available\u201d beneath, where it differs by 0.1 or more, is the box-score rating adjusted for how his teams did with and without him. Off and Def split the best-available rating."
-    + (y <= 1972 ? " Before 1973-74 steals, blocks and turnovers were not recorded, so defence is mostly invisible in the box score: great defenders, big men above all, are understated." : "");
+  return "* Before 1996-97 there is no lineup data. These ratings add an estimated lineup part (what the box score misses, mostly defense) to his box-score rating, as the all-time table's opening view does; \u201cbest available\u201d beneath, where it differs by 0.1 or more, is the box-score rating adjusted for how his teams did with and without him. Off and Def split the best-available rating."
+    + (y <= 1972 ? " Before 1973-74 steals, blocks and turnovers were not recorded, so defense is mostly invisible in the box score: great defenders, big men above all, are understated." : "");
 }
 function hxRetiredHTML(id, doc, dots){
   const c = doc.c || {}, cb = doc.cb || {}, b = doc.b || [], dk = doc.dk;
@@ -357,7 +357,7 @@ function hxRetiredHTML(id, doc, dots){
   ${shape}
   <section class="mod" id="hx-seasons"><div class="mhead"><h2>Season by season</h2><span class="note">click a team for that team season</span></div>
     <div class="tbl"><table class="hx-tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th class="l">${ap ? "As played" : "Rating"}${st}</th><th>Off</th><th>Def</th>${ap ? `<th title="His Singular SiPM at the end of that season: its projection for the following season">Forecast<br><small>next season</small></th>` : ""}<th title="Season mean of his box-score game rating, the one measure that exists in every era">Box</th><th>Age</th><th>G</th><th>Min</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offence + defence." : "Rating = Singular SiPM (offence + defence)."} ${(iv ? hxIvNote : hxEraNote)(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
+    <p class="note" style="margin-top:8px">Regular season, ${HX_ASC ? "oldest first" : "newest first"}. ${ap ? HX_AP_NOTE + " As played = offense + defense." : "Rating = Singular SiPM (offense + defense)."} ${(iv ? hxIvNote : hxEraNote)(Math.min(...doc.s.map(r => r[0])))} Box = his box-score rating alone, comparable across every era. PTS, REB, AST per game. Games and minutes: Basketball-Reference season totals (all his teams).</p>
   </section>
   <footer>Ratings: Singular SiPM (all-time data from 1951-52). ${typeof LINE_MODE !== "undefined" && LINE_MODE === "dots" ? "Smoothed line: a minutes-weighted average of his ten-game ratings." : "Smoothed trajectory: item D's career-path model (November 2026)."}</footer>`;
 }

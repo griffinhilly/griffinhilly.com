@@ -422,7 +422,7 @@ function modPlaytypes(d){
       <span>${E(PTN[r.type]||r.type)}</span><span class="pb"><i style="width:${(r.poss/tot/mx*100).toFixed(1)}%;background:${pcol(r.pct??50)}"></i></span>
       <span class="num" style="text-align:right">${r.ppp.toFixed(2)}</span><span class="num mute" style="text-align:right">${r.pct??"–"}</span></div>`).join(""); };
   return `<section class="mod"><div class="mhead"><h2>Play types, 2025-26</h2></div>
-  <p class="lede">How his possessions ended, by Synergy play type. Bar length = share of his plays; colour = NBA.com percentile (hot = good; on defence, hot = few points allowed). Columns: points per play, then that percentile.</p>
+  <p class="lede">How his possessions ended, by Synergy play type. Bar length = share of his plays; colour = NBA.com percentile (hot = good; on defense, hot = few points allowed). Columns: points per play, then that percentile.</p>
   <div class="cols"><div><h3>Offense</h3>${blk(pt.off,"off")}</div><div><h3>Defense (as the defender)</h3>${blk(pt.def,"def")}</div></div></section>`;
 }
 
@@ -621,9 +621,9 @@ function modUpcoming(d){
       <td style="color:${tilt>0?css("--hot"):tilt<0?css("--cold"):css("--mute")}">${tilt>0?"+":""}${tilt}%</td></tr>`; }).join("");
   const q = t.pts && t.pts.actual_over_base_by_opp_quintile;
   return `<section class="mod"><div class="mhead"><h2>Next games</h2></div>
-  <p class="lede">A projected line for his team's next ${u.games.length} games: our rest-of-season projection (${f(u.base[0])} points, ${f(u.base[1])} rebounds, ${f(u.base[2])} assists a game), nudged for each opponent's defence and pace. Grey numbers are an 80% range for one game; single games swing far more than any matchup does.</p>
+  <p class="lede">A projected line for his team's next ${u.games.length} games: our rest-of-season projection (${f(u.base[0])} points, ${f(u.base[1])} rebounds, ${f(u.base[2])} assists a game), nudged for each opponent's defense and pace. Grey numbers are an 80% range for one game; single games swing far more than any matchup does.</p>
   <div class="tbl"><table><thead><tr><th class="l">Date</th><th class="l">Opponent</th><th>PTS</th><th>REB</th><th>AST</th><th>Matchup</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <p class="note">Tested on 2023-24 and 2024-25 games${t.pts?` (${t.pts.n_test.toLocaleString()} player-games)`:""}: ${q?`players scored ${Math.round(100*(q[0]-1))}% vs the stingiest fifth of defences and +${Math.round(100*(q[4]-1))}% vs the leakiest, but `:""}the matchup nudge cut the error by only ${t.pts?t.pts.rmse_gain_pct.toFixed(1):"?"}% for points${t.ast?` and ${t.ast.rmse_gain_pct.toFixed(1)}% for assists`:""}. The 80% ranges held ${t.pts?Math.round(100*t.pts.cover80):"?"}% of point totals. Home court and back-to-backs did not help and are left out. Schedule as of ${E((M.schedule_file||"").split("/")[3]||"")}; the list does not update.</p></section>`;
+  <p class="note">Tested on 2023-24 and 2024-25 games${t.pts?` (${t.pts.n_test.toLocaleString()} player-games)`:""}: ${q?`players scored ${Math.round(100*(q[0]-1))}% vs the stingiest fifth of defenses and +${Math.round(100*(q[4]-1))}% vs the leakiest, but `:""}the matchup nudge cut the error by only ${t.pts?t.pts.rmse_gain_pct.toFixed(1):"?"}% for points${t.ast?` and ${t.ast.rmse_gain_pct.toFixed(1)}% for assists`:""}. The 80% ranges held ${t.pts?Math.round(100*t.pts.cover80):"?"}% of point totals. Home court and back-to-backs did not help and are left out. Schedule as of ${E((M.schedule_file||"").split("/")[3]||"")}; the list does not update.</p></section>`;
 }
 
 /* ---------- rotation pattern ---------- */
@@ -782,7 +782,7 @@ function modDefense(d){
   const list = (rows, lab) => rows && rows.length ? `<h3>${lab}</h3><div class="tbl"><table><thead><tr><th class="l">Player</th><th>Possessions</th><th>Pts per 100</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="l">${META.players.some(p=>p.id===r.id)?`<a href="#p-${r.id}" style="color:inherit">${E(r.name)}</a>`:E(r.name)}</td><td>${Math.round(r.poss)}</td><td>${r.pts100!=null?r.pts100.toFixed(0):"–"}</td></tr>`).join("")}</tbody></table></div>` : "";
   const h = m.hunted, sw = m.switch;
   const tiles = `<div class="figs" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:16px">
-    ${h?`<div class="fig"><div class="k">How often offences attack him</div><div class="v">${h.target.toFixed(2)}×</div><div class="s">1.00 = what his assignments predict. More targeted than ${h.pct}% of defenders (${sname(h.y)}). Being targeted is a stable trait; it does not mean he gets scored on.</div></div>`:""}
+    ${h?`<div class="fig"><div class="k">How often offenses attack him</div><div class="v">${h.target.toFixed(2)}×</div><div class="s">1.00 = what his assignments predict. More targeted than ${h.pct}% of defenders (${sname(h.y)}). Being targeted is a stable trait; it does not mean he gets scored on.</div></div>`:""}
     ${sw?`<div class="fig"><div class="k">Who he guards (${sname(sw.y)})</div><div class="v" style="font-size:22px">${Math.round(100*sw.p_g)} / ${Math.round(100*sw.p_w)} / ${Math.round(100*sw.p_b)}</div><div class="s">% of matchups vs guards / wings / bigs. Switchability ${sw.pct}th percentile.</div></div>`:""}</div>`;
   return `<section class="mod"><div class="mhead"><h2>Matchups, 2025-26<span class="new">rare view</span></h2></div>
   <p class="lede">From NBA.com matchup tracking: the players he spent the most possessions guarding, and those who guarded him. "Pts per 100" is the scoring in those head-to-head possessions; samples are small, so read them as who, not how well.</p>
