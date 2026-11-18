@@ -16,6 +16,18 @@ const LINE_MODE = "dots";
 // playoff series (po[10] = 1). CMP_VIEW_MARK draws those hollow, adds a legend entry and one note line. False, or data without
 // flags = the chart as before.
 const CMP_VIEW_MARK = true;
+// DESIGNP 2026-11-17 (Griffin: the chart is cluttered). CMP_DECLUTTER: comparison players are drawn as smooth lines only; with
+// exactly two players on the chart the other player's dots show too, fainter than the main player's; with 3-4 players only the
+// main player's dots show, fainter; with 5+ none. The main player's line is drawn last (in front of everything, playoff
+// diamonds included). Playoff diamonds are smaller and paler. Clicking or tapping a dot or a diamond opens a small label:
+// regular season = dates from-to (traj fd, pp_traj.py DOT_DATES; without it his age), games, rating; playoffs = season, round,
+// opponent, series result, games, rating. False = the chart as before.
+const CMP_DECLUTTER = true;
+// CMP_GLOSS (DESIGNP sweep): a two-line lede; the full lede, the hollow-dot note and the method notes open from a (?) after it
+// (mods/gloss.js). False = the text as before.
+const CMP_GLOSS = true;
+// End-of-line labels: ppSur (mods/gloss.js NAME_SHORT) drops Jr. / Sr. / II / III / IV; without it, the last word as before.
+let CMPHIT = [];   // CMP_DECLUTTER: clickable marks of the chart now drawn {x, y, k: "f" | "po", s: series, p: point, i: index}
 let CMPX = "age", CMPGHOST = false, CMPCAR = null, CMPLOAD = null, CMPW = 0, CMPD = null;
 const CMPST = {};  // player id -> {on: [ids shown], extra: [ids added by search]}
 const CMPTJ = {};  // traj shard number -> object, or "loading"
@@ -41,6 +53,45 @@ const CMPCSS = `
 .cmptbl td.l{font-family:var(--sans)}
 .cmptbl td i{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 `;
+const CMPCSS2 = `
+.cmpwrap{position:relative}
+.cmpwrap svg.chart{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cmptip{position:absolute;z-index:4;max-width:250px;padding:7px 10px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:13px/1.4 var(--sans);box-shadow:0 6px 18px rgba(0,0,0,.14);pointer-events:none}
+.cmptip[hidden]{display:none}
+.cmptip b{font-weight:700}
+.cmptip .v{font:500 15px var(--mono);font-variant-numeric:tabular-nums}
+.cmptip .m{color:var(--mute)}
+#m-cmp circle.cmpsel{fill:none;stroke:var(--ink);stroke-width:1.5;pointer-events:none}
+`;
+// CMP_DECLUTTER: the label for a clicked mark (h = an entry of CMPHIT)
+function cmpTipHTML(h){
+  const p = h.p, nm = h.s.me ? "" : `<div class="m">${E(h.s.name)}</div>`;
+  if (h.k === "po") {
+    const res = p[7] != null ? `${p[7] > p[8] ? "won" : p[7] < p[8] ? "lost" : "tied"} ${p[7]}–${p[8]}` : "result not on file";
+    return `${nm}<b>${E(sname(p[4]))} playoffs</b><div>${cmpRound(p[6], p[4]).replace(/^./, c => c.toUpperCase())} vs ${E(p[5])}, ${res}</div><div class="m">${p[3]} game${p[3] === 1 ? "" : "s"}, ${p[2]} minutes${p[9] ? " (partly estimated)" : ""}</div><div class="v">${sgn(p[1])}</div>`;
+  }
+  const fd = h.s.fd && h.s.fd[h.i];
+  const dt = n => new Date(n * 864e5).toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric", timeZone: "UTC"});
+  const when = fd ? (fd[1] ? `${dt(fd[0])} – ${dt(fd[0] + fd[1])}` : dt(fd[0])) : `about age ${p[0].toFixed(1)}`;
+  return `${nm}<b>${when}</b><div class="m">Regular season, ${p[3]} game${p[3] === 1 ? "" : "s"}${p[4] === 1 ? "; box score + estimated lineup part" : ""}</div><div class="v">${sgn(p[1])}</div>`;
+}
+function cmpTipAt(svg, ev){
+  const wrap = svg.parentNode, tip = wrap && wrap.querySelector(".cmptip");
+  if (!tip) return;
+  const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, sx = vb.width / r.width;
+  const vx = (ev.clientX - r.left) * sx, vy = (ev.clientY - r.top) * sx, rad = Math.max(10, 14 * sx);
+  let best = null, bd = rad * rad;
+  for (const h of CMPHIT) { const d2 = (h.x - vx) ** 2 + (h.y - vy) ** 2 + (h.k === "po" ? -20 : 0); if (d2 < bd) { bd = d2; best = h; } }
+  const old = svg.querySelector("circle.cmpsel"); if (old) old.remove();
+  if (!best) { tip.hidden = true; return; }
+  svg.insertAdjacentHTML("beforeend", `<circle class="cmpsel" cx="${best.x.toFixed(1)}" cy="${best.y.toFixed(1)}" r="${best.k === "po" ? 6 : 4.5}"/>`);
+  tip.innerHTML = cmpTipHTML(best); tip.hidden = false;
+  const px = best.x / sx, py = best.y / sx, tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = px + 12, top = py - th - 10;
+  if (left + tw > r.width - 4) left = Math.max(4, px - tw - 12);
+  if (top < 4) top = py + 12;
+  tip.style.left = left.toFixed(0) + "px"; tip.style.top = top.toFixed(0) + "px";
+}
 
 function cmpRerender(){
   const y = window.scrollY;
@@ -152,14 +203,14 @@ function modCompare(d){
   // series: {name, col, me, dots | null, line [segments], ls, po, trend, rows [age, r, min, season], xs}
   const mkS = (id, name, col, dash, xs, rows, isMe) => { const tj = cmpTraj(id), dt = tj ? tj.f || [] : null, ln = tj && LINE_MODE !== "dots" ? cmpLine(tj) : [];
     const fr = LINE_MODE === "dots" && CMPCAR && CMPCAR.by[id] ? CMPCAR.by[id][4] : rows;   // season rows on the dots' scale (as played)
-    return {id, name, col, dash, me: isMe, xs, rows, dots: dt, line: ln, ls: tj ? tj.ls || "" : "", po: isMe && tj ? tj.po || [] : [],
+    return {id, name, col, dash, me: isMe, xs, rows, dots: dt, fd: tj ? tj.fd || null : null, line: ln, ls: tj ? tj.ls || "" : "", po: isMe && tj ? tj.po || [] : [],
             trend: !ln.length && dt && dt.length ? cmpTrend(id, LINE_MODE === "dots" ? cmpFill(dt, fr) : dt) : []}; };
   const series = comps.map(c => mkS(c[0], c[1], colOf(c[0]), dashOf(c[0]), xsOf(c[3]), c[4], false));
   const meS = mkS(d.id, d.name, css("--brown"), "", xsMe, me.map(s => [s.age, s.r, s.min, s.season]), true);
   series.push(meS);
 
   const sc = META.cmp_meta && META.cmp_meta.scale;
-  const lede = `<p class="lede">Each faint dot is about ten games of his rating, inside one regular season${meS.line.length ? "; the bold line is his smoothed trajectory" + (meS.ls === "d" ? ", with its 80% band shaded" : "") : meS.trend.length ? "; the bold line smooths the dots" : ""}.${meS.po.length ? " Teal diamonds are his playoff series, one per series." : ""} ${simC ? "Similar careers" : "Comparison players"} are drawn the same way in their own colours. The rating is points per 100 possessions better than an average player, so 0 is average${sc ? `; in ${sname(sc.season)} the middle player with 1,500+ minutes rated ${sgn(sc.median)}, the 10th best ${sgn(sc.tenth)} and the best ${sgn(sc.best)}` : ""}.${pj.length ? " The dashed olive line is his forecast for the next five seasons, with its 80% range." : ""}</p>`;
+  const lede = `<p class="lede">Each faint dot is about ten games of his rating, inside one regular season${meS.line.length ? "; the bold line is his smoothed trajectory" + (meS.ls === "d" ? ", with its 80% band shaded" : "") : meS.trend.length ? "; the bold line smooths the dots" : ""}.${meS.po.length ? " Teal diamonds are his playoff series, one per series." : ""} ${simC ? "Similar careers" : "Comparison players"} are drawn ${CMP_DECLUTTER ? `as lines in their own colours${series.length > 4 ? " (with five or more players, dots are hidden; click a diamond for a playoff series)" : series.length > 2 ? " (his dots fade when three or more players are drawn)" : ""}. Click or tap a dot or a diamond to read it` : "the same way in their own colours"}. The rating is points per 100 possessions better than an average player, so 0 is average${sc ? `; in ${sname(sc.season)} the middle player with 1,500+ minutes rated ${sgn(sc.median)}, the 10th best ${sgn(sc.tenth)} and the best ${sgn(sc.best)}` : ""}.${pj.length ? " The dashed olive line is his forecast for the next five seasons, with its 80% range." : ""}</p>`;
 
   const ghosts = CMPGHOST ? (cm.ghost || []).map(g => {
     const o = me.find(s => s.season === g[0]); if (!o) return null;
@@ -207,11 +258,20 @@ function modCompare(d){
   let bands = "", clouds = "", trends = "", marks = "", labs = [];
   const ord = [...series.filter(s => !s.me), ...series.filter(s => s.me)];
   let ivN = 0;   // CMP_VIEW_MARK: hollow dots / series drawn (seasons before 1996-97 on the all-time table's opening view)
+  // CMP_DECLUTTER: dot opacity scale per series (0 = no dots) by how many players are on the chart; the main player's line
+  // goes into trendMe, drawn after the playoff diamonds
+  const nS = series.length, dk = s => !CMP_DECLUTTER ? 1 : s.me ? (nS <= 2 ? 1 : nS <= 4 ? 0.55 : 0) : (nS === 2 ? 0.6 : 0);
+  let trendMe = "";
+  CMPHIT = [];
   ord.forEach(s => {
-    const op = s.me ? 0.42 : 0.3, rr = s.me ? 2.1 : 1.8, cls = s.me ? "fd me" : "fd";
-    if (s.dots && s.dots.length) clouds += s.dots.filter(p => p[1] >= y0 && p[1] <= y1).map(p => CMP_VIEW_MARK && p[4] === 1
-      ? (ivN++, `<circle class="${cls}" cx="${f1(Xp(s.xs(p[0], null)))}" cy="${f1(Yp(p[1]))}" r="${rr}" fill="none" stroke="${s.col}" stroke-width="${s.me ? 1.2 : 1}" opacity="${s.me ? 0.6 : 0.45}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])} (box score + estimated lineup part)</title></circle>`)
-      : `<circle class="${cls}" cx="${f1(Xp(s.xs(p[0], null)))}" cy="${f1(Yp(p[1]))}" r="${rr}" fill="${s.col}" opacity="${op}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])}</title></circle>`).join("");
+    const k = dk(s), op = (s.me ? 0.42 : 0.3) * k, rr = s.me ? 2.1 : 1.8, cls = s.me ? "fd me" : "fd";
+    const t0 = trends; if (CMP_DECLUTTER && s.me) trends = "";
+    if (k > 0 && s.dots && s.dots.length) clouds += s.dots.map((p, i) => [p, i]).filter(([p]) => p[1] >= y0 && p[1] <= y1).map(([p, i]) => {
+      const cx = Xp(s.xs(p[0], null)), cy = Yp(p[1]);
+      if (CMP_DECLUTTER) CMPHIT.push({x: cx, y: cy, k: "f", s, p, i});
+      return CMP_VIEW_MARK && p[4] === 1
+      ? (ivN++, `<circle class="${cls}" cx="${f1(cx)}" cy="${f1(cy)}" r="${rr}" fill="none" stroke="${s.col}" stroke-width="${s.me ? 1.2 : 1}" opacity="${(s.me ? 0.6 : 0.45) * k}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])} (box score + estimated lineup part)</title></circle>`)
+      : `<circle class="${cls}" cx="${f1(cx)}" cy="${f1(cy)}" r="${rr}" fill="${s.col}" opacity="${op}"><title>${E(s.name)}: age ${p[0].toFixed(1)}, ${p[3]} games, rating ${sgn(p[1])}</title></circle>`; }).join("");
     let last = null;
     if (s.line.length) {
       const lc = s.me ? "trj me" : "trj c", sw = s.me ? 3.4 : 2.4;
@@ -236,13 +296,15 @@ function modCompare(d){
       trends += `<path d="${path(pts)}" fill="none" stroke="${s.col}" stroke-width="${s.me ? 3.2 : 2}" stroke-dasharray="${s.dash || (s.dots === null ? "2 3" : "")}"/>`;
       last = [...pts[pts.length-1], s.rows[s.rows.length-1][1]];
     }
-    if (last) labs.push({x: last[0], y: last[1], v: last[2], t: s.name.split(" ").slice(-1)[0], col: s.col, me: s.me});
+    if (CMP_DECLUTTER && s.me) { trendMe = trends; trends = t0; }
+    if (last) labs.push({x: last[0], y: last[1], v: last[2], t: typeof ppSur === "function" ? ppSur(s.name) : s.name.split(" ").slice(-1)[0], col: s.col, me: s.me});
   });
   const poIn = meS.po.filter(p => p[1] >= y0 && p[1] <= y1);
-  marks = poIn.map(p => { const x = Xp(meS.xs(p[0], null)), y = Yp(p[1]), k = small ? 3.8 : 4.4;
+  marks = poIn.map((p, i) => { const x = Xp(meS.xs(p[0], null)), y = Yp(p[1]), k = CMP_DECLUTTER ? (small ? 3 : 3.4) : small ? 3.8 : 4.4;
     const res = p[7] != null ? `, ${p[7] > p[8] ? "won" : p[7] < p[8] ? "lost" : "tied"} ${p[7]}-${p[8]}` : "";
     const hol = CMP_VIEW_MARK && p[10] === 1; if (hol) ivN++;   // hollow: a season on the table's opening view (estimated lineup part)
-    return `<path class="po" d="M${f1(x)} ${f1(y - k)}L${f1(x + k)} ${f1(y)}L${f1(x)} ${f1(y + k)}L${f1(x - k)} ${f1(y)}Z" style="${hol ? "fill:var(--panel);stroke:var(--po)" : "fill:var(--po);stroke:var(--panel)"}" stroke-width="${hol ? 1.6 : 1}"><title>${E(sname(p[4]))} playoffs, ${cmpRound(p[6], p[4])} vs ${E(p[5])}${res}: ${p[3]} game${p[3] === 1 ? "" : "s"}, ${p[2]} minutes, rating ${sgn(p[1])}${p[9] ? " (minutes partly estimated)" : ""}${hol ? " (box score + estimated lineup part)" : ""}</title></path>`; }).join("");
+    if (CMP_DECLUTTER) CMPHIT.push({x, y, k: "po", s: meS, p, i});
+    return `<path class="po" d="M${f1(x)} ${f1(y - k)}L${f1(x + k)} ${f1(y)}L${f1(x)} ${f1(y + k)}L${f1(x - k)} ${f1(y)}Z" style="${hol ? "fill:var(--panel);stroke:var(--po)" : "fill:var(--po);stroke:var(--panel)"}" stroke-width="${hol ? 1.6 : 1}"${CMP_DECLUTTER ? ` opacity="${hol ? 0.75 : 0.6}"` : ""}><title>${E(sname(p[4]))} playoffs, ${cmpRound(p[6], p[4])} vs ${E(p[5])}${res}: ${p[3]} game${p[3] === 1 ? "" : "s"}, ${p[2]} minutes, rating ${sgn(p[1])}${p[9] ? " (minutes partly estimated)" : ""}${hol ? " (box score + estimated lineup part)" : ""}</title></path>`; }).join("");
 
   let fan = "";
   if (pj.length) {
@@ -257,7 +319,8 @@ function modCompare(d){
   labs.sort((a, b) => a.y - b.y);
   for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i-1].y < 15 && Math.abs(labs[i].x - labs[i-1].x) < 90) labs[i].y = labs[i-1].y + 15;
   const lb = labs.map(l => `<text x="${f1(Math.min(l.x + 7, W - 4))}" y="${f1(l.y + 4)}" text-anchor="${l.x + 7 > W - R + 60 ? "end" : "start"}" style="fill:${l.col};font:${l.me ? 700 : 600} ${small ? 11 : 12}px var(--sans);paint-order:stroke;stroke:${css("--bg")};stroke-width:3px">${E(l.t)}</text>`).join("");
-  const svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${E(d.name)}: rating by ${CMPX}, with ${simC ? "similar careers" : "comparison players"}">${g}${gh}${bands}${clouds}${fan}${trends}${marks}${lb}</svg>`;
+  const svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${E(d.name)}: rating by ${CMPX}, with ${simC ? "similar careers" : "comparison players"}">${g}${gh}${bands}${clouds}${fan}${trends}${marks}${trendMe}${lb}</svg>`
+    + (CMP_DECLUTTER ? `<div class="cmptip" hidden role="status"></div>` : "");
 
   const hand = new Set(sug.slice(0, cn).map(x => x[0]));
   const chip = (x, extra) => { const on = ids.includes(x[0]); const tip = extra ? "added by you" : hand.has(x[0]) ? "picked by hand: a player he is measured against in all-time debates" : `career-arc gap ${x[2]} points over ${x[3]} shared ages`;
@@ -280,10 +343,10 @@ function modCompare(d){
   const dot = col => `<svg width="12" height="10" aria-hidden="true"><circle cx="6" cy="5" r="2.4" fill="${col}" opacity=".5"/></svg>`;
   const br = css("--brown");
   const lnSw = `<svg width="22" height="12" aria-hidden="true">${meS.ls === "d" ? `<rect x="0" y="1" width="22" height="10" fill="${br}" opacity=".16"/>` : ""}<line x1="1" x2="21" y1="6" y2="6" stroke="${br}" stroke-width="3"/></svg>`;
-  const dia = `<svg width="12" height="12" aria-hidden="true"><path d="M6 1.2L10.8 6L6 10.8L1.2 6Z" style="fill:var(--po)"/></svg>`;
+  const dia = `<svg width="12" height="12" aria-hidden="true"><path d="M6 1.2L10.8 6L6 10.8L1.2 6Z" style="fill:var(--po)"${CMP_DECLUTTER ? ` opacity=".6"` : ""}/></svg>`;
   const loading = !CMPCAR || series.some(s => s.dots === null);
   const hol = `<svg width="12" height="10" aria-hidden="true"><circle cx="6" cy="5" r="2.6" fill="none" stroke="${br}" stroke-width="1.2" opacity=".7"/></svg>`;
-  const legend = `<div class="cmpleg"><span>${dot(br)}about ten games, regular season</span>${ivN ? `<span>${hol}before 1996-97: box score + estimated lineup part</span>` : ""}${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? (LINE_MODE === "dots" ? `<span>${sw(br, "", 3.4)}smoothed line through his dots</span>` : `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>`) : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
+  const legend = `<div class="cmpleg">${CMP_DECLUTTER && dk(meS) === 0 ? "" : `<span>${dot(br)}about ten games, regular season</span>`}${ivN ? `<span>${hol}before 1996-97: box score + estimated lineup part</span>` : ""}${meS.line.length ? `<span>${lnSw}smoothed trajectory${meS.ls === "d" ? ", 80% band" : " (simple average)"}</span>` : meS.trend.length ? (LINE_MODE === "dots" ? `<span>${sw(br, "", 3.4)}smoothed line through his dots</span>` : `<span>${sw(br, "", 3)}smoothed (simple average of his dots)</span>`) : ""}${poIn.length ? `<span>${dia}playoffs, one dot per series</span>` : ""}${pj.length ? `<span>${sw(ol, "6 4", 2)}forecast and 80% range</span>` : ""}${CMPGHOST ? `<span>${sw(ol, "3 3", 1.3)}past forecasts</span>` : ""}${loading ? `<span>loading game-level careers\u2026</span>` : ""}${CMPCAR && CMPCAR.err ? `<span>comparison careers did not load (${E(CMPCAR.err)})</span>` : ""}</div>`;
 
   const nowA = me.length ? me[me.length-1].age : null, ak = nowA != null ? Math.floor(nowA) : null;
   const atAge = rows => { if (ak == null) return null; const r = rows.find(x => Math.floor(x[0]) === ak); return r ? r[1] : null; };
@@ -293,7 +356,7 @@ function modCompare(d){
   const trow = (name, id, col, rows, pos) => { const pk = cmpPeak(rows), best = rows.length ? rows.reduce((a, b) => b[1] > a[1] && b[2] >= 500 ? b : a, rows[0]) : null;
     return `<tr><td class="l"><i style="background:${col}"></i>${linkable(id) ? `<a href="#p-${id}">${E(name)}</a>` : E(name)}</td><td class="l">${E(pos || "")}</td><td>${rows.length ? `${sname(rows[0][3]).slice(0,4)}\u2013${String(rows[rows.length-1][3]+1).slice(2)}` : "\u2013"}</td><td>${rows.length}</td><td>${anyAt ? sgn(atAge(rows)) : rows.length ? `${sgn(rows[rows.length-1][1])} <span class="mute">(${fmtA(rows[rows.length-1][0])})</span>` : "\u2013"}</td><td>${sgn(pk)}</td><td>${best ? `${sgn(best[1])} <span class="mute">(${fmtA(best[0])})</span>` : "\u2013"}</td></tr>`; };
   const tbl = (me.length && comps.length) ? `<div class="tbl cmptbl"><table><thead><tr><th class="l">Player</th><th class="l">Pos</th><th>Seasons</th><th>N</th><th>${anyAt ? `At age ${ak}` : "Last season (age)"}</th><th>Best 3 avg</th><th>Best season (age)</th></tr></thead><tbody>
-    ${trow(d.name, d.id, css("--brown"), me.map(s => [s.age, s.r, s.min, s.season]), cm.posg || d.pos)}${comps.map(c => trow(c[1], c[0], colOf(c[0]), c[4], c[2])).join("")}</tbody></table><p class="note" style="margin:6px 8px">Season columns use ${(META.cmp_meta || {}).ap ? "the season ratings (as played from 1996-97 on)" : "the season SiPM ratings"}${ivN ? "; before 1996-97, box score + estimated lineup part, as the chart" : ""}.</p></div>` : "";
+    ${trow(d.name, d.id, css("--brown"), me.map(s => [s.age, s.r, s.min, s.season]), cm.posg || d.pos)}${comps.map(c => trow(c[1], c[0], colOf(c[0]), c[4], c[2])).join("")}</tbody></table><p class="note" style="margin:6px 8px">Season columns use ${(META.cmp_meta || {}).ap ? "the season ratings (as played from 1996-97 on)" : "the season SiPM ratings"}${ivN || (CMP_DECLUTTER && series.some(s => (s.dots || []).some(p => p[4] === 1))) ? "; before 1996-97, box score + estimated lineup part, as the chart" : ""}.</p></div>` : "";
 
   const gt = META.cmp_meta && META.cmp_meta.ghost_test, h1 = gt && gt.by_h[0], h5 = gt && gt.by_h[gt.by_h.length-1];
   const lineTxt = meS.line.length ? (meS.ls === "d"
@@ -304,7 +367,13 @@ function modCompare(d){
 
   // CMP_VIEW_MARK: one note line under the chart when hollow dots are drawn
   const ivNote = ivN ? `<p class="note" style="margin:6px 0 0">Hollow dots: seasons before 1996-97, when there is no lineup data. Each such season averages the box-score rating plus an estimated lineup part (what the box score misses, mostly defence), as in the all-time table’s opening view; its “Box score, every era” button shows box score only.</p>` : "";
-  return `<section class="mod" id="m-cmp"><style>${CMPCSS}</style>${head}${lede}${chips}${legend}${svg}${ivNote}${tbl}${notes}</section>`;
+  if (CMP_GLOSS && typeof ppQ === "function") {   // short lede; the full lede, the hollow-dot note and the method notes behind a (?)
+    const inner = (h, open) => h.slice(h.indexOf(">", h.indexOf(open)) + 1, h.lastIndexOf("</p>"));
+    const short = `<p class="lede">Each faint dot is about ten games of his rating; the bold line smooths them.${meS.po.length ? " Diamonds are his playoff series." : ""}${pj.length ? " The dashed olive line is his forecast for the next five seasons." : ""}${CMP_DECLUTTER ? " Click or tap a dot or a diamond to read it." : ""} 0 is an average player.${ppQ("cmpq", "How this chart is made")}</p>`;
+    const body = `<p>${inner(lede, "<p")}</p>${ivNote ? `<p>${inner(ivNote, "<p")}</p>` : ""}<p>${inner(notes, "<p")}</p>`;
+    return `<section class="mod" id="m-cmp"><style>${CMPCSS}${CMP_DECLUTTER ? CMPCSS2 : ""}</style>${head}${short}${ppQBody("cmpq", body)}${chips}${legend}${CMP_DECLUTTER ? `<div class="cmpwrap">${svg}</div>` : svg}${tbl}</section>`;
+  }
+  return `<section class="mod" id="m-cmp"><style>${CMPCSS}${CMP_DECLUTTER ? CMPCSS2 : ""}</style>${head}${lede}${chips}${legend}${CMP_DECLUTTER ? `<div class="cmpwrap">${svg}</div>` : svg}${ivNote}${tbl}${notes}</section>`;
 }
 
 // wiring for the chart's controls; history.js also calls it after drawing a retired page (CMPD = the player drawn)
@@ -315,6 +384,8 @@ function cmpWire(){
   const tog = e => { const b = e.target.closest("button[data-id]"); if (!b || !CMPD) return; const id = +b.dataset.id, st = cmpState(CMPD);
     keep(() => { const i = st.on.indexOf(id); if (i >= 0) { st.on.splice(i, 1); const j = st.extra.indexOf(id); if (j >= 0) st.extra.splice(j, 1); } else st.on.push(id); }); };
   ["#cmpChips", "#cmpMore"].forEach(s => { const el = document.querySelector(s); if (el) el.onclick = tog; });
+  if (CMP_DECLUTTER) { const sv = document.querySelector("#m-cmp .cmpwrap svg.chart");   // click / tap a mark -> its label
+    if (sv && typeof sv.getBoundingClientRect === "function") sv.onclick = e => cmpTipAt(sv, e); }
   // the name list for "+ add any player" lives outside #app so re-renders do not rebuild it
   if (CMPCAR && CMPCAR.list.length && typeof document.getElementById === "function" && !document.getElementById("cmpList") && document.body)
     document.body.insertAdjacentHTML("beforeend", `<datalist id="cmpList">${Object.keys(CMPCAR.key).map(k => `<option value="${E(k)}"></option>`).join("")}</datalist>`);

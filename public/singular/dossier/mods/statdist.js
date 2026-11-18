@@ -231,7 +231,7 @@ function sdChart(k, D, H, posf, W){
   }
   g += `<text x="${ml + pw / 2}" y="${Hh - 4}" text-anchor="middle">${E(st[0])}${st[3] ? " (lower is better)" : ""}</text><text x="4" y="${mt - 14}">players</text>`;
   if (H && H.v != null && isFinite(H.v)) {
-    const hx = X(H.v), last = String(H.name || "").split(" ").slice(-1)[0], lab = `${last} ${sdVal(k, H.v)}${H.ss ? " (small sample)" : ""}`;
+    const hx = X(H.v), last = typeof ppSur === "function" ? ppSur(String(H.name || "")) : String(H.name || "").split(" ").slice(-1)[0], lab = `${last} ${sdVal(k, H.v)}${H.ss ? " (small sample)" : ""}`;
     const right = hx > W - 150;
     g += `<line x1="${hx.toFixed(1)}" x2="${hx.toFixed(1)}" y1="${mt - 6}" y2="${mt + ph}" stroke="var(--ink)" stroke-width="2"${H.ss ? ' stroke-dasharray="4 3"' : ""}/>`
       + `<text class="mk" x="${(right ? hx - 5 : hx + 5).toFixed(1)}" y="${mt - 2}" text-anchor="${right ? "end" : "start"}">${E(lab)}</text>`;

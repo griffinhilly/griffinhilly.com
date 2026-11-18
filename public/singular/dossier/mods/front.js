@@ -1,6 +1,9 @@
 // Front page: league table with "surprise" heat (data: front.json, built by scripts/pp_front.py).
 // Colour = how unusual a number is for a player of his impact (z of actual vs expected), or plain league percentile.
 let FR = null;                       // front.json
+// FR_SELECTS (DESIGNP 2026-11-17 sweep; Griffin: rarely used option buttons become menus, frequent toggles stay buttons): the
+// "Colour", "Expected from" and "Sort stats by" rows become drop-down menus; "Season" stays as buttons. False = all buttons.
+const FR_SELECTS = true;
 const FS = { season: "2026", colour: "surp", exp: "pos", sortBy: "val", sort: "r", dir: -1,
              team: "", pos: "", gfrac: 0.25, mpg: 10, q: "" };
 const F_STAT_DESC = {
@@ -29,6 +32,7 @@ function renderFront(){
   const dt = new Date(FR.data_through + "T12:00:00");
   const dts = isNaN(dt) ? E(FR.data_through) : dt.toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
   const seg = (id, cur, opts) => `<div class="seg" id="${id}" role="group">${opts.map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(v) === String(cur)}">${l}</button>`).join("")}</div>`;
+  const pick = (id, cur, opts, lab) => !FR_SELECTS ? seg(id, cur, opts) : `<select id="${id}" aria-label="${lab}">${opts.map(([v, l]) => `<option value="${v}"${String(v) === String(cur) ? " selected" : ""}>${l}</option>`).join("")}</select>`;
   $("#app").innerHTML = `<style>
   .fhead{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:8px 32px;padding-block:26px 14px;border-bottom:1px solid var(--line)}
   @media (max-width:860px){.fhead{grid-template-columns:minmax(0,1fr)}}
@@ -88,9 +92,9 @@ function renderFront(){
     </div>
     <div class="fctl">
       <div class="row"><span>Season</span>${seg("fSeason", FS.season, [["2026", "2026-27 so far"], ["2025", "2025-26"]])}</div>
-      <div class="row"><span>Colour</span>${seg("fColour", FS.colour, [["surp", "Surprise vs impact"], ["pct", "League percentile"], ["off", "Off"]])}</div>
-      <div class="row" id="fExpRow"><span>Expected from</span>${seg("fExp", FS.exp, [["pos", "SiPM + position"], ["imp", "SiPM only"]])}</div>
-      <div class="row"><span>Sort stats by</span>${seg("fSortBy", FS.sortBy, [["val", "Number"], ["z", "Colour (surprise)"]])}</div>
+      <div class="row"><span>Colour</span>${pick("fColour", FS.colour, [["surp", "Surprise vs impact"], ["pct", "League percentile"], ["off", "Off"]], "Colour")}</div>
+      <div class="row" id="fExpRow"><span>Expected from</span>${pick("fExp", FS.exp, [["pos", "SiPM + position"], ["imp", "SiPM only"]], "Expected from")}</div>
+      <div class="row"><span>Sort stats by</span>${pick("fSortBy", FS.sortBy, [["val", "Number"], ["z", "Colour (surprise)"]], "Sort stats by")}</div>
     </div>
   </header>
   <section style="padding-top:14px">
@@ -115,6 +119,8 @@ function frWire(){
   const segOn = (id, key, num) => { const el = $("#" + id); if (!el) return; el.onclick = e => { const b = e.target.closest && e.target.closest("button"); if (!b) return;
     FS[key] = num ? +b.dataset.v : b.dataset.v; [...el.children].forEach(x => x.setAttribute("aria-pressed", String(x === b))); frUpdate(); }; };
   segOn("fSeason", "season"); segOn("fColour", "colour"); segOn("fExp", "exp"); segOn("fSortBy", "sortBy"); segOn("fPos", "pos"); segOn("fCardsMode", "cards");
+  if (FR_SELECTS) for (const [id, key] of [["fColour", "colour"], ["fExp", "exp"], ["fSortBy", "sortBy"]]) { const el = $("#" + id);
+    if (el && el.tagName === "SELECT") el.onchange = () => { FS[key] = el.value; frUpdate(); }; }
   const q = $("#fQ"); if (q) q.oninput = () => { FS.q = q.value; frUpdate(); };
   const t = $("#fTeam"); if (t) t.onchange = () => { FS.team = t.value; frUpdate(); };
   const g = $("#fG"); if (g) g.onchange = () => { FS.gfrac = +g.value; frUpdate(); };

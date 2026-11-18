@@ -18,6 +18,10 @@ const HX_DF = true;  // DOSSIER_FIRST (2026-11-16): the header link to the hub p
 // season rows before 1996-97 flagged r[14] = 1 show the table's value with the best-available value r[13] beneath when it differs
 // by 0.1+. HX_VIEW_MARK false, or docs without iv = the page as before.
 const HX_VIEW_MARK = true;
+// HX_SORT (DESIGNP 2026-11-17 sweep; Griffin: rank numbers as the first column in sortable tables): the team-season roster gets
+// an "Rk" column first and sorts by any column header (click again to flip); it opens sorted by minutes as before. False = as before.
+const HX_SORT = true;
+const HXS = {k: "mn", dir: -1};
 const HX_IV_READ = "Seasons before 1996-97 (marked *) add an estimated lineup part to his box-score rating: what the box score misses, mostly defence, as the all-time table's opening view does. There is no lineup data before then.";
 const HX_AP_NOTE = "As played = his rating for that season itself: that season's lineup results, shrunk toward his box-score rating (from 1996-97). Forecast for next season = his Singular SiPM at the end of that season, which projects the following season and so includes the expected change with age.";
 const HXCSS = `
@@ -129,14 +133,27 @@ function hxTeamHTML(c, y, d, T){
   const codeIn = s => (T.seasons[s].find(r => r[4] === d.fr) || [c])[0];
   const pct = d.w != null && d.w + d.l ? (d.w / (d.w + d.l)).toFixed(3).replace(/^0/, "") : null;
   // rating columns first after the name, so a phone shows them without sideways scrolling
-  const ths = `<tr><th class="l">Player</th><th title="Minutes for this team">Min</th><th class="l" title="${d.ap && !pre && !cur ? "As played: his rating for that season itself, points per 100 possessions above an average player" : "Singular SiPM for his season: points per 100 possessions above an average player"}">${d.ap && !cur && !pre ? "As played" : "Rating"}${pre ? "*" : ""}</th><th title="Offence part of the rating">Off</th><th title="Defence part of the rating">Def</th><th title="Rating x his share of the team's minutes (five players at a time)">Adds</th><th title="Age on Feb 1 of the season">Age</th><th title="Games played for this team">G</th><th title="Minutes per game">MPG</th><th>PTS</th><th>REB</th><th>AST</th></tr>`;
-  const body = d.rows.map(r => {
+  let ths = `<tr><th class="l">Player</th><th title="Minutes for this team">Min</th><th class="l" title="${d.ap && !pre && !cur ? "As played: his rating for that season itself, points per 100 possessions above an average player" : "Singular SiPM for his season: points per 100 possessions above an average player"}">${d.ap && !cur && !pre ? "As played" : "Rating"}${pre ? "*" : ""}</th><th title="Offence part of the rating">Off</th><th title="Defence part of the rating">Def</th><th title="Rating x his share of the team's minutes (five players at a time)">Adds</th><th title="Age on Feb 1 of the season">Age</th><th title="Games played for this team">G</th><th title="Minutes per game">MPG</th><th>PTS</th><th>REB</th><th>AST</th></tr>`;
+  let rows = d.rows;
+  if (HX_SORT) {   // Rk first; every column header sorts (click again to flip); default = minutes, most first (the order above)
+    const ks = ["nm", "mn", "rr", "ro", "rd", "con", "age", "g", "mpg", "pts", "reb", "ast"];
+    const at = {nm: 1, age: 2, g: 3, mn: 4, pts: 5, reb: 6, ast: 7, rr: 8, ro: 9, rd: 10, con: 11};
+    const val = r => HXS.k === "mpg" ? (r[3] ? r[4] / r[3] : null) : r[at[HXS.k]];
+    if (!(HXS.k === "mn" && HXS.dir < 0)) rows = d.rows.slice().sort((a, b) => { const x = val(a), y = val(b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return (typeof x === "string" ? x.localeCompare(y) : x - y) * HXS.dir; });
+    let i = 0;
+    ths = ths.replace("<tr>", `<tr><th title="Rank in the current order; click any column header to sort">Rk</th>`).replace(/<th([^>]*)>([\s\S]*?)<\/th>/g, (m, a, t) => {
+      if (/>Rk$/.test(m.slice(0, m.length - 5)) || t === "Rk") return m;
+      const k = ks[i++]; const on = HXS.k === k;
+      return `<th${a} data-k="${k}" style="cursor:pointer"${on ? ` aria-sort="${HXS.dir > 0 ? "ascending" : "descending"}"` : ""}>${t}${on ? (HXS.dir > 0 ? " ▴" : " ▾") : ""}</th>`; });
+  }
+  const body = rows.map((r, ri) => {
     const [id, nm, age, g, mn, pts, reb, ast, rr, ro, rd, con, lk] = r;
     const name = lk ? `<a class="hx-tl" href="#p-${id}">${E(nm)}</a>` : E(nm);
-    return `<tr><td class="l">${name}</td><td>${hxInt(mn)}</td><td class="l">${hxBar(rr, 6)}<b>${hxS(rr)}</b></td><td>${hxS(ro)}</td><td>${hxS(rd)}</td><td>${hxS(con)}</td>`
+    return `<tr>${HX_SORT ? `<td>${ri + 1}</td>` : ""}<td class="l">${name}</td><td>${hxInt(mn)}</td><td class="l">${hxBar(rr, 6)}<b>${hxS(rr)}</b></td><td>${hxS(ro)}</td><td>${hxS(rd)}</td><td>${hxS(con)}</td>`
       + `<td>${age ?? "\u2013"}</td><td>${g}</td><td>${g ? (mn / g).toFixed(1) : "\u2013"}</td><td>${hxF1(pts)}</td><td>${hxF1(reb)}</td><td>${hxF1(ast)}</td></tr>`;
   }).join("");
-  const tot = `<tr class="tot"><td class="l">Team: ratings added up</td><td>${hxInt(d.tmin)}</td><td class="l"></td><td></td><td></td><td>${hxS(d.est)}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+  const tot = `<tr class="tot">${HX_SORT ? "<td></td>" : ""}<td class="l">Team: ratings added up</td><td>${hxInt(d.tmin)}</td><td class="l"></td><td></td><td></td><td>${hxS(d.est)}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
   const seasonOpts = yrs.slice().reverse().map(s => `<option value="${s}"${s === y ? " selected" : ""}>${sname(s)}</option>`).join("");
   const teamOpts = T.seasons[y].slice().sort((a, b) => a[1].localeCompare(b[1])).map(r => `<option value="${r[0]}"${r[0] === c ? " selected" : ""}>${E(r[1])}</option>`).join("");
   const unr = d.rated != null && d.rated < 0.995 ? ` ${Math.round(100 * (1 - d.rated))}% of the team's minutes belong to players Singular does not rate; they count as 0 (average).` : "";
@@ -158,7 +175,7 @@ function hxTeamHTML(c, y, d, T){
     </div>
   </header>
   ${why ? `<p class="hx-why">${why}</p>` : ""}
-  <section class="mod" id="hx-roster"><div class="mhead"><h2>Roster and ratings</h2><span class="note">sorted by minutes; click a name for his page</span></div>
+  <section class="mod" id="hx-roster"><div class="mhead"><h2>Roster and ratings</h2><span class="note">${HX_SORT ? "click a column to sort; click a name for his page" : "sorted by minutes; click a name for his page"}</span></div>
     <div class="tbl"><table class="hx-tbl"><thead>${ths}</thead><tbody>${body}${tot}</tbody></table></div>
     <p class="note" style="margin-top:8px">${d.ap && !pre && !cur ? `As played = the player's own rating for his whole season (all his teams): that season's lineup results, shrunk toward his box-score rating; not SiPM's end-of-season number, which projects the next season. Points per 100 possessions above an average player of that season; offence + defence = rating.` : "Rating = Singular SiPM for the player's whole season (all his teams), points per 100 possessions above an average player of that season; offence + defence = rating."}${cur ? ` 2026-27 is in progress: ratings are each player's current rating (Singular's rest-of-season projection); games and minutes are to date${M.data_through ? ` (through ${E(M.data_through)})` : ""}.` : ""} PTS, REB, AST per game for this team.${unr} ${hxEraNote(y)}</p>
     <p class="note">Rosters, minutes and box lines: Basketball-Reference season totals${y >= M.cur ? "; 2026-27 from NBA box scores" : ""}. Record, margin and net rating: ${d.src === "db" ? "NBA box scores (net rating = margin per 100 possessions)" : "Basketball-Reference"}.</p>
@@ -166,6 +183,10 @@ function hxTeamHTML(c, y, d, T){
   <footer>Ratings: Singular SiPM. History pages built ${E(M.built || "")}.</footer>`;
 }
 function hxWireTeam(c, y, S, T){
+  const th = document.querySelector("#hx-roster thead");
+  if (HX_SORT && th && typeof th.addEventListener === "function") th.addEventListener("click", e => { const h = e.target.closest("th[data-k]"); if (!h) return;
+    const k = h.dataset.k; HXS.dir = HXS.k === k ? -HXS.dir : (k === "nm" ? 1 : -1); HXS.k = k;
+    const sy = window.scrollY; $("#app").innerHTML = hxTeamHTML(c, y, S[c], T); hxWireTeam(c, y, S, T); window.scrollTo(0, sy); });
   const ts = document.querySelector("#hxTeam"), ss = document.querySelector("#hxSeason");
   if (ts) ts.onchange = () => { location.hash = `t-${ts.value}-${y}`; };
   if (ss) ss.onchange = () => { const s = +ss.value, fr = S[c].fr, r = (T.seasons[s] || []).find(r => r[4] === fr);

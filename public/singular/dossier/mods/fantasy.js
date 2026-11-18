@@ -1,6 +1,9 @@
 // Fantasy ranks view, shown at #fantasy (data: fantasy.json, built by scripts/pp_fantasy.py from su_fantasy_live.py).
 // Our own 9-cat projection with live minutes. No other site's rankings appear here; the one expert number is an aggregate test score.
 let FN = null;
+// FN_GLOSS (DESIGNP 2026-11-17 sweep: long explanations behind a (?)): the tests box and the three "Value / Stat line / Live
+// minutes" blocks open from two (?) lines at the top right (mods/gloss.js). False = shown in full, as before.
+const FN_GLOSS = true;
 const FNS = { q: "", team: "", pos: "", rule: "", top: 150, cell: "pg", sort: "rk", dir: 1 };
 const FN_CATS = [["pts", "PTS", "Points per game"], ["fg3m", "3PM", "Threes made per game"], ["reb", "REB", "Rebounds per game"], ["ast", "AST", "Assists per game"],
   ["stl", "STL", "Steals per game"], ["blk", "BLK", "Blocks per game"], ["fgp", "FG%", "Field-goal %, weighted by attempts in the z-score"],
@@ -22,6 +25,7 @@ function renderFantasy(){
   const seg = (id, cur, opts) => `<div class="seg" id="${id}" role="group">${opts.map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(v) === String(cur)}">${l}</button>`).join("")}</div>`;
   const s0 = MT.seasons[0], s1 = MT.seasons[1], rc = M.rule_counts || {};
   const f2 = x => x.toFixed(2), f3 = x => x.toFixed(3);
+  const FNG = FN_GLOSS && typeof ppQ === "function";
   $("#app").innerHTML = `<style>
   .fnhead{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:8px 32px;padding-block:26px 16px;border-bottom:1px solid var(--line)}
   @media (max-width:900px){.fnhead{grid-template-columns:minmax(0,1fr)}}
@@ -59,7 +63,7 @@ function renderFantasy(){
   .fntbl .flag.inj{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 45%,var(--line))}
   .fntbl tbody tr:hover td{box-shadow:inset 0 1px 0 var(--mute),inset 0 -1px 0 var(--mute)}
   .fntbl tbody tr:hover td.stk{background:color-mix(in srgb,var(--ochre) 14%,var(--panel))}
-  .fnnote{font-size:12.5px;color:var(--mute);margin-top:8px;max-width:110ch}
+  .fnnote{font-size:12.5px;color:var(--mute);margin-top:8px;max-width:110ch}${FNG ? ".fnmeth[hidden],.fnbox[hidden]{display:none}.fnside{align-self:start}.fnql{margin:0 0 8px;font-size:15px;display:flex;align-items:center;justify-content:flex-end;gap:2px}.fnside .fnbox{margin-top:6px;text-align:left}@media (max-width:760px){.fnql{justify-content:flex-start}}" : ""}
   @media (max-width:640px){.fnfil input{width:100%}.fnfil .cnt{margin-left:0}.fntbl .c1{min-width:128px;max-width:140px}}
   </style>
   <header class="fnhead">
@@ -68,14 +72,14 @@ function renderFantasy(){
       <h1 style="margin-top:6px">Fantasy ranks, 9-category</h1>
       <p class="lede">Our per-game fantasy value for ${E(M.season)}, ranked. Each player's projected stat line is his per-minute rates times the minutes he is likely to play from here on. Colour shows each category against the top ${M.pool_size} players (a 12-team league's rosters): hot helps a fantasy team, cold hurts. Click a column to sort; click a name for his page. Minutes and injuries through ${dts}.</p>
     </div>
-    <div class="fnbox">
-      <h3>Does the minutes model help? The tests</h3>
+    ${FNG ? `<div class="fnside"><p class="fnql">How these ranks are built${ppQ("fnq-how", "How these ranks are built")}</p><p class="fnql">Does the minutes model help? The tests${ppQ("fnq-test", "The minutes model tests")}</p>` : ""}<div class="fnbox"${FNG ? ' id="fnq-test" hidden' : ""}>
+      ${FNG ? "" : "<h3>Does the minutes model help? The tests</h3>"}
       <p><b>${s1 - s0 + 1} past seasons</b> (${sname(s0)} to ${sname(s1)}), each predicted from earlier seasons only: the model missed minutes per game by <b>${f2(MT.mpg_n10.model_mae)}</b> over the next 10 games, against <b>${f2(MT.mpg_n10.baseline_mae)}</b> for season-to-date minutes; and by <b>${f2(MT.mpg_ros.model_mae)}</b> for the rest of the season, against <b>${f2(MT.mpg_ros.baseline_mae)}</b> for the best simple rule (a blend of this season and last). It won in <b>${E(MT.mpg_n10.seasons_improved.replace("/", " of "))}</b> seasons on both.</p>
       <p><b>This season</b>, frozen at opening night: how well did each version's ranks match the 9-cat value players have actually produced (${RA.n} players with 6+ games; rank correlation, 1 = perfect)? With the minutes model <b>${f3(RA.minutes_model)}</b>, with our old minutes <b>${f3(RA.old_minutes)}</b>, the median of public expert rankings <b>${f3(RA.experts)}</b>.${RA.top150 ? ` Among the top 150 there is no gain (${f3(RA.top150.minutes_model)} vs ${f3(RA.top150.old_minutes)}; experts ${f3(RA.top150.experts)}).` : ""}</p>
       <p style="color:var(--mute)">Read: a small preseason gain, still a little behind the experts. The model earns its place in-season, when roles change.</p>
-    </div>
+    </div>${FNG ? "</div>" : ""}
   </header>
-  <div class="fnmeth">
+  <div class="fnmeth"${FNG ? ' id="fnq-how" hidden' : ""}>
     <div><h3>Value</h3><p>Nine categories: points, threes, rebounds, assists, steals, blocks, FG%, FT% and turnovers. Each is a z-score against the top ${M.pool_size} players; shooting percentages count by attempts, so a 60% shooter on 3 shots helps less than on 15. Value is the average of the nine. It is per game played, so games missed to injury do not lower it.</p></div>
     <div><h3>Stat line</h3><p>Per-minute rates come from our preseason projection: his last three seasons, weighted toward the latest, aged with Singular's skill curves and pulled toward average when the sample is small. They are not yet updated for how he has played this season; only his minutes are.</p></div>
     <div><h3>Live minutes</h3><ul>

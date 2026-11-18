@@ -5,19 +5,25 @@
 <title>NBA player ratings 2026-27 | Singular</title>
 <meta name="description" content="SiPM impact ratings, 2026-27 projections and five-season outlooks for every NBA player.">
 <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
-<style>.sg-top{background:var(--panel);border-bottom:1px solid var(--line);font-family:var(--sans)}
-.sg-bar{max-width:1400px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.sg-brand{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:.01em;font-size:1.05rem}
-.sg-bar nav{display:flex;gap:16px;flex-wrap:wrap;flex:1}
-.sg-bar nav a{color:var(--mute);text-decoration:none;font-size:.92rem}
-.sg-bar nav a[aria-current],.sg-bar nav a:hover{color:var(--ink)}
-.sg-bar nav a[aria-current]{box-shadow:0 2px 0 var(--ink)}
-.sg-bar .theme{background:none;border:1px solid var(--line);color:var(--mute);border-radius:6px;padding:4px 6px;cursor:pointer;line-height:0}
-.sg-asof{max-width:1400px;margin:0 auto;padding:0 16px 8px;font:500 .78rem/1.4 var(--mono);color:var(--mute);letter-spacing:.02em}
-.sg-asof b{color:var(--ink);font-weight:500}.sg-asof a{color:var(--mute)}
-.sg-top .hm{display:none}
-@media (max-width:640px){.sg-top .hs{display:none}.sg-top .hm{display:inline}.sg-bar{gap:12px}
- .sg-bar nav{flex-wrap:nowrap;overflow-x:auto;gap:12px;scrollbar-width:none}.sg-bar nav a{font-size:.86rem;white-space:nowrap}}</style>
+<style>.sg-top.sg2-bar{background:var(--bg);border-bottom:1px solid var(--line);font-family:var(--sans)}
+.sg2-in{position:relative;max-width:1360px;margin:0 auto;padding:0 16px;min-height:54px;display:flex;align-items:center;gap:14px}
+.sg2-brand{flex:0 0 auto;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:.01em;font-size:1.05rem}
+.sg2-q{flex:1 1 auto;max-width:560px;min-width:0;margin:0}
+.sg2-q input{width:100%;font:16px var(--sans);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 12px;min-height:36px}
+.sg2-menu{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font:600 14px var(--sans);color:var(--ink);background:var(--panel);
+ border:1px solid var(--line);border-radius:999px;padding:7px 13px;min-height:36px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sg2-menu:hover,.sg2-menu[aria-expanded=true]{border-color:var(--mute)}
+.sg2-panel{position:absolute;right:16px;top:calc(100% + 2px);min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:8px;
+ padding:6px;box-shadow:0 10px 28px rgb(0 0 0/.14);display:flex;flex-direction:column;z-index:31}
+.sg2-panel[hidden]{display:none}
+.sg2-panel a,.sg2-panel button{display:block;width:100%;text-align:left;padding:8px 12px;border-radius:6px;color:var(--ink);text-decoration:none;
+ font:15px/1.3 var(--sans);background:none;border:0;cursor:pointer}
+.sg2-panel a:hover,.sg2-panel button:hover{background:var(--bg)}
+.sg2-panel a[aria-current]{font-weight:700}
+.sg2-panel hr{border:0;border-top:1px solid var(--line);margin:5px 6px}
+.sg2-panel .sg2-theme{color:var(--mute)}
+@media (max-width:480px){.sg2-menu span{display:none}.sg2-menu{padding:8px 10px}.sg2-in{gap:10px}.sg2-brand{font-size:15px}}</style>
+<script>/* DESIGNP 2026-11-17 (mods/header.js HDR_V2): the hub's stored light / dark choice, applied before the page paints */(function(on){if(!on)return;try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}})(/*HDR_V2*/true)</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -109,7 +115,7 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
 @media (prefers-reduced-motion:no-preference){.track i{transition:width .4s ease}}
 </style>
 
-<header class="sg-top"><div class="sg-bar"><a class="sg-brand" href="/singular/">Singular</a><nav><a href="/singular/" aria-current="page">Players</a><a href="/singular/all-time/">All-time</a><a href="/singular/tests/">Tests</a><a href="/singular/method/">Method</a><a href="/singular/report/"><span class="hs">Bulls report</span><span class="hm">Report</span></a></nav><button class="theme" type="button" aria-label="Switch light or dark" onclick="var r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=d==='light'?'dark':'light';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button></div><p class="sg-asof">Data through <b>November 16, 2026</b> · <a href="/singular/ratings/">Ratings table</a></p></header>
+<header class="sg-top sg2-bar"><div class="sg2-in w"><a class="sg2-brand" href="/singular/">Singular</a><form class="sg2-q" role="search" action="/singular/dossier/" method="get"><input id="sg2-qi" name="q" type="search" placeholder="Find a player or a team season" aria-label="Find a player or a team season" autocomplete="off"></form><button class="sg2-menu" type="button" aria-expanded="false" aria-controls="sg2-panel" aria-label="Menu"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg><span>Menu</span></button><nav class="sg2-panel" id="sg2-panel" aria-label="Site" hidden><a href="/singular/" aria-current="page">Players</a><a href="/singular/all-time/">All-time</a><a href="/singular/season/">Seasons</a><a href="/singular/dossier/#teams">Teams</a><a href="/singular/dossier/#fantasy">Fantasy</a><a href="/singular/method/">Method</a><hr><a href="/singular/tests/">Tests</a><a href="/singular/ratings/">Ratings table</a><a href="/singular/report/">Bulls report</a><hr><button class="sg2-theme" type="button">Light / dark</button></nav></div></header><script>(function(){var b=document.querySelector('.sg2-menu'),p=document.getElementById('sg2-panel');if(!b||!p)return;function set(o){p.hidden=!o;b.setAttribute('aria-expanded',o?'true':'false')}b.addEventListener('click',function(e){e.stopPropagation();set(p.hidden)});document.addEventListener('click',function(e){if(!p.hidden&&!p.contains(e.target))set(false)});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden){set(false);b.focus()}});p.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});var t=p.querySelector('.sg2-theme');if(t)t.addEventListener('click',function(){var r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=d==='light'?'dark':'light';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}})})();</script>
 <div class="bar"><div class="wrap">
   <span class="brand">Players</span>
   <input id="q" list="plist" placeholder="Find a player (626 current players)" autocomplete="off" aria-label="Find a player">
@@ -143,6 +149,9 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
 <script src="/singular/dossier/mods/statdist.js"></script>
 <script src="/singular/dossier/mods/asplayed.js"></script>
 <script src="/singular/dossier/mods/dossierfirst.js"></script>
+<script src="/singular/dossier/mods/gloss.js"></script>
+<script src="/singular/dossier/mods/header.js"></script>
+<script src="/singular/dossier/mods/sweep.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -524,7 +533,7 @@ function modDraft(d){
   const top5 = new Set((r.class||[]).slice(0,5).map(c=>c[0]));
   const dots = r.dots.slice().reverse().map(x => { const me = x[2]===d.id, cx = X(x[0]) + (x[0]==null ? ((x[2]%17)-8) : 0);
     return `<circle cx="${cx.toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="${me?7:4}" fill="${me?css("--brown"):css("--mid")}" stroke="${me?css("--ink"):"none"}" opacity="${me?1:.85}"><title>${E(names[x[2]]||"")}${names[x[2]]?": ":""}pick ${x[0]??"undrafted"}, value ${x[1]}</title></circle>
-      ${(top5.has(x[2]) || me) ? `<text x="${(cx+9).toFixed(1)}" y="${(Y(x[1])+4).toFixed(1)}" style="${me?"font-weight:700;":""}fill:${css(me?"--brown":"--mute")}">${E((names[x[2]]||d.name).split(" ").slice(-1)[0])}</text>` : ""}`; }).join("");
+      ${(top5.has(x[2]) || me) ? `<text x="${(cx+9).toFixed(1)}" y="${(Y(x[1])+4).toFixed(1)}" style="${me?"font-weight:700;":""}fill:${css(me?"--brown":"--mute")}">${E((typeof ppSur === "function" ? ppSur((names[x[2]]||d.name)) : (names[x[2]]||d.name).split(" ").slice(-1)[0]))}</text>` : ""}`; }).join("");
   const xt = [1,10,20,30,40,50,60].map(p=>`<text x="${X(p)}" y="${H-12}" text-anchor="middle">${p}</text>`).join("") + `<text x="${X(null)}" y="${H-12}" text-anchor="middle">undrafted</text>`;
   const yt = [0, .5, 1].map(f=>`<line x1="${L}" x2="${W-R+20}" y1="${Y(f*vmax)}" y2="${Y(f*vmax)}" stroke="${css("--grid")}"/><text x="${L-6}" y="${Y(f*vmax)+4}" text-anchor="end">${Math.round(f*vmax)}</text>`).join("");
   const rows = (r.class||[]).slice(0,10).concat(r.rank>10 ? (r.class||[]).filter(c=>c[0]===d.id) : []).map(c => `<tr${c[0]===d.id?' style="font-weight:700"':""}><td>${c[4]}</td><td class="l">${c[5]&&c[0]!==d.id?`<a href="#p-${c[0]}" style="color:inherit">${E(c[1])}</a>`:E(c[1])}</td><td>${c[2]??"UD"}</td><td>${c[3]}</td></tr>`).join("");
@@ -615,7 +624,7 @@ function modLineups(d){
   const rows = L.units.map(u => { const [nm, ids, poss, net, lo, hi] = u;
     const mates = nm.map((n,i)=>META.players.some(p=>p.id===ids[i])?`<a href="#p-${ids[i]}" style="color:inherit">${E(n)}</a>`:E(n)).join(", ");
     const svg = `<svg viewBox="0 0 ${Wd} 22" style="width:100%;max-width:${Wd}px;height:22px" aria-hidden="true"><line x1="${X(0)}" x2="${X(0)}" y1="2" y2="20" stroke="${css("--mute")}" stroke-dasharray="2 2"/>${lo!=null?`<line x1="${X(lo)}" x2="${X(hi)}" y1="11" y2="11" stroke="${css("--ink")}" stroke-width="1.5"/>`:""}<circle cx="${X(net)}" cy="11" r="5" fill="${lo!=null&&lo<=0&&hi>=0?css("--bg"):dcol(net,15)}" stroke="${css("--ink")}"/></svg>`;
-    return `<tr><td class="l" style="white-space:normal;min-width:200px">${E(d.name.split(" ").slice(-1)[0])} + ${mates}</td><td>${poss.toLocaleString()}</td><td><b>${net>0?"+":""}${net.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo!=null?`${lo.toFixed(1)} to ${hi.toFixed(1)}`:""}</div></td><td style="min-width:150px">${svg}</td></tr>`; }).join("");
+    return `<tr><td class="l" style="white-space:normal;min-width:200px">${E((typeof ppSur === "function" ? ppSur(d.name) : d.name.split(" ").slice(-1)[0]))} + ${mates}</td><td>${poss.toLocaleString()}</td><td><b>${net>0?"+":""}${net.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo!=null?`${lo.toFixed(1)} to ${hi.toFixed(1)}`:""}</div></td><td style="min-width:150px">${svg}</td></tr>`; }).join("");
   return `<section class="mod"><div class="mhead"><h2>His most-used lineups, 2025-26</h2></div>
   <p class="lede">The five-man units he played in most (60+ possessions each)${L.share!=null?`, covering ${Math.round(100*L.share)}% of his ${L.poss.toLocaleString()} possessions`:""}. Net points per 100 with an 80% range from resampling the unit's games; an open dot means the range crosses zero. Unit samples are small, so the ranges are wide.</p>
   <div class="tbl"><table><thead><tr><th class="l">Unit</th><th>Possessions</th><th>Net / 100</th><th>−40 to +40</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
@@ -814,7 +823,7 @@ function modPasses(d){
   return `<section class="mod"><div class="mhead"><h2>Who feeds him, whom he feeds, 2025-26<span class="new">rare view</span></h2></div>
   <p class="lede">NBA.com pass tracking. Left: teammates who pass to him most (blue). Right: teammates he passes to most (red). Line width = passes; assists are the passes that led straight to a basket.${role.top_feeder_share!=null?` ${Math.round(100*role.top_feeder_share)}% of the passes he receives come from one teammate.`:""}</p>
   <div style="overflow-x:auto"><svg class="chart" viewBox="0 0 ${W} ${H}" style="min-width:560px">${side(p.from||[], true)}${side(p.to||[], false)}
-  <circle cx="${cx}" cy="${cy}" r="42" fill="${css("--panel")}" stroke="${css("--ink")}"/><text class="lab" x="${cx}" y="${cy+4}" text-anchor="middle" style="font-weight:700">${E(d.name.split(" ").slice(-1)[0])}</text></svg></div></section>`;
+  <circle cx="${cx}" cy="${cy}" r="42" fill="${css("--panel")}" stroke="${css("--ink")}"/><text class="lab" x="${cx}" y="${cy+4}" text-anchor="middle" style="font-weight:700">${E((typeof ppSur === "function" ? ppSur(d.name) : d.name.split(" ").slice(-1)[0]))}</text></svg></div></section>`;
 }
 
 /* ---------- consistency + signature games ---------- */

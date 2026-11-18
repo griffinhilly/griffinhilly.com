@@ -15,6 +15,30 @@
 // Stat chips (H3; R1 layout): when mods/statdist.js is loaded, each own-side stat step shows its chips (his Basketball-Reference
 // stat + league percentile, linking to #s-<stat>-<year>-p<id>) to the left of its bar, stacked when a row has two; cross-side
 // rows show none. A control sits above the columns; players without stat steps get a strip.
+// BD_SHORT (DESIGNP 2026-11-17; Griffin: "show less by default, but let people dig in"): the short default. Layer 2 shows two
+// lines per side instead of seven or eight: "Defence -> offence" (on offence: what his steals, blocks, defensive rebounds and fouls
+// add beyond his offensive box score) or "Offence -> defence" (on defence: scoring, shooting, assists, offensive rebounds,
+// turnovers), and "Minutes, height and age" (minutes and games, height, age, the model's starting value). Each has a (?) that
+// opens the stat-by-stat detail in plain words with the sign spelled out ("Players who take more shots than their defensive
+// stats suggest also tend to defend worse than their defensive box score shows. He takes more shots than his defensive stats
+// suggest: -0.8"); the pattern's direction is read from the build's own pattern line, his side of it from the sign of his part.
+// Height and age are split when the data carry "x" (pp_sipm_breakdown.py BD_SPLIT). The long lede and "How to read this" move
+// behind a (?) next to the heading. Needs mods/gloss.js (ppQ); without it, or BD_SHORT false, the module is as before.
+const BD_SHORT = true;
+const BD_ACT = {stl: ["get more steals", "gets more steals", "gets fewer steals"], blk: ["block more shots", "blocks more shots", "blocks fewer shots"],
+  dreb: ["grab more defensive rebounds", "grabs more defensive rebounds", "grabs fewer defensive rebounds"], fouls: ["commit more fouls", "commits more fouls", "commits fewer fouls"],
+  scoring: ["take more shots", "takes more shots", "takes fewer shots"], efficiency: ["shoot more efficiently", "shoots more efficiently", "shoots less efficiently"],
+  passing: ["get more assists", "gets more assists", "gets fewer assists"], oreb: ["grab more offensive rebounds", "grabs more offensive rebounds", "grabs fewer offensive rebounds"],
+  turnovers: ["commit more turnovers", "commits more turnovers", "commits fewer turnovers"], minutes: ["play more minutes", "plays more minutes", "plays fewer minutes"]};
+const BDCSS2 = `
+#m-sipmbd .bdr .bdl .ppq{margin-left:5px}
+#m-sipmbd .bdr.bdc .bdl{overflow:visible;white-space:normal;line-height:1.25}
+#m-sipmbd .bdr .bdst2 .bdst{grid-area:auto;margin:0;display:flex;flex-direction:column;gap:2px}
+#m-sipmbd .ppqb{margin:4px 0 10px}
+#m-sipmbd .ppqb .num{font:500 13px var(--mono);white-space:nowrap}
+#m-sipmbd .bdg .ppq{margin-left:6px}
+#m-sipmbd .lede .ppq{vertical-align:1px}
+`;
 const BDCSS = `
 #m-sipmbd .bdcols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 36px;margin-top:6px}
 @media (max-width:1080px){#m-sipmbd .bdcols{grid-template-columns:minmax(0,1fr)}}
@@ -85,6 +109,7 @@ function modBreakdown(d){
     return head + `<p class="lede">SiPM has no rating for ${E(d.name)} yet: he has no recent NBA rating and no draft-based estimate, so there is nothing to break down.</p>${strip ? sdControl(d, true) + strip : ""}</section>`;
   }
   const groups = M.groups[B.v] || [];
+  const SHORT = BD_SHORT && typeof ppQ === "function" && B.v === "sipm";
   const side = {o: B.o || [], d: B.d || []}, pub = {o: s.r_proj_o, d: s.r_proj_d};
   const SW = {o: "offence", d: "defence"};
   const AT = M.attribution || null, ADJ = {o: "offensive", d: "defensive"};
@@ -105,6 +130,45 @@ function modBreakdown(d){
   const X = t => (100 * (t - lo) / (hi - lo)).toFixed(2);
   const zero = `<b style="left:${X(0)}%"></b>`;
   const bar = (a, b, col) => `<i style="left:${X(Math.min(a, b))}%;width:${(100 * Math.abs(b - a) / (hi - lo)).toFixed(2)}%;background:${col}"></i>`;
+  // BD_SHORT: layer 2 as two lines with (?) detail (see the note at the top of this file)
+  const bdShortBeyond = (k, idx, gsum, keys, R, cross) => {
+    const SW = {o: "offence", d: "defence"}[k], OWNW = {o: "offensive", d: "defensive"}[k];
+    const dirOf = key => /underperform/.test((R[key] || [])[1] || "") ? -1 : 1;
+    const eff = d => k === "o" ? (d > 0 ? "help the offence in ways their offensive box score misses" : "hurt the offence in ways their offensive box score misses")
+      : (d > 0 ? "defend better than their defensive box score shows" : "defend worse than their defensive box score shows");
+    const sent = (key, t, v, basis) => {   // the pattern, then where he sits on it, then his number
+      const a = BD_ACT[key], d = dirOf(key), his = Math.sign(v) * d;
+      return `Players who ${a[0]} than their ${basis} suggest${basis === "box score" ? "s" : ""} also tend to ${eff(d)}. `
+        + (t === 0 ? `For him this rounds to 0.0.` : `He ${his > 0 ? a[1] : a[2]} than his ${basis} suggest${basis === "box score" ? "s" : ""}: <span class="num">${bdFmt(t)}</span>.`);
+    };
+    const line = (label, qid, ii, body, chips, tip) => {
+      const a = cum[k][ii[0]][0], b = cum[k][ii[ii.length - 1]][1], t = ii.reduce((s, i) => s + disp[k][i], 0);
+      return `<div class="bdr${chips ? "" : " nc"} bdc" data-k="${qid}"><span class="bdl" title="${E(tip || "")}">${label}${ppQ(qid, "What makes up this line")}</span>${chips ? `<span class="bdst bdst2">${chips}</span>` : '<span class="bdst0"></span>'}<span class="bdt">${zero}${t ? bar(a, b, t > 0 ? "var(--hot)" : "var(--cold)") : ""}</span><span class="bdv">${bdFmt(t)}</span></div>${ppQBody(qid, body)}`;
+    };
+    const vOf = key => { const i = keys.indexOf(key); return i < 0 ? null : [disp[k][i], side[k][i][1]]; };
+    const ci = idx.filter(i => cross.has(keys[i])), oi = idx.filter(i => !cross.has(keys[i]));
+    let h = `<div class="bdg" data-g="beyond"><span>Patterns beyond the box${ppQ(`bdq-${k}-bey`, "What patterns beyond the box are")}</span><span class="bdgt">${bdFmt(gsum)}</span></div>${ppQBody(`bdq-${k}-bey`, `<p>${beyondNote(k)}</p>`)}`;
+    if (ci.length) {
+      const lab = k === "o" ? "Defence → offence" : "Offence → defence";
+      const intro = k === "o" ? `What his defensive stats say about his offence, beyond his offensive box score. A plus means his defensive stats go with better offence than his offensive box shows.`
+        : `What his offensive stats say about his defence, beyond his defensive box score. A minus means his offensive load goes with worse defence than his defensive box shows.`;
+      h += line(lab, `bdq-${k}-x`, ci, `<p>${intro}</p>` + ci.map(i => `<p><b>${E((R[keys[i]] || [keys[i]])[0])}.</b> ${sent(keys[i], disp[k][i], side[k][i][1], `${OWNW} stats`)}</p>`).join(""), "", intro);
+    }
+    if (oi.length) {
+      const ps = [], x = (B.x || {})[k], sz = vOf("size"), mi = vOf("minutes"), co = vOf("const");
+      if (sz) {
+        if (x) { const tt = bdTenths(x, sz[0] / 10), dH = /are shorter/.test((R.size || [])[1] || "") ? -1 : 1, his = Math.sign(x[0]) * dH;
+          ps.push(`<p><b>Height.</b> ${dH > 0 ? "Taller" : "Shorter"} players tend to do better on ${SW} than their box score shows. ${tt[0] === 0 ? "For him this rounds to 0.0." : `He is ${his > 0 ? "taller" : "shorter"} than his stats would suggest: <span class="num">${bdFmt(tt[0])}</span>.`}</p>`);
+          ps.push(`<p><b>Age.</b> How players of his age, with the same box score, tend to do on ${SW}: <span class="num">${bdFmt(tt[1])}</span>.</p>`); }
+        else ps.push(`<p><b>Height and age.</b> ${E((R.size || [])[1] || "")} <span class="num">${bdFmt(sz[0])}</span>.</p>`);
+      }
+      if (mi) ps.push(`<p><b>Minutes and games.</b> ${sent("minutes", mi[0], mi[1], "box score")}</p>`);
+      if (co) ps.push(`<p><b>Starting value.</b> The model's fixed starting value, the same for every player: <span class="num">${bdFmt(co[0])}</span>.</p>`);
+      const rem = vOf("remainder"); if (rem) ps.push(`<p><b>Model remainder.</b> ${E((R.remainder || [])[1] || "")} <span class="num">${bdFmt(rem[0])}</span>.</p>`);
+      h += line("Minutes, height and age", `bdq-${k}-h`, oi, ps.join(""), oi.map(i => sdRow(keys[i], k)).join(""), `What his minutes, height and age add on ${SW} beyond his box score, once his stats are counted`);   // his MPG and height chips
+    }
+    return h;
+  };
   const chart = (k, title) => {
     const keys = side[k].map(x => x[0]), R = bdRowsOf(M, k), cross = new Set((M.cross || {})[k] || []), sub = (M.sub || {})[k] || {};
     let h = `<div class="bdside" data-side="${k}"><h3>${title} <span class="num">${sgn(pub[k])}</span></h3>`;
@@ -112,6 +176,7 @@ function modBreakdown(d){
       const idx = bdGKeys(g, k).map(key => keys.indexOf(key)).filter(i => i >= 0);
       if (!idx.length) continue;
       const gsum = idx.reduce((a, i) => a + disp[k][i], 0);
+      if (SHORT && g[0] === "beyond") { h += bdShortBeyond(k, idx, gsum, keys, R, cross); continue; }
       h += `<div class="bdg" data-g="${E(g[0])}"><span>${E(bdGTitle(g, k))}</span><span class="bdgt">${bdFmt(gsum)}</span></div>`;
       if (g[0] === "beyond") h += `<p class="bdgn">${beyondNote(k)}</p>`;
       for (const i of idx) {
@@ -187,9 +252,14 @@ function modBreakdown(d){
     how = dl + `<p class="note">${B.v === "sipm_gap" ? `When a player misses a season, SiPM keeps his last rating and moves it forward with a model fitted on past players who returned after time away (it accounts for his age and the seasons missed). His box-score games this season then move it.`
       : `Rookies have no NBA lineup data, so SiPM starts them from a rookie-season estimate: past rookies' first-season level, predicted from pre-NBA stats (when on file), draft slot and age. His box-score games this season then move it.`}</p>`;
   }
+  const howRead = `<b style="color:var(--ink)">How to read this:</b> start at 0, an average NBA player. Each bar adds (warm colour) or takes away (blue) points per 100 possessions, starting where the bar above it ended. Each layer's heading shows what that layer adds up to. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.`;
+  if (SHORT) return head + `<style>${BDCSS2}</style><p class="lede">SiPM rates ${E(nm)} <b style="color:var(--ink)">${sgn(net)}</b>: ${what}. The bars build that number step by step from 0, an average player.${ppQ("bdq-how", "How SiPM builds the rating and how to read the bars")}</p>
+  ${ppQBody("bdq-how", `<p>${lede}</p><p>${howRead}</p>`)}<div class="bdsum">${sum}</div>
+  ${sdOn ? sdControl(d, false) : ""}<div class="bdcols">${chart("o", "Offence")}${chart("d", "Defence")}</div>
+  <details><summary>What each step means</summary>${how}</details></section>`;
   return head + `<p class="lede">${lede}</p>
   <div class="bdsum">${sum}</div>
-  <p class="note"><b style="color:var(--ink)">How to read this:</b> start at 0, an average NBA player. Each bar adds (warm colour) or takes away (blue) points per 100 possessions, starting where the bar above it ended. Each layer's heading shows what that layer adds up to. The bottom bar is where he lands: the same rating as at the top of the page. Steps are rounded to 0.1 so that they add up.</p>
+  <p class="note">${howRead}</p>
   ${sdOn ? (B.v === "sipm" ? sdControl(d, false) : "") : ""}<div class="bdcols">${chart("o", "Offence")}${chart("d", "Defence")}</div>
   ${sdOn && B.v !== "sipm" ? (s => s ? sdControl(d, true) + s : "")(sdStrip(d)) : ""}
   <details><summary>What each step means</summary>${how}</details></section>`;

@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded',function(){
  $('#f-pos').addEventListener('change',function(e){st.pos=e.target.value;render()});
  $('#f-amin').addEventListener('input',function(e){st.amin=e.target.value;render()});
  $('#f-amax').addEventListener('input',function(e){st.amax=e.target.value;render()});
+ var fu=$('#f-unit');if(fu){fu.value=st.unit;if(!H.has_pg)fu.querySelector('[value=pg]').disabled=true;fu.addEventListener('change',function(e){st.unit=e.target.value;render()})}
  $('#f-rook').addEventListener('change',function(e){st.rook=e.target.checked;render()});
  $('#o-split').addEventListener('change',function(e){st.split=e.target.checked;render()});
  var op=$('#o-parts');if(op)op.addEventListener('change',function(e){st.parts=e.target.checked;render()});

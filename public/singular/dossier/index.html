@@ -4,6 +4,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="Player Dossier: every current NBA player's impact, stats, shot chart, comparisons and tested findings, from Singular.">
 <title>Player Dossier | Singular</title>
+<script>/* DESIGNP 2026-11-17 (mods/header.js HDR_V2): the hub's stored light / dark choice, applied before the page paints */(function(on){if(!on)return;try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}})(/*HDR_V2*/true)</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -128,6 +129,9 @@ footer{padding-top:24px;font-size:13px;color:var(--mute)}
 <script src="mods/statdist.js"></script>
 <script src="mods/asplayed.js"></script>
 <script src="mods/dossierfirst.js"></script>
+<script src="mods/gloss.js"></script>
+<script src="mods/header.js"></script>
+<script src="mods/sweep.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -509,7 +513,7 @@ function modDraft(d){
   const top5 = new Set((r.class||[]).slice(0,5).map(c=>c[0]));
   const dots = r.dots.slice().reverse().map(x => { const me = x[2]===d.id, cx = X(x[0]) + (x[0]==null ? ((x[2]%17)-8) : 0);
     return `<circle cx="${cx.toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="${me?7:4}" fill="${me?css("--brown"):css("--mid")}" stroke="${me?css("--ink"):"none"}" opacity="${me?1:.85}"><title>${E(names[x[2]]||"")}${names[x[2]]?": ":""}pick ${x[0]??"undrafted"}, value ${x[1]}</title></circle>
-      ${(top5.has(x[2]) || me) ? `<text x="${(cx+9).toFixed(1)}" y="${(Y(x[1])+4).toFixed(1)}" style="${me?"font-weight:700;":""}fill:${css(me?"--brown":"--mute")}">${E((names[x[2]]||d.name).split(" ").slice(-1)[0])}</text>` : ""}`; }).join("");
+      ${(top5.has(x[2]) || me) ? `<text x="${(cx+9).toFixed(1)}" y="${(Y(x[1])+4).toFixed(1)}" style="${me?"font-weight:700;":""}fill:${css(me?"--brown":"--mute")}">${E((typeof ppSur === "function" ? ppSur((names[x[2]]||d.name)) : (names[x[2]]||d.name).split(" ").slice(-1)[0]))}</text>` : ""}`; }).join("");
   const xt = [1,10,20,30,40,50,60].map(p=>`<text x="${X(p)}" y="${H-12}" text-anchor="middle">${p}</text>`).join("") + `<text x="${X(null)}" y="${H-12}" text-anchor="middle">undrafted</text>`;
   const yt = [0, .5, 1].map(f=>`<line x1="${L}" x2="${W-R+20}" y1="${Y(f*vmax)}" y2="${Y(f*vmax)}" stroke="${css("--grid")}"/><text x="${L-6}" y="${Y(f*vmax)+4}" text-anchor="end">${Math.round(f*vmax)}</text>`).join("");
   const rows = (r.class||[]).slice(0,10).concat(r.rank>10 ? (r.class||[]).filter(c=>c[0]===d.id) : []).map(c => `<tr${c[0]===d.id?' style="font-weight:700"':""}><td>${c[4]}</td><td class="l">${c[5]&&c[0]!==d.id?`<a href="#p-${c[0]}" style="color:inherit">${E(c[1])}</a>`:E(c[1])}</td><td>${c[2]??"UD"}</td><td>${c[3]}</td></tr>`).join("");
@@ -600,7 +604,7 @@ function modLineups(d){
   const rows = L.units.map(u => { const [nm, ids, poss, net, lo, hi] = u;
     const mates = nm.map((n,i)=>META.players.some(p=>p.id===ids[i])?`<a href="#p-${ids[i]}" style="color:inherit">${E(n)}</a>`:E(n)).join(", ");
     const svg = `<svg viewBox="0 0 ${Wd} 22" style="width:100%;max-width:${Wd}px;height:22px" aria-hidden="true"><line x1="${X(0)}" x2="${X(0)}" y1="2" y2="20" stroke="${css("--mute")}" stroke-dasharray="2 2"/>${lo!=null?`<line x1="${X(lo)}" x2="${X(hi)}" y1="11" y2="11" stroke="${css("--ink")}" stroke-width="1.5"/>`:""}<circle cx="${X(net)}" cy="11" r="5" fill="${lo!=null&&lo<=0&&hi>=0?css("--bg"):dcol(net,15)}" stroke="${css("--ink")}"/></svg>`;
-    return `<tr><td class="l" style="white-space:normal;min-width:200px">${E(d.name.split(" ").slice(-1)[0])} + ${mates}</td><td>${poss.toLocaleString()}</td><td><b>${net>0?"+":""}${net.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo!=null?`${lo.toFixed(1)} to ${hi.toFixed(1)}`:""}</div></td><td style="min-width:150px">${svg}</td></tr>`; }).join("");
+    return `<tr><td class="l" style="white-space:normal;min-width:200px">${E((typeof ppSur === "function" ? ppSur(d.name) : d.name.split(" ").slice(-1)[0]))} + ${mates}</td><td>${poss.toLocaleString()}</td><td><b>${net>0?"+":""}${net.toFixed(1)}</b><div class="mute" style="font-size:12px">${lo!=null?`${lo.toFixed(1)} to ${hi.toFixed(1)}`:""}</div></td><td style="min-width:150px">${svg}</td></tr>`; }).join("");
   return `<section class="mod"><div class="mhead"><h2>His most-used lineups, 2025-26</h2></div>
   <p class="lede">The five-man units he played in most (60+ possessions each)${L.share!=null?`, covering ${Math.round(100*L.share)}% of his ${L.poss.toLocaleString()} possessions`:""}. Net points per 100 with an 80% range from resampling the unit's games; an open dot means the range crosses zero. Unit samples are small, so the ranges are wide.</p>
   <div class="tbl"><table><thead><tr><th class="l">Unit</th><th>Possessions</th><th>Net / 100</th><th>−40 to +40</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
@@ -799,7 +803,7 @@ function modPasses(d){
   return `<section class="mod"><div class="mhead"><h2>Who feeds him, whom he feeds, 2025-26<span class="new">rare view</span></h2></div>
   <p class="lede">NBA.com pass tracking. Left: teammates who pass to him most (blue). Right: teammates he passes to most (red). Line width = passes; assists are the passes that led straight to a basket.${role.top_feeder_share!=null?` ${Math.round(100*role.top_feeder_share)}% of the passes he receives come from one teammate.`:""}</p>
   <div style="overflow-x:auto"><svg class="chart" viewBox="0 0 ${W} ${H}" style="min-width:560px">${side(p.from||[], true)}${side(p.to||[], false)}
-  <circle cx="${cx}" cy="${cy}" r="42" fill="${css("--panel")}" stroke="${css("--ink")}"/><text class="lab" x="${cx}" y="${cy+4}" text-anchor="middle" style="font-weight:700">${E(d.name.split(" ").slice(-1)[0])}</text></svg></div></section>`;
+  <circle cx="${cx}" cy="${cy}" r="42" fill="${css("--panel")}" stroke="${css("--ink")}"/><text class="lab" x="${cx}" y="${cy+4}" text-anchor="middle" style="font-weight:700">${E((typeof ppSur === "function" ? ppSur(d.name) : d.name.split(" ").slice(-1)[0]))}</text></svg></div></section>`;
 }
 
 /* ---------- consistency + signature games ---------- */
