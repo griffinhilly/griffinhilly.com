@@ -98,7 +98,7 @@ export const explorations: Exploration[] = [
 		title: 'Singular',
 		description:
 			'A player-evaluation model powerful enough to compete with the best public models, and flexible enough to answer any question a front office wants to know.',
-		href: '/singular',
+		href: 'https://nbasingularity.com/',
 		thumb: singularTall,
 		date: '2026-10',
 	},

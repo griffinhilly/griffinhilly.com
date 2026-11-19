@@ -1,9 +1,44 @@
 {
   "redirects": [
-    { "source": "/ai-safety-takes", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
-    { "source": "/ai-safety-takes/", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
-    { "source": "/explorations/ai-safety", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
-    { "source": "/explorations/ai-safety/", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true },
-    { "source": "/explorations/ai-safety/index.html", "destination": "https://aisafetycompendium.com/compendium/", "permanent": true }
+    {
+      "source": "/ai-safety-takes",
+      "destination": "https://aisafetycompendium.com/compendium/",
+      "permanent": true
+    },
+    {
+      "source": "/ai-safety-takes/",
+      "destination": "https://aisafetycompendium.com/compendium/",
+      "permanent": true
+    },
+    {
+      "source": "/explorations/ai-safety",
+      "destination": "https://aisafetycompendium.com/compendium/",
+      "permanent": true
+    },
+    {
+      "source": "/explorations/ai-safety/",
+      "destination": "https://aisafetycompendium.com/compendium/",
+      "permanent": true
+    },
+    {
+      "source": "/explorations/ai-safety/index.html",
+      "destination": "https://aisafetycompendium.com/compendium/",
+      "permanent": true
+    },
+    {
+      "source": "/singular",
+      "destination": "https://nbasingularity.com/",
+      "permanent": true
+    },
+    {
+      "source": "/singular/",
+      "destination": "https://nbasingularity.com/",
+      "permanent": true
+    },
+    {
+      "source": "/singular/:path(.*)",
+      "destination": "https://nbasingularity.com/:path",
+      "permanent": true
+    }
   ]
 }
