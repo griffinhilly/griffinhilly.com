@@ -37,3 +37,6 @@ src/pages/ledger-prototype.astro
 
 # Griffin prose drafts for /singular (local only)
 drafts/
+
+# Singular moved to nbasingularity.com (2026-11-19); local staging folder only
+/public/singular/
